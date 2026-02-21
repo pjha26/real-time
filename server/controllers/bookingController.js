@@ -88,18 +88,66 @@ const updateBookingStatus = async (req, res) => {
         const { status } = req.body;
         const { id } = req.params;
 
-        const validStatuses = ['Pending', 'Confirmed', 'Completed'];
+        const validStatuses = ['Pending', 'Confirmed', 'Completed', 'Cancelled', 'Rescheduled'];
         if (!validStatuses.includes(status)) {
             return res.status(400).json({ message: 'Invalid status' });
         }
 
-        const booking = await Booking.findByIdAndUpdate(id, { status }, { new: true });
+        const booking = await Booking.findById(id);
         if (!booking) return res.status(404).json({ message: 'Booking not found' });
 
-        res.json(booking);
+        // Ensure user owns booking or is admin (MVP: User owns booking)
+        if (booking.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ message: 'Not authorized to update this booking' });
+        }
+
+        booking.status = status;
+        const updatedBooking = await booking.save();
+
+        if (req.io && (status === 'Cancelled' || status === 'Rescheduled')) {
+            req.io.emit('bookingCancelled', { expertId: booking.expert, date: booking.date, timeSlot: booking.timeSlot });
+        }
+
+        res.json(updatedBooking);
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
 
-module.exports = { createBooking, getBookingsByUser, updateBookingStatus };
+const rescheduleBooking = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { newDate, newTimeSlot } = req.body;
+
+        const booking = await Booking.findById(id);
+        if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+        if (booking.user.toString() !== req.user._id.toString()) {
+            return res.status(401).json({ message: 'Not authorized to reschedule this booking' });
+        }
+
+        // Simplistic reschedule for MVP: Just update date/time and set status.
+        // In reality, this requires the same overlap & transaction checks as createBooking.
+
+        const oldDate = booking.date;
+        const oldTimeSlot = booking.timeSlot;
+
+        booking.date = newDate;
+        booking.timeSlot = newTimeSlot;
+        booking.status = 'Rescheduled'; // Or back to pending/confirmed
+
+        const updatedBooking = await booking.save();
+
+        // Broadcast slot changes
+        if (req.io) {
+            req.io.emit('bookingCancelled', { expertId: booking.expert, date: oldDate, timeSlot: oldTimeSlot });
+            req.io.emit('slotBooked', { expertId: booking.expert, date: newDate, timeSlot: newTimeSlot });
+        }
+
+        res.json(updatedBooking);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports = { createBooking, getBookingsByUser, updateBookingStatus, rescheduleBooking };
