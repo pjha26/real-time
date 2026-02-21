@@ -1,33 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, Loader2, Calendar as CalendarIcon, Clock, User, CheckCircle, Clock3 } from 'lucide-react';
+import { Loader2, Calendar as CalendarIcon, Clock, User, CheckCircle, Clock3 } from 'lucide-react';
+import useAuthStore from '../store/useAuthStore';
+import { Link } from 'react-router-dom';
 
 const MyBookings = () => {
-    const [email, setEmail] = useState('');
-    const [searchedEmail, setSearchedEmail] = useState('');
+    const { user } = useAuthStore();
     const [bookings, setBookings] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const fetchBookings = async (e) => {
-        e.preventDefault();
-        if (!email.trim()) return;
+    useEffect(() => {
+        const fetchBookings = async () => {
+            try {
+                setLoading(true);
+                // GET /api/bookings now uses req.user._id from the token
+                const res = await axios.get(`http://localhost:5000/api/bookings`);
+                setBookings(res.data);
+            } catch (err) {
+                setError(err.response?.data?.message || 'Failed to fetch bookings');
+            } finally {
+                setLoading(false);
+            }
+        };
 
-        setLoading(true);
-        setError(null);
-        setSearchedEmail(email);
-
-        try {
-            const res = await axios.get(`http://localhost:5000/api/bookings`, {
-                params: { email: email.trim() }
-            });
-            setBookings(res.data);
-        } catch (err) {
-            setError(err.response?.data?.message || 'Failed to fetch bookings');
-        } finally {
+        if (user) {
+            fetchBookings();
+        } else {
             setLoading(false);
         }
-    };
+    }, [user]);
 
     const getStatusBadge = (status) => {
         switch (status) {
@@ -37,54 +39,45 @@ const MyBookings = () => {
         }
     };
 
+    if (!user) {
+        return (
+            <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-slate-800 mb-4">Please log in to view your bookings</h2>
+                <Link to="/login" className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700">Log in</Link>
+            </div>
+        );
+    }
+
     return (
         <div className="max-w-4xl mx-auto space-y-8">
             <div className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-slate-100">
-                <div className="text-center max-w-xl mx-auto mb-8">
-                    <h1 className="text-3xl font-bold text-slate-900 mb-4">Find Your Bookings</h1>
-                    <p className="text-slate-600">Enter the email address you used to book your expert sessions to view their current status.</p>
+                <div className="text-center max-w-xl mx-auto">
+                    <h1 className="text-3xl font-bold text-slate-900 mb-2">My Bookings</h1>
+                    <p className="text-slate-600">Review and manage your scheduled expert sessions below.</p>
                 </div>
-
-                <form onSubmit={fetchBookings} className="relative max-w-md mx-auto flex gap-2">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                        <input
-                            type="email"
-                            required
-                            placeholder="name@example.com"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all shadow-sm"
-                        />
-                    </div>
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3.5 rounded-xl font-bold transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center min-w-[120px]"
-                    >
-                        {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Search'}
-                    </button>
-                </form>
             </div>
 
-            {error && (
+            {loading ? (
+                <div className="flex justify-center items-center h-32">
+                    <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
+                </div>
+            ) : error ? (
                 <div className="bg-red-50 text-red-600 p-4 rounded-xl border border-red-100 text-center font-medium">
                     {error}
                 </div>
-            )}
-
-            {searchedEmail && !loading && !error && (
+            ) : (
                 <div className="space-y-4">
                     <h2 className="text-xl font-bold text-slate-800 px-2 flex justify-between items-center">
-                        <span>Results for {searchedEmail}</span>
-                        <span className="text-sm font-medium bg-slate-200 text-slate-700 px-3 py-1 rounded-full">{bookings.length} found</span>
+                        <span>Your Schedule</span>
+                        <span className="text-sm font-medium bg-slate-200 text-slate-700 px-3 py-1 rounded-full">{bookings.length} upcoming</span>
                     </h2>
 
                     {bookings.length === 0 ? (
                         <div className="text-center py-16 bg-white rounded-2xl border border-slate-100 shadow-sm">
                             <CalendarIcon className="w-12 h-12 text-slate-300 mx-auto mb-4" />
                             <h3 className="text-lg font-bold text-slate-700">No bookings found</h3>
-                            <p className="text-slate-500 mt-1">We couldn&apos;t find any bookings associated with this email.</p>
+                            <p className="text-slate-500 mt-2 mb-6">You haven't scheduled any sessions yet.</p>
+                            <Link to="/experts" className="px-6 py-3 bg-indigo-50 text-indigo-600 font-semibold rounded-xl hover:bg-indigo-100">Find an Expert</Link>
                         </div>
                     ) : (
                         <div className="grid gap-4">
@@ -97,7 +90,7 @@ const MyBookings = () => {
                                         </div>
                                         <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                                             <User className="w-5 h-5 text-indigo-500" />
-                                            Session with {booking.expert?.name}
+                                            Session with {booking.expert?.name || 'an Expert'}
                                         </h3>
                                     </div>
 

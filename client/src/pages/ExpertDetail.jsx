@@ -3,11 +3,13 @@ import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { io } from 'socket.io-client';
 import { User, Briefcase, Star, ArrowLeft, Loader2, Calendar as CalendarIcon, Clock, CheckCircle } from 'lucide-react';
+import useAuthStore from '../store/useAuthStore';
 
 const socket = io('http://localhost:5000');
 
 const ExpertDetail = () => {
     const { id } = useParams();
+    const { user } = useAuthStore();
     const [expert, setExpert] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -208,9 +210,9 @@ const ExpertDetail = () => {
                                                 disabled={booked}
                                                 onClick={() => { setSelectedSlot(time); setBookingError(null); }}
                                                 className={`flex items-center justify-center gap-1.5 py-3 rounded-xl border font-medium text-sm transition-all ${booked ? 'bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed opacity-50 relative'
-                                                        : selectedSlot === time
-                                                            ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200 scale-[1.02]'
-                                                            : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-indigo-50'
+                                                    : selectedSlot === time
+                                                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200 scale-[1.02]'
+                                                        : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-indigo-50'
                                                     }`}
                                             >
                                                 {!booked && <Clock className="w-3.5 h-3.5 opacity-70" />}
@@ -233,33 +235,40 @@ const ExpertDetail = () => {
                                         </div>
                                     )}
 
-                                    <form onSubmit={handleBooking} className="space-y-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
-                                                <input required type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all" placeholder="John Doe" />
+                                    {!user ? (
+                                        <div className="text-center p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
+                                            <p className="text-slate-700 font-medium mb-4">You need an account to book sessions with experts.</p>
+                                            <Link to="/login" className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-sm">Log In to Book</Link>
+                                        </div>
+                                    ) : (
+                                        <form onSubmit={handleBooking} className="space-y-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
+                                                    <input required type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all" placeholder="John Doe" />
+                                                </div>
+                                                <div>
+                                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
+                                                    <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all" placeholder="john@example.com" />
+                                                </div>
                                             </div>
                                             <div>
-                                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
-                                                <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all" placeholder="john@example.com" />
+                                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Phone Number</label>
+                                                <input required type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all" placeholder="+1 (555) 000-0000" />
                                             </div>
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Phone Number</label>
-                                            <input required type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all" placeholder="+1 (555) 000-0000" />
-                                        </div>
-                                        <div>
-                                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Additional Notes</label>
-                                            <textarea value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} rows="3" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all resize-none" placeholder="Any topics you'd like to discuss..."></textarea>
-                                        </div>
-                                        <button
-                                            type="submit"
-                                            disabled={bookingLoading}
-                                            className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl mt-4 transition-all shadow-sm shadow-indigo-200 disabled:opacity-70 disabled:cursor-wait flex justify-center items-center"
-                                        >
-                                            {bookingLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : `Confirm Session for ${selectedSlot}`}
-                                        </button>
-                                    </form>
+                                            <div>
+                                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Additional Notes</label>
+                                                <textarea value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} rows="3" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all resize-none" placeholder="Any topics you'd like to discuss..."></textarea>
+                                            </div>
+                                            <button
+                                                type="submit"
+                                                disabled={bookingLoading}
+                                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl mt-4 transition-all shadow-sm shadow-indigo-200 disabled:opacity-70 disabled:cursor-wait flex justify-center items-center"
+                                            >
+                                                {bookingLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : `Confirm Session for ${selectedSlot}`}
+                                            </button>
+                                        </form>
+                                    )}
                                 </div>
                             )}
                         </div>
