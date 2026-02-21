@@ -5,6 +5,7 @@ import ExpertDetail from './pages/ExpertDetail';
 import MyBookings from './pages/MyBookings';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Profile from './pages/Profile';
 import ExpertDashboard from './pages/ExpertDashboard';
 import PublicBookingPage from './pages/PublicBookingPage';
