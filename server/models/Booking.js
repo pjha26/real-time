@@ -11,6 +11,7 @@ const bookingSchema = new mongoose.Schema({
     timeSlot: { type: String, required: true }, // Legacy format HH:mm, or StartTime in new format
     endTime: { type: String }, // Calculated endpoint HH:mm
     notes: { type: String },
+    meetingLink: { type: String }, // Auto-generated Zoom/Meet link
     status: { type: String, enum: ['Pending', 'Confirmed', 'Completed', 'Cancelled', 'Rescheduled'], default: 'Pending' }
 }, { timestamps: true });
 

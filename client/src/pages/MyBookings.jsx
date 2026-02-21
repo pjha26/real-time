@@ -148,6 +148,17 @@ const MyBookings = () => {
                                             Add to Calendar
                                         </button>
 
+                                        {booking.meetingLink && booking.status !== 'Cancelled' && (
+                                            <a
+                                                href={booking.meetingLink}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="px-4 py-2 bg-emerald-50 text-emerald-600 border border-emerald-200 text-sm font-bold rounded-xl hover:bg-emerald-100 transition flex items-center gap-2 whitespace-nowrap"
+                                            >
+                                                Join Meeting
+                                            </a>
+                                        )}
+
                                         {booking.status !== 'Cancelled' && booking.status !== 'Completed' && (
                                             <>
                                                 <button
