@@ -33,8 +33,11 @@ app.use((req, res, next) => {
 });
 
 // Import Routes
+const authRoutes = require('./routes/authRoutes');
 const expertRoutes = require('./routes/expertRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
+
+app.use('/api/auth', authRoutes);
 
 app.use('/api/experts', expertRoutes);
 app.use('/api/bookings', bookingRoutes);

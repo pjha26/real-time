@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { createBooking, getBookingsByEmail, updateBookingStatus } = require('../controllers/bookingController');
+const { createBooking, getBookingsByUser, updateBookingStatus } = require('../controllers/bookingController');
+const { protect } = require('../middleware/authMiddleware');
 
-router.post('/', createBooking);
-router.get('/', getBookingsByEmail);
+router.post('/', protect, createBooking);
+router.get('/', protect, getBookingsByUser);
 router.patch('/:id/status', updateBookingStatus);
 
 module.exports = router;

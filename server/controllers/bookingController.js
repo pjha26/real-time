@@ -15,6 +15,7 @@ const createBooking = async (req, res) => {
 
     try {
         const { expertId, email, name, phone, date, timeSlot, notes } = req.body;
+        const userId = req.user._id;
 
         // Check if slot is already booked for this expert
         const queryOpts = session ? { session } : {};
@@ -41,7 +42,7 @@ const createBooking = async (req, res) => {
             return res.status(404).json({ message: 'Expert not found' });
         }
 
-        const newBooking = new Booking({ expert: expertId, email, name, phone, date, timeSlot, notes });
+        const newBooking = new Booking({ user: userId, expert: expertId, email, name, phone, date, timeSlot, notes });
 
         // Save booking
         if (session) {
@@ -67,12 +68,11 @@ const createBooking = async (req, res) => {
     }
 };
 
-const getBookingsByEmail = async (req, res) => {
+const getBookingsByUser = async (req, res) => {
     try {
-        const { email } = req.query;
-        if (!email) return res.status(400).json({ message: 'Email is required' });
+        const userId = req.user._id;
 
-        const bookings = await Booking.find({ email }).populate('expert', 'name category rating').sort({ createdAt: -1 });
+        const bookings = await Booking.find({ user: userId }).populate('expert', 'name category rating').sort({ createdAt: -1 });
         res.json(bookings);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -98,4 +98,4 @@ const updateBookingStatus = async (req, res) => {
     }
 };
 
-module.exports = { createBooking, getBookingsByEmail, updateBookingStatus };
+module.exports = { createBooking, getBookingsByUser, updateBookingStatus };
