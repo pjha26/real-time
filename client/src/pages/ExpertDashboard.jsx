@@ -32,14 +32,14 @@ const ExpertDashboard = () => {
                 }
 
                 // Temporary MVP mapping: fetch expert based on user ID directly
-                const { data: experts } = await axios.get('http://localhost:5000/api/experts?limit=100');
+                const { data: experts } = await axios.get('https://real-time-x3n3.onrender.com/api/experts?limit=100');
                 const matchedExpert = experts.find(e => e.user === user._id || e.email === user.email);
 
                 if (matchedExpert) {
                     setExpertData(matchedExpert);
                     setBufferTime(matchedExpert.bufferTime || 0);
 
-                    const { data } = await axios.get(`http://localhost:5000/api/event-types/expert/${matchedExpert._id}`);
+                    const { data } = await axios.get(`https://real-time-x3n3.onrender.com/api/event-types/expert/${matchedExpert._id}`);
                     setEventTypes(data);
                 }
             } catch (error) {
@@ -58,7 +58,7 @@ const ExpertDashboard = () => {
         e.preventDefault();
         setFormLoading(true);
         try {
-            const { data } = await axios.post('http://localhost:5000/api/event-types', {
+            const { data } = await axios.post('https://real-time-x3n3.onrender.com/api/event-types', {
                 expertId: expertData._id,
                 title, duration, location, description, urlSlug
             }, {
@@ -78,7 +78,7 @@ const ExpertDashboard = () => {
     const handleDelete = async (id) => {
         if (!confirm('Are you sure you want to delete this event type?')) return;
         try {
-            await axios.delete(`http://localhost:5000/api/event-types/${id}`, {
+            await axios.delete(`https://real-time-x3n3.onrender.com/api/event-types/${id}`, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             setEventTypes(eventTypes.filter(et => et._id !== id));

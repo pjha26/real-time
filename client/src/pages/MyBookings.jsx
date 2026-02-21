@@ -21,7 +21,7 @@ const MyBookings = () => {
     const fetchBookings = async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`http://localhost:5000/api/bookings`, {
+            const res = await axios.get(`https://real-time-x3n3.onrender.com/api/bookings`, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             setBookings(res.data);
@@ -34,7 +34,7 @@ const MyBookings = () => {
 
     const handleStatusUpdate = async (id, newStatus) => {
         try {
-            await axios.patch(`http://localhost:5000/api/bookings/${id}/status`, { status: newStatus }, {
+            await axios.patch(`https://real-time-x3n3.onrender.com/api/bookings/${id}/status`, { status: newStatus }, {
                 headers: { Authorization: `Bearer ${user.token}` }
             });
             fetchBookings(); // Refresh list to get updated status
@@ -45,7 +45,7 @@ const MyBookings = () => {
 
     const handleDownloadICS = async (id, expertName) => {
         try {
-            const res = await axios.get(`http://localhost:5000/api/bookings/${id}/calendar`, {
+            const res = await axios.get(`https://real-time-x3n3.onrender.com/api/bookings/${id}/calendar`, {
                 headers: { Authorization: `Bearer ${user.token}` },
                 responseType: 'blob'
             });

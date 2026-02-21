@@ -31,7 +31,7 @@ const PublicBookingPage = () => {
         const fetchDetails = async () => {
             try {
                 // Fetch all experts (MVP workaround instead of strict username lookup)
-                const { data: experts } = await axios.get('http://localhost:5000/api/experts?limit=100');
+                const { data: experts } = await axios.get('https://real-time-x3n3.onrender.com/api/experts?limit=100');
 
                 // Find expert by username OR fallback to matching by the ID string if the username route parameter was an ID
                 const foundExpert = experts.find(e => e.username === username || e._id === username);
@@ -43,7 +43,7 @@ const PublicBookingPage = () => {
                 }
                 setExpert(foundExpert);
 
-                const { data: events } = await axios.get(`http://localhost:5000/api/event-types/expert/${foundExpert._id}`);
+                const { data: events } = await axios.get(`https://real-time-x3n3.onrender.com/api/event-types/expert/${foundExpert._id}`);
                 const foundEvent = events.find(e => e.urlSlug === urlSlug);
 
                 if (!foundEvent) {
@@ -80,7 +80,7 @@ const PublicBookingPage = () => {
 
         setSubmitting(true);
         try {
-            await axios.post('http://localhost:5000/api/bookings', {
+            await axios.post('https://real-time-x3n3.onrender.com/api/bookings', {
                 expertId: expert._id,
                 email,
                 name,

@@ -5,7 +5,7 @@ import { io } from 'socket.io-client';
 import { User, Briefcase, Star, ArrowLeft, Loader2, Calendar as CalendarIcon, Clock, CheckCircle } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore';
 
-const socket = io('http://localhost:5000');
+const socket = io('https://real-time-x3n3.onrender.com');
 
 const ExpertDetail = () => {
     const { id } = useParams();
@@ -29,7 +29,7 @@ const ExpertDetail = () => {
     useEffect(() => {
         const fetchExpert = async () => {
             try {
-                const res = await axios.get(`http://localhost:5000/api/experts/${id}`);
+                const res = await axios.get(`https://real-time-x3n3.onrender.com/api/experts/${id}`);
                 setExpert(res.data);
 
                 // Group slots by date
@@ -86,7 +86,7 @@ const ExpertDetail = () => {
         setBookingLoading(true);
 
         try {
-            await axios.post('http://localhost:5000/api/bookings', {
+            await axios.post('https://real-time-x3n3.onrender.com/api/bookings', {
                 expertId: id,
                 date: selectedDate,
                 timeSlot: selectedSlot,

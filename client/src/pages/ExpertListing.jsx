@@ -21,7 +21,7 @@ const ExpertListing = () => {
         try {
             setLoading(true);
             setError(null);
-            const res = await axios.get(`http://localhost:5000/api/experts`, {
+            const res = await axios.get(`https://real-time-x3n3.onrender.com/api/experts`, {
                 params: { page, limit, search, category }
             });
             setExperts(res.data.experts);

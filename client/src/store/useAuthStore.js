@@ -9,7 +9,7 @@ const useAuthStore = create((set) => ({
     login: async (email, password) => {
         set({ loading: true, error: null });
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/login', { email, password });
+            const { data } = await axios.post('https://real-time-x3n3.onrender.com/api/auth/login', { email, password });
             localStorage.setItem('user', JSON.stringify(data));
             set({ user: data, loading: false });
         } catch (err) {
@@ -20,7 +20,7 @@ const useAuthStore = create((set) => ({
     register: async (name, email, password) => {
         set({ loading: true, error: null });
         try {
-            const { data } = await axios.post('http://localhost:5000/api/auth/register', { name, email, password });
+            const { data } = await axios.post('https://real-time-x3n3.onrender.com/api/auth/register', { name, email, password });
             localStorage.setItem('user', JSON.stringify(data));
             set({ user: data, loading: false });
         } catch (err) {
@@ -28,28 +28,29 @@ const useAuthStore = create((set) => ({
         }
     },
 
-    updateUser: async (name, email) => {
+    updateProfile: async (name, email) => {
         set({ loading: true, error: null });
         try {
-            const { data } = await axios.put('http://localhost:5000/api/auth/profile', { name, email });
+            const { data } = await axios.put('https://real-time-x3n3.onrender.com/api/auth/profile', { name, email }, {
+                headers: { Authorization: `Bearer ${useAuthStore.getState().user.token}` }
+            });
             localStorage.setItem('user', JSON.stringify(data));
             set({ user: data, loading: false });
             return { success: true };
         } catch (err) {
-            set({ error: err.response?.data?.message || 'Update failed', loading: false });
+            set({ error: err.response?.data?.message || 'Profile update failed', loading: false });
             return { success: false, error: err.response?.data?.message };
         }
     },
 
     updatePassword: async (password) => {
-        set({ loading: true, error: null });
         try {
-            await axios.put('http://localhost:5000/api/auth/password', { password });
-            set({ loading: false });
+            await axios.put('https://real-time-x3n3.onrender.com/api/auth/password', { password }, {
+                headers: { Authorization: `Bearer ${useAuthStore.getState().user.token}` }
+            });
             return { success: true };
         } catch (err) {
-            set({ error: err.response?.data?.message || 'Password update failed', loading: false });
-            return { success: false, error: err.response?.data?.message };
+            return { success: false, error: err.response?.data?.message || 'Password update failed' };
         }
     },
 
