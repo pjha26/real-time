@@ -33,7 +33,6 @@ const MyBookings = () => {
     };
 
     const handleStatusUpdate = async (id, newStatus) => {
-        if (!confirm(`Are you sure you want to ${newStatus.toLowerCase()} this booking?`)) return;
         try {
             await axios.patch(`http://localhost:5000/api/bookings/${id}/status`, { status: newStatus }, {
                 headers: { Authorization: `Bearer ${user.token}` }

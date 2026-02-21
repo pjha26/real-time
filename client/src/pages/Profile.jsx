@@ -4,7 +4,7 @@ import useAuthStore from '../store/useAuthStore';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Profile = () => {
-    const { user, logout, updateUser, updatePassword } = useAuthStore();
+    const { user, logout, updateUser, updatePassword, becomeExpert } = useAuthStore();
     const navigate = useNavigate();
 
     const [activeTab, setActiveTab] = useState('overview');
@@ -44,6 +44,16 @@ const Profile = () => {
             setUpdateMsg('Password updated successfully!');
             setPassword('');
         } else setErrorMsg(res.error || 'Failed to update password');
+    };
+
+    const handleBecomeExpert = async () => {
+        setUpdateMsg(''); setErrorMsg('');
+        const res = await becomeExpert();
+        if (res.success) {
+            setUpdateMsg('You are now an Expert! Access the dashboard to set up your profile.');
+        } else {
+            setErrorMsg(res.error || 'Failed to upgrade role');
+        }
     };
 
     return (
@@ -100,6 +110,19 @@ const Profile = () => {
                                 </div>
                                 <button type="submit" className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition">Update Profile</button>
                             </form>
+
+                            {!user?.isExpert && (
+                                <div className="mt-12 pt-8 border-t border-slate-100 max-w-md">
+                                    <h3 className="text-xl font-bold text-slate-900 mb-2">Upgrade to Expert</h3>
+                                    <p className="text-slate-600 mb-4 text-sm">Unlock the ability to create event types, set your availability, and let clients book sessions with you.</p>
+                                    <button
+                                        onClick={handleBecomeExpert}
+                                        className="w-full px-6 py-3 bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold rounded-xl hover:bg-emerald-100 transition"
+                                    >
+                                        Become an Expert
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     )}
 

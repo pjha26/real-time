@@ -58,6 +58,23 @@ const useAuthStore = create((set) => ({
         set({ user: null });
     },
 
+    becomeExpert: async () => {
+        set({ loading: true, error: null });
+        try {
+            const { user } = useAuthStore.getState();
+            const { data } = await axios.post('http://localhost:5000/api/auth/become-expert', {}, {
+                headers: { Authorization: `Bearer ${user.token}` }
+            });
+            const updatedUser = { ...user, isExpert: true };
+            localStorage.setItem('user', JSON.stringify(updatedUser));
+            set({ user: updatedUser, loading: false });
+            return { success: true };
+        } catch (err) {
+            set({ error: err.response?.data?.message || 'Upgrade failed', loading: false });
+            return { success: false, error: err.response?.data?.message };
+        }
+    },
+
     clearError: () => set({ error: null })
 }));
 

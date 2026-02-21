@@ -103,4 +103,35 @@ const updateUserPassword = async (req, res) => {
     }
 };
 
-module.exports = { registerUser, loginUser, getMe, updateUserProfile, updateUserPassword };
+const becomeExpert = async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id);
+
+        if (user) {
+            user.isExpert = true;
+            await user.save();
+
+            // create expert profile if not exists
+            const Expert = require('../models/Expert'); // late require to avoid circular dependency issues if any
+            const existingExpert = await Expert.findOne({ user: user._id });
+            if (!existingExpert) {
+                await Expert.create({
+                    user: user._id,
+                    name: user.name,
+                    email: user.email,
+                    category: 'Uncategorized', // default
+                    bio: 'New expert on the platform',
+                    username: user.name.toLowerCase().replace(/\s+/g, '') + Math.floor(Math.random() * 1000)
+                });
+            }
+
+            res.json({ message: 'Successfully upgraded to Expert role', isExpert: true });
+        } else {
+            res.status(404).json({ message: 'User not found' });
+        }
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+module.exports = { registerUser, loginUser, getMe, updateUserProfile, updateUserPassword, becomeExpert };

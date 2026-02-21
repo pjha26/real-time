@@ -25,10 +25,15 @@ const ExpertDashboard = () => {
         // Fetch expert ID from user email mapping (temporary MVP workaround)
         const initDashboard = async () => {
             try {
-                // In full implementation, User holds an expert reference. For MVP, we search experts list for matching email/name.
-                // Assuming we get the expert ID directly or create a quick mapping:
+                // Require isExpert flag
+                if (!user.isExpert) {
+                    setLoading(false);
+                    return;
+                }
+
+                // Temporary MVP mapping: fetch expert based on user ID directly
                 const { data: experts } = await axios.get('http://localhost:5000/api/experts?limit=100');
-                const matchedExpert = experts.find(e => e.name === user.name) || experts[0]; // Fallback to first expert for demo
+                const matchedExpert = experts.find(e => e.user === user._id || e.email === user.email);
 
                 if (matchedExpert) {
                     setExpertData(matchedExpert);
@@ -90,8 +95,14 @@ const ExpertDashboard = () => {
         return <div className="flex justify-center py-20"><Loader2 className="w-10 h-10 animate-spin text-indigo-500" /></div>;
     }
 
-    if (!expertData) {
-        return <div className="text-center py-20 text-slate-500">You must be logged in as an Expert to view this dashboard.</div>;
+    if (!user?.isExpert || !expertData) {
+        return (
+            <div className="text-center py-20">
+                <h2 className="text-2xl font-bold text-slate-800 mb-4">Expert Dashboard</h2>
+                <p className="text-slate-500 mb-8">You must upgrade your account to an Expert to access the dashboard and manage your bookings.</p>
+                <Link to="/profile" className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-sm hover:bg-indigo-700 transition">Go to Profile</Link>
+            </div>
+        );
     }
 
     const publicUrl = `http://localhost:5173/${expertData.username || `expert/${expertData._id}`}`;
