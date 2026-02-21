@@ -58,6 +58,9 @@ const Profile = () => {
                     <button onClick={() => setActiveTab('security')} className={`text-left px-4 py-3 rounded-xl font-semibold transition-colors flex items-center gap-3 ${activeTab === 'security' ? 'bg-indigo-50 text-indigo-600' : 'text-slate-600 hover:bg-slate-50'}`}>
                         <Lock className="w-5 h-5" /> Security
                     </button>
+                    <button onClick={() => navigate('/expert-dashboard')} className={`text-left px-4 py-3 rounded-xl font-semibold transition-colors flex items-center gap-3 text-slate-600 hover:bg-slate-50`}>
+                        <Calendar className="w-5 h-5" /> Expert Dashboard
+                    </button>
                     <button onClick={() => navigate('/my-bookings')} className={`text-left px-4 py-3 rounded-xl font-semibold transition-colors flex items-center gap-3 text-slate-600 hover:bg-slate-50`}>
                         <Calendar className="w-5 h-5" /> My Bookings
                     </button>
