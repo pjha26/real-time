@@ -7,6 +7,7 @@ import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import ExpertDashboard from './pages/ExpertDashboard';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/experts" element={<ExpertListing />} />
           <Route path="/expert/:id" element={<ExpertDetail />} />
+          <Route path="/expert-dashboard" element={<ExpertDashboard />} />
           <Route path="/my-bookings" element={<MyBookings />} />
         </Routes>
       </Layout>
