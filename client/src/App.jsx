@@ -6,6 +6,7 @@ import MyBookings from './pages/MyBookings';
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={<Profile />} />
           <Route path="/experts" element={<ExpertListing />} />
           <Route path="/expert/:id" element={<ExpertDetail />} />
           <Route path="/my-bookings" element={<MyBookings />} />

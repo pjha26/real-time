@@ -11,6 +11,10 @@ const createBooking = async (req, res) => {
         session.startTransaction();
     } catch (e) {
         console.log("Transactions not supported, proceeding without transaction session");
+        if (session) {
+            session.endSession();
+        }
+        session = null;
     }
 
     try {

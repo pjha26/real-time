@@ -40,9 +40,9 @@ const Layout = ({ children }) => {
                                         Logout
                                     </button>
                                     <div className="hidden sm:flex items-center gap-2 ml-4 pl-4 border-l border-slate-200">
-                                        <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">
+                                        <Link to="/profile" className="w-8 h-8 rounded-full bg-indigo-100 hover:bg-indigo-200 text-indigo-700 flex items-center justify-center font-bold text-xs ring-2 ring-transparent hover:ring-indigo-100 transition-all">
                                             {user.name.charAt(0).toUpperCase()}
-                                        </div>
+                                        </Link>
                                     </div>
                                 </>
                             ) : (
