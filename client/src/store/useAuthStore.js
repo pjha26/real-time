@@ -28,6 +28,31 @@ const useAuthStore = create((set) => ({
         }
     },
 
+    updateUser: async (name, email) => {
+        set({ loading: true, error: null });
+        try {
+            const { data } = await axios.put('http://localhost:5000/api/auth/profile', { name, email });
+            localStorage.setItem('user', JSON.stringify(data));
+            set({ user: data, loading: false });
+            return { success: true };
+        } catch (err) {
+            set({ error: err.response?.data?.message || 'Update failed', loading: false });
+            return { success: false, error: err.response?.data?.message };
+        }
+    },
+
+    updatePassword: async (password) => {
+        set({ loading: true, error: null });
+        try {
+            await axios.put('http://localhost:5000/api/auth/password', { password });
+            set({ loading: false });
+            return { success: true };
+        } catch (err) {
+            set({ error: err.response?.data?.message || 'Password update failed', loading: false });
+            return { success: false, error: err.response?.data?.message };
+        }
+    },
+
     logout: () => {
         localStorage.removeItem('user');
         set({ user: null });
