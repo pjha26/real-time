@@ -121,6 +121,7 @@ const becomeExpert = async (req, res) => {
                     email: user.email,
                     category: 'Uncategorized', // default
                     bio: 'New expert on the platform',
+                    experience: 0,
                     username: user.name.toLowerCase().replace(/\s+/g, '') + Math.floor(Math.random() * 1000)
                 });
             }
