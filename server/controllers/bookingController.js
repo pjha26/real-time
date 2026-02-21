@@ -46,14 +46,20 @@ const createBooking = async (req, res) => {
             return res.status(404).json({ message: 'Expert not found' });
         }
 
-        const generateMeetingLink = () => {
+        const generateGoogleMeetLink = () => {
             const chars = 'abcdefghijklmnopqrstuvwxyz';
             const randomString = (length) => Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
             return `https://meet.google.com/${randomString(3)}-${randomString(4)}-${randomString(3)}`;
         };
-        const meetingLink = generateMeetingLink();
+        const generateZoomLink = () => {
+            const randomNum = () => Math.floor(Math.random() * 9000000000) + 1000000000;
+            return `https://zoom.us/j/${randomNum()}?pwd=random-password-hash`;
+        };
 
-        const newBooking = new Booking({ user: userId, expert: expertId, email, name, phone, date, timeSlot, notes, meetingLink });
+        const googleMeetLink = generateGoogleMeetLink();
+        const zoomLink = generateZoomLink();
+
+        const newBooking = new Booking({ user: userId, expert: expertId, email, name, phone, date, timeSlot, notes, googleMeetLink, zoomLink });
 
         // Save booking
         if (session) {

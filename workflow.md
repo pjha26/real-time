@@ -30,7 +30,7 @@ This document details the user journey and system processes for different scenar
 ## 5. Backend Booking Resolution (Transaction & Integrations)
 -   **Validation:** The server checks if the exact `Date` and `Time` slot for that `ExpertId` is already booked.
 -   *(Optional MVP Flow)* **Transactions:** A MongoDB session opens and locks the booking attempt. If two people book at the exact same millisecond, the first one is committed.
--   **Video Integration:** The `bookingController` auto-generates a mock Google Meet link (`https://meet.google.com/xxx-xxxx-xxx`) upon booking instantiation.
+-   **Video Integration:** The `bookingController` auto-generates mock Google Meet (`https://meet.google.com/...`) and Zoom (`https://zoom.us/j/...`) links upon booking instantiation.
 -   **Save & Broadcast:** Booking saves. `Socket.io` emits a `newBooking` event.
 
 ## 6. Dashboard & Management
