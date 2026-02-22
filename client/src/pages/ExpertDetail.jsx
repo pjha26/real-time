@@ -4,6 +4,8 @@ import axios from 'axios';
 import { io } from 'socket.io-client';
 import { User, Briefcase, Star, ArrowLeft, Loader2, Calendar as CalendarIcon, Clock, CheckCircle } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore';
+import { format, addDays, startOfDay, endOfDay, addMinutes, isBefore } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
 const socket = io('https://real-time-x3n3.onrender.com');
 
@@ -32,14 +34,41 @@ const ExpertDetail = () => {
                 const res = await axios.get(`https://real-time-x3n3.onrender.com/api/experts/${id}`);
                 setExpert(res.data);
 
-                // Group slots by date
-                const grouped = res.data.availableSlots.reduce((acc, slot) => {
-                    if (!acc[slot.date]) acc[slot.date] = [];
-                    if (!acc[slot.date].includes(slot.time)) {
-                        acc[slot.date].push(slot.time);
+                // Generate dynamic slots for the next 7 days in User's timezone based on Expert's timezone availability
+                const expertTz = res.data.timezone || 'UTC';
+                const grouped = {};
+                const today = new Date();
+
+                for (let i = 0; i < 7; i++) {
+                    const checkDate = addDays(today, i);
+                    const dateStr = format(checkDate, 'yyyy-MM-dd');
+                    const dayStart = startOfDay(checkDate);
+                    const dayEnd = endOfDay(checkDate);
+
+                    const newAvailableTimes = [];
+                    let currentSlot = dayStart;
+
+                    while (isBefore(currentSlot, dayEnd)) {
+                        const expertTimeStr = formatInTimeZone(currentSlot, expertTz, 'HH:mm');
+                        const expertIsoDay = parseInt(formatInTimeZone(currentSlot, expertTz, 'i'), 10);
+                        const expertDayOfWeek = expertIsoDay === 7 ? 0 : expertIsoDay;
+
+                        const dayRule = res.data.availability?.find(a => a.dayOfWeek === expertDayOfWeek);
+
+                        if (dayRule && dayRule.isAvailable) {
+                            if (expertTimeStr >= dayRule.startTime && expertTimeStr < dayRule.endTime) {
+                                newAvailableTimes.push(format(currentSlot, 'HH:mm'));
+                            }
+                        }
+                        // Default generic 30 min duration for profile booking
+                        currentSlot = addMinutes(currentSlot, 30);
                     }
-                    return acc;
-                }, {});
+
+                    if (newAvailableTimes.length > 0) {
+                        grouped[dateStr] = newAvailableTimes;
+                    }
+                }
+
                 setGroupedSlots(grouped);
 
                 if (Object.keys(grouped).length > 0) {

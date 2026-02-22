@@ -35,4 +35,21 @@ const getExpertById = async (req, res) => {
     }
 };
 
-module.exports = { getExperts, getExpertById };
+const updateExpertAvailability = async (req, res) => {
+    try {
+        const { availability, timezone } = req.body;
+
+        const expert = await Expert.findOne({ user: req.user._id });
+        if (!expert) return res.status(404).json({ message: 'Expert profile not found' });
+
+        if (availability) expert.availability = availability;
+        if (timezone) expert.timezone = timezone;
+
+        await expert.save();
+        res.json(expert);
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};
+
+module.exports = { getExperts, getExpertById, updateExpertAvailability };

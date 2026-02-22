@@ -122,7 +122,16 @@ const becomeExpert = async (req, res) => {
                     category: 'Uncategorized', // default
                     bio: 'New expert on the platform',
                     experience: 0,
-                    username: user.name.toLowerCase().replace(/\s+/g, '') + Math.floor(Math.random() * 1000)
+                    username: user.name.toLowerCase().replace(/\s+/g, '') + Math.floor(Math.random() * 1000),
+                    availability: [
+                        { dayOfWeek: 1, isAvailable: true, startTime: '09:00', endTime: '17:00' }, // Mon
+                        { dayOfWeek: 2, isAvailable: true, startTime: '09:00', endTime: '17:00' }, // Tue
+                        { dayOfWeek: 3, isAvailable: true, startTime: '09:00', endTime: '17:00' }, // Wed
+                        { dayOfWeek: 4, isAvailable: true, startTime: '09:00', endTime: '17:00' }, // Thu
+                        { dayOfWeek: 5, isAvailable: true, startTime: '09:00', endTime: '17:00' }, // Fri
+                        { dayOfWeek: 6, isAvailable: false, startTime: '09:00', endTime: '17:00' }, // Sat
+                        { dayOfWeek: 0, isAvailable: false, startTime: '09:00', endTime: '17:00' }  // Sun
+                    ]
                 });
             }
 

@@ -1,7 +1,9 @@
 const { writeFileSync } = require('fs');
 const ics = require('ics');
 const path = require('path');
+const { google } = require('googleapis');
 const Booking = require('../models/Booking');
+const Expert = require('../models/Expert');
 
 // @desc    Download ICS file for a booking
 // @route   GET /api/bookings/:id/calendar
@@ -53,7 +55,6 @@ const downloadIcs = async (req, res) => {
                 return res.status(500).json({ message: 'Failed to generate calendar event' });
             }
 
-            // Provide as a download
             res.setHeader('Content-Type', 'text/calendar; charset=utf-8');
             res.setHeader('Content-Disposition', `attachment; filename="booking_${booking._id}.ics"`);
             res.send(value);
@@ -63,4 +64,65 @@ const downloadIcs = async (req, res) => {
     }
 };
 
-module.exports = { downloadIcs };
+// @desc    Get Google Calendar Auth URL
+// @route   GET /api/calendar/auth
+// @access  Private (Expert Only)
+const getAuthUrl = (req, res) => {
+    // Requires GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI in env
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+        return res.status(400).json({
+            message: 'Google Calendar integration is not configured on the server. Please add OAuth credentials to .env'
+        });
+    }
+
+    const oauth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5000/api/calendar/callback'
+    );
+
+    const scopes = [
+        'https://www.googleapis.com/auth/calendar.events'
+    ];
+
+    const url = oauth2Client.generateAuthUrl({
+        access_type: 'offline',
+        scope: scopes,
+        state: req.user._id.toString() // Pass user ID in state to link account on callback
+    });
+
+    res.json({ url });
+};
+
+// @desc    Handle Google Calendar OAuth Callback
+// @route   GET /api/calendar/callback
+// @access  Public (Called by Google)
+const handleCallback = async (req, res) => {
+    const { code, state } = req.query;
+
+    if (!code) return res.status(400).json({ message: 'No authorization code provided' });
+
+    try {
+        const oauth2Client = new google.auth.OAuth2(
+            process.env.GOOGLE_CLIENT_ID,
+            process.env.GOOGLE_CLIENT_SECRET,
+            process.env.GOOGLE_REDIRECT_URI || 'http://localhost:5000/api/calendar/callback'
+        );
+
+        const { tokens } = await oauth2Client.getToken(code);
+
+        // Find expert by user ID passed in state
+        const expert = await Expert.findOne({ user: state });
+        if (expert && tokens.refresh_token) {
+            expert.googleRefreshToken = tokens.refresh_token;
+            await expert.save();
+        }
+
+        // In a real app, redirect to a frontend success page.
+        res.send('Google Calendar Linked Successfully! You can close this window.');
+    } catch (err) {
+        res.status(500).json({ message: 'Authentication failed', error: err.message });
+    }
+};
+
+module.exports = { downloadIcs, getAuthUrl, handleCallback };

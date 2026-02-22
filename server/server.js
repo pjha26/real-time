@@ -37,11 +37,13 @@ const authRoutes = require('./routes/authRoutes');
 const expertRoutes = require('./routes/expertRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const eventTypeRoutes = require('./routes/eventTypeRoutes');
+const calendarRoutes = require('./routes/calendarRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/experts', expertRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/event-types', eventTypeRoutes);
+app.use('/api/calendar', calendarRoutes);
 
 const PORT = process.env.PORT || 5000;
 

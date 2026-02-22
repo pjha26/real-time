@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Booking = require('../models/Booking');
 const Expert = require('../models/Expert');
+const { sendEmail, sendSMS } = require('../utils/notificationService');
 
 const createBooking = async (req, res) => {
     let session;
@@ -75,6 +76,18 @@ const createBooking = async (req, res) => {
             req.io.emit('slotBooked', { expertId, date, timeSlot });
         }
 
+        // Send Notifications
+        const emailMsg = `
+            <h2>Booking Confirmed</h2>
+            <p>Your session with <strong>${expert.name}</strong> is confirmed for <strong>${date}</strong> at <strong>${timeSlot}</strong>.</p>
+            <p><strong>Join Google Meet:</strong> <a href="${googleMeetLink}">${googleMeetLink}</a></p>
+            <p><strong>Join Zoom:</strong> <a href="${zoomLink}">${zoomLink}</a></p>
+        `;
+        const smsMsg = `ExpertBook: Your session with ${expert.name} on ${date} at ${timeSlot} is confirmed!`;
+
+        await sendEmail({ to: email, subject: 'Booking Confirmation - ExpertBook', html: emailMsg });
+        if (phone) await sendSMS({ to: phone, body: smsMsg });
+
         res.status(201).json({ message: 'Booking successful', booking: newBooking });
     } catch (err) {
         if (session && session.inTransaction()) {
@@ -119,6 +132,15 @@ const updateBookingStatus = async (req, res) => {
 
         if (req.io && (status === 'Cancelled' || status === 'Rescheduled')) {
             req.io.emit('bookingCancelled', { expertId: booking.expert, date: booking.date, timeSlot: booking.timeSlot });
+        }
+
+        // Send Cancellation Notification
+        if (status === 'Cancelled') {
+            const emailMsg = `
+            < h2 > Booking Cancelled</h2 >
+                <p>Your session on <strong>${booking.date}</strong> at <strong>${booking.timeSlot}</strong> has been cancelled.</p>
+        `;
+            await sendEmail({ to: booking.email, subject: 'Booking Cancelled - ExpertBook', html: emailMsg });
         }
 
         res.json(updatedBooking);

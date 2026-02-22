@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Calendar, Clock, MapPin, User, Loader2, ArrowRight } from 'lucide-react';
 import useAuthStore from '../store/useAuthStore';
+import { format, addMinutes, isBefore, endOfDay, parseISO } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 
 // Note: This MVP component handles the public booking view `/:username/:urlSlug` 
 // It simulates the Calendly public link booking flow.
@@ -23,6 +25,7 @@ const PublicBookingPage = () => {
     const [notes, setNotes] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedTime, setSelectedTime] = useState('');
+    const [availableTimes, setAvailableTimes] = useState([]);
 
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
@@ -61,6 +64,42 @@ const PublicBookingPage = () => {
 
         fetchDetails();
     }, [username, urlSlug]);
+
+    useEffect(() => {
+        if (!expert || !eventType || !selectedDate) return;
+
+        const expertTz = expert.timezone || 'UTC';
+        const duration = eventType.duration || 30;
+
+        // Parse the selected date in the user's local timezone (start of that day)
+        const dateUser = parseISO(`${selectedDate}T00:00:00`);
+        const newAvailableTimes = [];
+        let currentSlot = dateUser;
+        const end = endOfDay(dateUser);
+
+        while (isBefore(currentSlot, end)) {
+            // Get the time in the expert's timezone
+            const expertTimeStr = formatInTimeZone(currentSlot, expertTz, 'HH:mm');
+            // Get the day of the week in the expert's timezone (1=Mon ... 7=Sun)
+            const expertIsoDay = parseInt(formatInTimeZone(currentSlot, expertTz, 'i'), 10);
+            const expertDayOfWeek = expertIsoDay === 7 ? 0 : expertIsoDay; // convert to 0=Sun
+
+            // Check if expert is available at this time in their timezone
+            const dayRule = expert.availability?.find(a => a.dayOfWeek === expertDayOfWeek);
+
+            if (dayRule && dayRule.isAvailable) {
+                if (expertTimeStr >= dayRule.startTime && expertTimeStr < dayRule.endTime) {
+                    // For a complete MVP, we should also check if currentSlot+duration < endTime
+                    // We'll add the slot mapped to the user's local timezone
+                    newAvailableTimes.push(format(currentSlot, 'HH:mm'));
+                }
+            }
+
+            currentSlot = addMinutes(currentSlot, duration);
+        }
+
+        setAvailableTimes(newAvailableTimes);
+    }, [selectedDate, expert, eventType]);
 
     const handleBooking = async (e) => {
         e.preventDefault();
@@ -118,7 +157,7 @@ const PublicBookingPage = () => {
     }
 
     // Generate dummy time slots for demo
-    const availableTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
+    // const availableTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
 
     if (success) {
         return (
