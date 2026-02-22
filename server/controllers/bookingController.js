@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { google } = require('googleapis');
 const Booking = require('../models/Booking');
 const Expert = require('../models/Expert');
 const { sendEmail, sendSMS } = require('../utils/notificationService');
@@ -87,6 +88,41 @@ const createBooking = async (req, res) => {
 
         await sendEmail({ to: email, subject: 'Booking Confirmation - ExpertBook', html: emailMsg });
         if (phone) await sendSMS({ to: phone, body: smsMsg });
+
+        // Push to Google Calendar if linked
+        if (expert.googleRefreshToken && process.env.GOOGLE_CLIENT_ID) {
+            try {
+                const oauth2Client = new google.auth.OAuth2(
+                    process.env.GOOGLE_CLIENT_ID,
+                    process.env.GOOGLE_CLIENT_SECRET,
+                    process.env.GOOGLE_REDIRECT_URI
+                );
+                oauth2Client.setCredentials({ refresh_token: expert.googleRefreshToken });
+                
+                const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
+                
+                const [year, month, day] = date.split('-');
+                const [hour, minute] = timeSlot.split(':');
+                const startDateTime = new Date(year, month - 1, day, hour, minute).toISOString();
+                
+                const eventDuration = 30; // Or fetch from EventType if available
+                const endDateTime = new Date(new Date(startDateTime).getTime() + eventDuration * 60000).toISOString();
+
+                await calendar.events.insert({
+                    calendarId: 'primary',
+                    requestBody: {
+                        summary: `Session with ${name}`,
+                        description: `Notes: ${notes}\nPhone: ${phone}\nGoogle Meet: ${googleMeetLink}\nZoom: ${zoomLink}`,
+                        start: { dateTime: startDateTime, timeZone: expert.timezone || 'UTC' },
+                        end: { dateTime: endDateTime, timeZone: expert.timezone || 'UTC' },
+                        attendees: [{ email: email }],
+                    },
+                });
+                console.log('✅ Event pushed to Google Calendar');
+            } catch (err) {
+                console.error('❌ Failed to push to Google Calendar:', err.message);
+            }
+        }
 
         res.status(201).json({ message: 'Booking successful', booking: newBooking });
     } catch (err) {
