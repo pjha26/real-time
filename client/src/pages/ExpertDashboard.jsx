@@ -116,6 +116,20 @@ const ExpertDashboard = () => {
         }
     };
 
+    const handleConnectGoogle = async () => {
+        try {
+            const { data } = await axios.get('https://real-time-x3n3.onrender.com/api/calendar/auth', {
+                headers: { Authorization: `Bearer ${user.token}` }
+            });
+            if (data.url) {
+                window.location.href = data.url;
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Failed to connect to Google Calendar. " + (error.response?.data?.message || ''));
+        }
+    };
+
     const handleAvailabilityChange = (dayOfWeek, field, value) => {
         setAvailability(prev =>
             prev.map(day => day.dayOfWeek === dayOfWeek ? { ...day, [field]: value } : day)
@@ -164,6 +178,12 @@ const ExpertDashboard = () => {
                     className={`pb-4 px-2 font-bold transition-colors ${activeTab === 'availability' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
                 >
                     Availability
+                </button>
+                <button
+                    onClick={() => setActiveTab('integrations')}
+                    className={`pb-4 px-2 font-bold transition-colors ${activeTab === 'integrations' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
+                >
+                    Integrations
                 </button>
             </div>
 
@@ -302,6 +322,33 @@ const ExpertDashboard = () => {
                             className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition flex items-center gap-2"
                         >
                             {savingAvailability ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Changes"}
+                        </button>
+                    </div>
+                </div>
+            )}
+
+            {activeTab === 'integrations' && (
+                <div className="bg-white border border-slate-200 rounded-3xl p-8 max-w-4xl shadow-sm">
+                    <div className="mb-8 border-b border-slate-100 pb-6">
+                        <h2 className="text-2xl font-bold text-slate-800">Integrations</h2>
+                        <p className="text-slate-500 mt-1">Connect your favorite tools to streamline your workflow.</p>
+                    </div>
+
+                    <div className="flex items-center justify-between p-6 border border-slate-200 rounded-2xl hover:border-indigo-200 transition">
+                        <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 flex items-center justify-center bg-slate-50 rounded-xl">
+                                <CalendarIcon className="w-6 h-6 text-indigo-600" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-800">Google Calendar</h3>
+                                <p className="text-slate-500 text-sm">Automatically add new bookings to your calendar and prevent double bookings.</p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={handleConnectGoogle}
+                            className="px-6 py-2.5 bg-indigo-50 text-indigo-700 font-bold rounded-xl hover:bg-indigo-100 transition whitespace-nowrap"
+                        >
+                            {expertData.googleRefreshToken ? 'Connected' : 'Connect'}
                         </button>
                     </div>
                 </div>
