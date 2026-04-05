@@ -1,98 +1,77 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, Loader2, Calendar } from 'lucide-react';
-import useAuthStore from '../store/useAuthStore';
+import { useAuthStore } from '../store/useStore';
 
-const Login = () => {
+export default function Login() {
+    const { login, loading, error } = useAuthStore();
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { login, user, loading, error, clearError } = useAuthStore();
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (user) navigate('/experts');
-        return () => clearError();
-    }, [user, navigate, clearError]);
+    const [showPass, setShowPass] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await login(email, password);
+        try {
+            await login(email, password);
+            navigate('/workspace');
+        } catch (_) { }
     };
 
     return (
-        <div className="min-h-[80vh] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center text-indigo-600 mb-6">
-                    <Calendar className="w-12 h-12" />
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+            <div className="blob blob-1" />
+            <div className="blob blob-2" />
+
+            <div style={{ width: '100%', maxWidth: '420px', padding: '2rem', position: 'relative', zIndex: 1 }}>
+                {/* Logo */}
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '0.5rem' }}>
+                        ⚡ Match & Flow
+                    </div>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Welcome back</h2>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--on-surface-var)' }}>Sign in to your workspace</p>
                 </div>
-                <h2 className="text-center text-3xl font-extrabold text-slate-900 mb-2">Welcome back</h2>
-                <p className="text-center text-sm text-slate-600 mb-8">
-                    Sign in to your account to manage your expert sessions
-                </p>
-            </div>
 
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-10 px-8 shadow-sm border border-slate-100 rounded-2xl sm:px-10">
-                    {error && (
-                        <div className="mb-6 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm font-medium">
-                            {error}
+                {/* Card */}
+                <div className="card" style={{ padding: '2rem', border: '1px solid rgba(218,185,255,0.08)' }}>
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        {error && (
+                            <div style={{ background: 'rgba(255,180,171,0.1)', border: '1px solid rgba(255,180,171,0.2)', color: 'var(--error)', padding: '10px 14px', borderRadius: 'var(--radius)', fontSize: '0.85rem' }}>
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="form-group">
+                            <label className="form-label">Email address</label>
+                            <input className="input" type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
                         </div>
-                    )}
 
-                    <form className="space-y-6" onSubmit={handleSubmit}>
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email address</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-slate-400" />
-                                </div>
-                                <input
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all outline-none"
-                                    placeholder="you@example.com"
-                                />
+                        <div className="form-group">
+                            <label className="form-label">Password</label>
+                            <div style={{ position: 'relative' }}>
+                                <input className="input" type={showPass ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} required style={{ paddingRight: '48px' }} />
+                                <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--outline)', padding: 0 }}>
+                                    <span className="material-icons" style={{ fontSize: 20 }}>{showPass ? 'visibility_off' : 'visibility'}</span>
+                                </button>
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-slate-400" />
-                                </div>
-                                <input
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all outline-none"
-                                    placeholder="••••••••"
-                                />
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70 disabled:cursor-wait transition-all"
-                        >
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Sign in'}
+                        <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', justifyContent: 'center', padding: '13px', fontSize: '0.95rem', marginTop: '0.5rem', opacity: loading ? 0.7 : 1 }}>
+                            {loading ? <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} /> : (
+                                <>
+                                    <span className="material-icons" style={{ fontSize: 18 }}>login</span>
+                                    Sign in
+                                </>
+                            )}
                         </button>
                     </form>
-
-                    <div className="mt-8 text-center text-sm">
-                        <span className="text-slate-500">Don't have an account? </span>
-                        <Link to="/register" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                            Sign up today
-                        </Link>
-                    </div>
                 </div>
+
+                <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--on-surface-var)' }}>
+                    Don't have an account?{' '}
+                    <Link to="/register" style={{ color: 'var(--primary)', fontWeight: 600 }}>Create workspace</Link>
+                </p>
             </div>
         </div>
     );
-};
-
-export default Login;
+}

@@ -1,163 +1,146 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { Search, Filter, Star, Briefcase, ChevronLeft, ChevronRight, Loader2, User } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useExpertStore } from '../store/useStore';
+import Layout from '../components/Layout';
 
-const ExpertListing = () => {
-    const [experts, setExperts] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const MOCK_EXPERTS = [
+    { id: '1', name: 'Marcus Thorne', specialty: ['Product Strategy', 'Growth', 'FinTech'], bio: 'Ex-Apple strategist specializing in fluid transactional experiences and high-growth ecosystems.', match_score: 97, hourly_rate: 450 },
+    { id: '2', name: 'Elena Vance', specialty: ['UI/UX', 'Motion Systems', 'Accessibility'], bio: 'Senior UI Architect with focus on accessibility and motion systems. Creator of the Flux Framework.', match_score: 94, hourly_rate: 380 },
+    { id: '3', name: 'David Chen', specialty: ['Cloud Infrastructure', 'AWS', 'Azure'], bio: 'Cloud Infrastructure expert. AWS/Azure specialist for scaling SaaS platforms to millions.', match_score: 91, hourly_rate: 420 },
+    { id: '4', name: 'Zoe Nakamura', specialty: ['AI/ML', 'Python', 'Data Science'], bio: 'Lead AI researcher. Deployed ML pipelines for 3 Fortune 500 companies. Ethics-first approach.', match_score: 89, hourly_rate: 500 },
+    { id: '5', name: 'Alex Rivera', specialty: ['Blockchain', 'DeFi', 'Smart Contracts'], bio: 'Web3 pioneer with 6 years building decentralized finance infrastructure at scale.', match_score: 87, hourly_rate: 460 },
+    { id: '6', name: 'Sarah Kim', specialty: ['Growth Marketing', 'SEO', 'Analytics'], bio: 'Growth architect who scaled 4 SaaS companies from 0 to $10M ARR. Data-obsessed.', match_score: 85, hourly_rate: 340 },
+];
 
-    // Pagination & Filters
-    const [page, setPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(1);
+const FILTERS = ['All', 'Product Strategy', 'UI/UX', 'Cloud Infrastructure', 'AI/ML', 'Blockchain', 'Growth Marketing'];
+
+export default function ExpertListing() {
+    const { experts, fetchExperts, loading } = useExpertStore();
+    const [activeFilter, setActiveFilter] = useState('All');
     const [search, setSearch] = useState('');
-    const [category, setCategory] = useState('');
-    const limit = 6;
-
-    const categories = ['', 'Therapy', 'Career Coaching', 'Fitness Mentor', 'Consulting'];
-
-    const fetchExperts = async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            const res = await axios.get(`https://real-time-x3n3.onrender.com/api/experts`, {
-                params: { page, limit, search, category }
-            });
-            setExperts(res.data.experts);
-            setTotalPages(res.data.totalPages);
-        } catch (err) {
-            setError('Failed to fetch experts. Please try again later.');
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [displayExperts, setDisplayExperts] = useState(MOCK_EXPERTS);
+    const [searchParams] = useSearchParams();
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setPage(1);
-            fetchExperts();
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [search, category]);
+        const q = searchParams.get('search');
+        if (q) setSearch(q);
+        fetchExperts().catch(() => { });
+    }, []);
 
     useEffect(() => {
-        if (!search && !category) {
-            fetchExperts();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [page]);
+        if (experts.length > 0) setDisplayExperts(experts);
+    }, [experts]);
+
+    const filtered = displayExperts.filter(e => {
+        const matchFilter = activeFilter === 'All' || e.specialty?.some(s => s.toLowerCase().includes(activeFilter.toLowerCase()));
+        const matchSearch = !search || e.name?.toLowerCase().includes(search.toLowerCase()) || e.bio?.toLowerCase().includes(search.toLowerCase()) || e.specialty?.some(s => s.toLowerCase().includes(search.toLowerCase()));
+        return matchFilter && matchSearch;
+    });
 
     return (
-        <div className="space-y-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                <div className="relative flex-1 w-full">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                    <input
-                        type="text"
-                        placeholder="Search experts by name..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all"
-                    />
-                </div>
-                <div className="relative w-full md:w-64">
-                    <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
-                    <select
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className="w-full pl-10 pr-4 py-3 appearance-none rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all bg-white"
-                    >
-                        <option value="">All Categories</option>
-                        {categories.slice(1).map(c => (
-                            <option key={c} value={c}>{c}</option>
+        <Layout>
+            <div style={{ position: 'relative', overflow: 'hidden' }}>
+                <div className="blob blob-1" style={{ width: '400px', height: '400px', top: '-100px' }} />
+
+                {/* Header */}
+                <div style={{ padding: '2.5rem 2rem 0', position: 'relative', zIndex: 1 }}>
+                    <span className="section-label">EXPLORE</span>
+                    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '0.5rem', marginBottom: '2rem' }}>
+                        <div>
+                            <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Discover Your Expert</h1>
+                            <p style={{ fontSize: '0.9rem' }}>AI-curated matches based on your project's unique fingerprint.</p>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(218,185,255,0.08)', padding: '8px 16px', borderRadius: 'var(--radius-full)' }}>
+                            <div className="pulse-dot" />
+                            <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600, fontFamily: 'var(--font-display)' }}>98.4% Match Rate</span>
+                        </div>
+                    </div>
+
+                    {/* Search */}
+                    <div style={{ position: 'relative', marginBottom: '1.5rem', maxWidth: '500px' }}>
+                        <span className="material-icons" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)', fontSize: '20px' }}>search</span>
+                        <input
+                            className="input"
+                            placeholder="Search experts, skills, domains…"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            style={{ paddingLeft: '48px' }}
+                        />
+                    </div>
+
+                    {/* Filter chips */}
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '2rem' }}>
+                        {FILTERS.map(f => (
+                            <button
+                                key={f}
+                                onClick={() => setActiveFilter(f)}
+                                style={{
+                                    padding: '6px 16px', borderRadius: 'var(--radius-sm)', border: 'none', cursor: 'pointer',
+                                    fontFamily: 'var(--font-body)', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.04em',
+                                    transition: 'all var(--transition)',
+                                    background: activeFilter === f ? 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))' : 'var(--surface-ch)',
+                                    color: activeFilter === f ? '#fff' : 'var(--on-surface-var)',
+                                }}
+                            >
+                                {f}
+                            </button>
                         ))}
-                    </select>
+                    </div>
+                </div>
+
+                {/* Grid */}
+                <div style={{ padding: '0 2rem 3rem', position: 'relative', zIndex: 1 }}>
+                    {loading ? (
+                        <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
+                            <div className="spinner" />
+                        </div>
+                    ) : (
+                        <>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--outline)', marginBottom: '1.5rem' }}>
+                                Showing <strong style={{ color: 'var(--primary)' }}>{filtered.length}</strong> experts
+                            </p>
+                            <div className="grid-auto stagger">
+                                {filtered.map((expert, i) => (
+                                    <ExpertCard key={expert.id || i} expert={expert} />
+                                ))}
+                            </div>
+                            {filtered.length === 0 && (
+                                <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--on-surface-var)' }}>
+                                    <span className="material-icons" style={{ fontSize: '3rem', marginBottom: '1rem', display: 'block', color: 'var(--outline)' }}>search_off</span>
+                                    <p>No experts match your search. Try different filters.</p>
+                                </div>
+                            )}
+                        </>
+                    )}
                 </div>
             </div>
-
-            {loading ? (
-                <div className="flex justify-center items-center h-64">
-                    <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
-                </div>
-            ) : error ? (
-                <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 text-center">
-                    <p className="font-medium">{error}</p>
-                    <button onClick={fetchExperts} className="mt-4 px-4 py-2 bg-red-100 hover:bg-red-200 rounded-lg text-sm font-semibold transition-colors">Retry</button>
-                </div>
-            ) : experts.length === 0 ? (
-                <div className="text-center py-20 bg-white rounded-2xl border border-slate-100 shadow-sm">
-                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Search className="w-8 h-8 text-slate-400" />
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-700">No experts found</h3>
-                    <p className="text-slate-500 mt-2">Try adjusting your search or filters.</p>
-                </div>
-            ) : (
-                <>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {experts.map(expert => (
-                            <div key={expert._id} className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow group flex flex-col">
-                                <div className="flex justify-between items-start mb-4">
-                                    <h3 className="text-xl font-bold text-slate-800 group-hover:text-indigo-600 transition-colors">
-                                        {expert.name}
-                                    </h3>
-                                    <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-2 py-1 rounded-md text-sm font-bold">
-                                        <Star className="w-4 h-4 fill-amber-500" />
-                                        <span>{expert.rating}</span>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-3 flex-grow text-slate-600 border-b border-slate-100 pb-4 mb-4">
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
-                                            <User className="w-4 h-4" />
-                                        </div>
-                                        <span className="font-medium">{expert.category}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="w-8 h-8 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-600">
-                                            <Briefcase className="w-4 h-4" />
-                                        </div>
-                                        <span>{expert.experience} years experience</span>
-                                    </div>
-                                </div>
-
-                                <Link
-                                    to={`/expert/${expert._id}`}
-                                    className="w-full text-center bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-600 font-semibold py-3 rounded-xl transition-all"
-                                >
-                                    View Availability
-                                </Link>
-                            </div>
-                        ))}
-                    </div>
-
-                    {totalPages > 1 && (
-                        <div className="flex justify-center items-center gap-4 mt-12">
-                            <button
-                                onClick={() => setPage(p => Math.max(1, p - 1))}
-                                disabled={page === 1}
-                                className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                <ChevronLeft className="w-5 h-5" />
-                            </button>
-                            <span className="text-sm font-medium text-slate-600">
-                                Page {page} of {totalPages}
-                            </span>
-                            <button
-                                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                                disabled={page === totalPages}
-                                className="p-2 rounded-lg border border-slate-200 hover:bg-slate-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                            >
-                                <ChevronRight className="w-5 h-5" />
-                            </button>
-                        </div>
-                    )}
-                </>
-            )}
-        </div>
+        </Layout>
     );
-};
+}
 
-export default ExpertListing;
+function ExpertCard({ expert }) {
+    const initials = expert.name?.split(' ').map(n => n[0]).join('') || '?';
+    return (
+        <Link to={`/experts/${expert.id}`} style={{ textDecoration: 'none' }}>
+            <div className="card animate-fadeInUp" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                    <div className="avatar" style={{ width: 48, height: 48, fontSize: '1rem' }}>{initials}</div>
+                    <div style={{ background: 'rgba(218,185,255,0.1)', color: 'var(--primary)', padding: '4px 10px', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'var(--font-display)', alignSelf: 'flex-start' }}>
+                        {expert.match_score || 90}%
+                    </div>
+                </div>
+                <h3 style={{ marginBottom: '0.25rem' }}>{expert.name}</h3>
+                <p style={{ fontSize: '0.85rem', marginBottom: '1rem', flex: 1, lineHeight: 1.5 }}>{expert.bio}</p>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '1.25rem' }}>
+                    {(expert.specialty || []).slice(0, 3).map(s => <span key={s} className="chip">{s}</span>)}
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '0.9rem', fontFamily: 'var(--font-display)', fontWeight: 700 }}>${expert.hourly_rate || 400}/hr</span>
+                    <button className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.8rem' }}>
+                        View Profile
+                    </button>
+                </div>
+            </div>
+        </Link>
+    );
+}

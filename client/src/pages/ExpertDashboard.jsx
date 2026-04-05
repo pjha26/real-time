@@ -1,413 +1,213 @@
-import { useState, useEffect } from 'react';
-import { Plus, Link as LinkIcon, Edit2, Trash2, Clock, MapPin, ExternalLink, Calendar as CalendarIcon, Loader2 } from 'lucide-react';
-import useAuthStore from '../store/useAuthStore';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useAuthStore, useBookingStore } from '../store/useStore';
+import Layout from '../components/Layout';
 import { Link } from 'react-router-dom';
 
-const ExpertDashboard = () => {
+const FLOW_TASKS = [
+    { id: 1, title: 'Architectural Review: Project Zenith', client: 'Sarah Jenkins', type: 'Technical Consultation', time: '10:00 AM', icon: 'architecture' },
+    { id: 2, title: 'Strategy Alignment Call', client: 'Neo-Tech Corp', type: 'Strategy Brief', time: '2:00 PM', icon: 'align_horizontal_left' },
+    { id: 3, title: 'Deep Work: Algorithm Refinement', client: '', type: 'Scheduled block · No interruptions enabled', time: '4:00 PM', icon: 'code' },
+];
+
+const CURATOR_NOTES = [
+    "Sarah's primary concern: Scalability hurdles in the Q4 roadmap.",
+    "Past collaboration note: Prefers data-backed visualizations over verbal summaries.",
+    "AI Suggestion: Share the 'Zenith Growth' dashboard early to set the tone.",
+];
+
+const RECENT = [
+    { label: 'Call with David', sub: 'Completed 2h ago · Summary ready', icon: 'call', color: '#4ade80' },
+    { label: 'New Brief: AI Ethics', sub: 'Received from Horizon Corp', icon: 'description', color: 'var(--primary)' },
+];
+
+export default function ExpertDashboard() {
     const { user } = useAuthStore();
-    const [eventTypes, setEventTypes] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [expertData, setExpertData] = useState(null);
-    const [activeTab, setActiveTab] = useState('events');
+    const { bookings, fetchExpertBookings } = useBookingStore();
+    const [activeSection, setActiveSection] = useState('flow');
 
-    // Form states
-    const [showModal, setShowModal] = useState(false);
-    const [title, setTitle] = useState('');
-    const [duration, setDuration] = useState(30);
-    const [location, setLocation] = useState('Video Call');
-    const [description, setDescription] = useState('');
-    const [urlSlug, setUrlSlug] = useState('');
-    const [bufferTime, setBufferTime] = useState(0);
-
-    const [availability, setAvailability] = useState([]);
-    const [timezone, setTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
-    const [savingAvailability, setSavingAvailability] = useState(false);
-
-    const [formLoading, setFormLoading] = useState(false);
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
     useEffect(() => {
-        // Fetch expert ID from user email mapping (temporary MVP workaround)
-        const initDashboard = async () => {
-            try {
-                // Require isExpert flag
-                if (!user.isExpert) {
-                    setLoading(false);
-                    return;
-                }
-
-                // Temporary MVP mapping: fetch expert based on user ID directly
-                const { data: experts } = await axios.get('https://real-time-x3n3.onrender.com/api/experts?limit=100');
-                const matchedExpert = experts.find(e => e.user === user._id || e.email === user.email);
-
-                if (matchedExpert) {
-                    setExpertData(matchedExpert);
-                    setBufferTime(matchedExpert.bufferTime || 0);
-                    if (matchedExpert.availability) setAvailability(matchedExpert.availability);
-                    if (matchedExpert.timezone) setTimezone(matchedExpert.timezone);
-
-                    const { data } = await axios.get(`https://real-time-x3n3.onrender.com/api/event-types/expert/${matchedExpert._id}`);
-                    setEventTypes(data);
-                }
-            } catch (error) {
-                console.error("Failed to load dashboard data", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (user) {
-            initDashboard();
-        }
-    }, [user]);
-
-    const handleCreateEvent = async (e) => {
-        e.preventDefault();
-        setFormLoading(true);
-        try {
-            const { data } = await axios.post('https://real-time-x3n3.onrender.com/api/event-types', {
-                expertId: expertData._id,
-                title, duration, location, description, urlSlug
-            }, {
-                headers: { Authorization: `Bearer ${user.token}` }
-            });
-            setEventTypes([...eventTypes, data]);
-            setShowModal(false);
-            resetForm();
-        } catch (error) {
-            console.error(error);
-            alert("Failed to create event type");
-        } finally {
-            setFormLoading(false);
-        }
-    };
-
-    const handleDelete = async (id) => {
-        if (!confirm('Are you sure you want to delete this event type?')) return;
-        try {
-            await axios.delete(`https://real-time-x3n3.onrender.com/api/event-types/${id}`, {
-                headers: { Authorization: `Bearer ${user.token}` }
-            });
-            setEventTypes(eventTypes.filter(et => et._id !== id));
-        } catch (error) {
-            console.error(error);
-        }
-    };
-
-    const resetForm = () => {
-        setTitle(''); setDuration(30); setLocation('Video Call'); setDescription(''); setUrlSlug('');
-    };
-
-    const handleSaveAvailability = async () => {
-        setSavingAvailability(true);
-        try {
-            await axios.put('https://real-time-x3n3.onrender.com/api/experts/availability', {
-                availability,
-                timezone
-            }, {
-                headers: { Authorization: `Bearer ${user.token}` }
-            });
-            alert('Availability saved successfully!');
-        } catch (error) {
-            console.error(error);
-            alert('Failed to save availability');
-        } finally {
-            setSavingAvailability(false);
-        }
-    };
-
-    const handleConnectGoogle = async () => {
-        try {
-            const { data } = await axios.get('https://real-time-x3n3.onrender.com/api/calendar/auth', {
-                headers: { Authorization: `Bearer ${user.token}` }
-            });
-            if (data.url) {
-                window.location.href = data.url;
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Failed to connect to Google Calendar. " + (error.response?.data?.message || ''));
-        }
-    };
-
-    const handleAvailabilityChange = (dayOfWeek, field, value) => {
-        setAvailability(prev =>
-            prev.map(day => day.dayOfWeek === dayOfWeek ? { ...day, [field]: value } : day)
-        );
-    };
-
-    const daysMap = { 0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday', 4: 'Thursday', 5: 'Friday', 6: 'Saturday' };
-
-    if (loading) {
-        return <div className="flex justify-center py-20"><Loader2 className="w-10 h-10 animate-spin text-indigo-500" /></div>;
-    }
-
-    if (!user?.isExpert || !expertData) {
-        return (
-            <div className="text-center py-20">
-                <h2 className="text-2xl font-bold text-slate-800 mb-4">Expert Dashboard</h2>
-                <p className="text-slate-500 mb-8">You must upgrade your account to an Expert to access the dashboard and manage your bookings.</p>
-                <Link to="/profile" className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-sm hover:bg-indigo-700 transition">Go to Profile</Link>
-            </div>
-        );
-    }
-
-    const publicUrl = `http://localhost:5173/${expertData.username || `expert/${expertData._id}`}`;
+        fetchExpertBookings().catch(() => { });
+    }, []);
 
     return (
-        <div className="max-w-6xl mx-auto py-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-                <div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 mb-2">Expert Dashboard</h1>
-                    <p className="text-slate-500 flex items-center gap-2">
-                        <LinkIcon className="w-4 h-4" />
-                        Share your link: <a href={publicUrl} target="_blank" rel="noreferrer" className="text-indigo-600 hover:underline">{publicUrl}</a>
-                    </p>
-                </div>
-            </div>
+        <Layout>
+            <div style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+                <div className="blob blob-1" style={{ width: '600px', height: '600px', top: '-200px', right: '-100px', opacity: 0.6 }} />
 
-            <div className="flex gap-6 border-b border-slate-200 mb-8">
-                <button
-                    onClick={() => setActiveTab('events')}
-                    className={`pb-4 px-2 font-bold transition-colors ${activeTab === 'events' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    Event Types
-                </button>
-                <button
-                    onClick={() => setActiveTab('availability')}
-                    className={`pb-4 px-2 font-bold transition-colors ${activeTab === 'availability' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    Availability
-                </button>
-                <button
-                    onClick={() => setActiveTab('integrations')}
-                    className={`pb-4 px-2 font-bold transition-colors ${activeTab === 'integrations' ? 'text-indigo-600 border-b-2 border-indigo-600' : 'text-slate-500 hover:text-slate-700'}`}
-                >
-                    Integrations
-                </button>
-            </div>
-
-            {activeTab === 'events' && (
-                <>
-                    <div className="flex justify-between items-center mb-6">
-                        <h2 className="text-xl font-bold text-slate-800">Your Event Types</h2>
-                        <div className="flex gap-4">
-                            <button className="px-5 py-2.5 bg-white border border-slate-200 text-slate-700 font-semibold rounded-xl hover:bg-slate-50 transition shadow-sm flex items-center gap-2" onClick={() => alert('Buffer time update coming soon')}>
-                                <Clock className="w-4 h-4" /> Buffer Time: {bufferTime}m
-                            </button>
-                            <button onClick={() => setShowModal(true)} className="px-5 py-2.5 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition flex items-center gap-2">
-                                <Plus className="w-5 h-5" /> New Event Type
-                            </button>
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                    {/* Header */}
+                    <div style={{ padding: '2.5rem 2rem 1.5rem', borderBottom: '1px solid rgba(218,185,255,0.06)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                            <div>
+                                <span className="section-label">WORKSPACE CENTRAL</span>
+                                <h1 style={{ marginTop: '0.5rem', fontSize: '2rem' }}>
+                                    {greeting}, <span style={{ color: 'var(--primary)' }}>{user?.name?.split(' ')[0] || 'Alex'}</span>.
+                                </h1>
+                                <p style={{ marginTop: '0.5rem', color: 'var(--on-surface-var)' }}>The Curator has prioritized 3 critical tasks for your peak flow state today.</p>
+                            </div>
+                            <div style={{ textAlign: 'right' }}>
+                                <div style={{ background: 'rgba(218,185,255,0.08)', borderRadius: 'var(--radius-lg)', padding: '1rem 1.5rem', border: '1px solid rgba(218,185,255,0.12)' }}>
+                                    <div className="stat-number">98.4%</div>
+                                    <div className="stat-label">Matching Rate</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {eventTypes.length === 0 ? (
-                        <div className="text-center py-20 bg-slate-50 rounded-3xl border border-dashed border-slate-200">
-                            <CalendarIcon className="w-12 h-12 text-slate-300 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold text-slate-700 mb-2">No event types yet</h3>
-                            <p className="text-slate-500 mb-6 max-w-sm mx-auto">Create event types (like a 15-min discovery call or 1-hour coaching session) so invitees can book time with you.</p>
-                            <button onClick={() => setShowModal(true)} className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-sm hover:bg-indigo-700 transition inline-flex items-center gap-2">
-                                <Plus className="w-5 h-5" /> Create Your First Event
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {eventTypes.map(event => (
-                                <div key={event._id} className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm hover:shadow-md transition group overflow-hidden relative">
-                                    <div className="absolute top-0 left-0 w-full h-1.5 bg-indigo-500"></div>
-                                    <div className="flex justify-between items-start mb-4">
-                                        <h3 className="text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition">{event.title}</h3>
-                                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition">
-                                            <button onClick={() => handleDelete(event._id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
-                                        </div>
-                                    </div>
+                    {/* Main grid */}
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: '2rem', padding: '2rem' }}>
 
-                                    <p className="text-slate-500 text-sm mb-6 line-clamp-2 min-h-[40px]">{event.description || 'No description provided.'}</p>
+                        {/* Left — Tasks + Network */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
-                                    <div className="space-y-3 mb-6">
-                                        <div className="flex items-center text-sm font-medium text-slate-700 gap-3">
-                                            <Clock className="w-4 h-4 text-slate-400" /> {event.duration} mins
-                                        </div>
-                                        <div className="flex items-center text-sm font-medium text-slate-700 gap-3">
-                                            <MapPin className="w-4 h-4 text-slate-400" /> {event.location}
-                                        </div>
-                                    </div>
-
-                                    <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
-                                        <span className="text-xs font-mono bg-slate-100 text-slate-600 px-2 py-1 rounded">/{event.urlSlug}</span>
-                                        <Link to={`/${expertData.username || `expert/${expertData._id}`}/${event.urlSlug}`} target="_blank" className="text-indigo-600 font-semibold text-sm hover:underline flex items-center gap-1">
-                                            View Booking Page <ExternalLink className="w-3 h-3" />
-                                        </Link>
-                                    </div>
+                            {/* Intelligent Flow */}
+                            <div className="card" style={{ background: 'rgba(143,0,255,0.05)', border: '1px solid rgba(218,185,255,0.08)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
+                                    <span className="material-icons" style={{ color: 'var(--primary)' }}>auto_awesome</span>
+                                    <h3>Intelligent Flow</h3>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </>
-            )}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} className="stagger">
+                                    {FLOW_TASKS.map((task, i) => (
+                                        <div key={task.id} className="animate-fadeInUp" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', padding: '1rem', borderRadius: 'var(--radius-md)', background: 'var(--surface-ch)', cursor: 'pointer', transition: 'all var(--transition)' }}
+                                            onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-chh)'}
+                                            onMouseLeave={e => e.currentTarget.style.background = 'var(--surface-ch)'}
+                                        >
+                                            <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                                <span className="material-icons" style={{ fontSize: 18, color: '#fff' }}>{task.icon}</span>
+                                            </div>
+                                            <div style={{ flex: 1 }}>
+                                                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, marginBottom: '2px', fontSize: '0.9rem' }}>{task.title}</div>
+                                                <div style={{ fontSize: '0.78rem', color: 'var(--on-surface-var)' }}>
+                                                    {task.client && <span style={{ color: 'var(--primary)' }}>{task.client}</span>}
+                                                    {task.client && ' · '}
+                                                    {task.type}
+                                                </div>
+                                            </div>
+                                            <div style={{ fontSize: '0.8rem', fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--on-surface-var)', flexShrink: 0 }}>{task.time}</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
 
-            {activeTab === 'availability' && (
-                <div className="bg-white border border-slate-200 rounded-3xl p-8 max-w-4xl shadow-sm">
-                    <div className="flex justify-between items-center mb-8 border-b border-slate-100 pb-6">
-                        <div>
-                            <h2 className="text-2xl font-bold text-slate-800">Working Hours</h2>
-                            <p className="text-slate-500 mt-1">Set your standard weekly availability for sessions.</p>
-                        </div>
-                        <div className="flex flex-col text-right">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Timezone</label>
-                            <select
-                                value={timezone}
-                                onChange={(e) => setTimezone(e.target.value)}
-                                className="px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none text-sm font-medium"
-                            >
-                                {/* A simple list of common timezones for MVP */}
-                                <option value="UTC">UTC</option>
-                                <option value="America/New_York">America/New_York (EST)</option>
-                                <option value="America/Chicago">America/Chicago (CST)</option>
-                                <option value="America/Los_Angeles">America/Los_Angeles (PST)</option>
-                                <option value="Europe/London">Europe/London (GMT)</option>
-                                <option value="Europe/Paris">Europe/Paris (CET)</option>
-                                <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
-                                <option value="Australia/Sydney">Australia/Sydney (AEST)</option>
-                                <option value={Intl.DateTimeFormat().resolvedOptions().timeZone}>Local ({Intl.DateTimeFormat().resolvedOptions().timeZone})</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4 mb-8">
-                        {availability.sort((a, b) => a.dayOfWeek - b.dayOfWeek).map((day) => (
-                            <div key={day.dayOfWeek} className="flex items-center gap-6 p-4 rounded-2xl hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
-                                <div className="w-32 flex items-center gap-3">
-                                    <label className="relative inline-flex items-center cursor-pointer">
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            checked={day.isAvailable}
-                                            onChange={(e) => handleAvailabilityChange(day.dayOfWeek, 'isAvailable', e.target.checked)}
-                                        />
-                                        <div className={"w-11 h-6 bg-slate-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-indigo-100 " + (day.isAvailable ? "peer-checked:bg-indigo-600" : "") + " after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all " + (day.isAvailable ? "peer-checked:after:translate-x-full peer-checked:after:border-white" : "")}></div>
-                                    </label>
-                                    <span className={`font-bold ${day.isAvailable ? 'text-slate-800' : 'text-slate-400'}`}>{daysMap[day.dayOfWeek]}</span>
+                            {/* Network Flow */}
+                            <div className="card">
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span className="material-icons" style={{ color: 'var(--primary)' }}>hub</span>
+                                        <h3>Network Flow</h3>
+                                    </div>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)' }}>12 active · 4 pending</span>
                                 </div>
 
-                                {day.isAvailable ? (
-                                    <div className="flex items-center gap-4 flex-1">
-                                        <input
-                                            type="time"
-                                            value={day.startTime}
-                                            onChange={(e) => handleAvailabilityChange(day.dayOfWeek, 'startTime', e.target.value)}
-                                            className="px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none text-slate-700 bg-white"
-                                        />
-                                        <span className="text-slate-400 font-medium">to</span>
-                                        <input
-                                            type="time"
-                                            value={day.endTime}
-                                            onChange={(e) => handleAvailabilityChange(day.dayOfWeek, 'endTime', e.target.value)}
-                                            className="px-4 py-2 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none text-slate-700 bg-white"
-                                        />
+                                {/* Visual flow */}
+                                <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-md)', padding: '1.5rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'center' }}>
+                                    <svg width="260" height="80" viewBox="0 0 260 80">
+                                        <defs>
+                                            <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" stopColor="#8f00ff" />
+                                                <stop offset="100%" stopColor="#dab9ff" />
+                                            </linearGradient>
+                                        </defs>
+                                        {/* Center node */}
+                                        <circle cx="130" cy="40" r="16" fill="#8f00ff" opacity="0.9" />
+                                        <text x="130" y="44" textAnchor="middle" fill="white" fontSize="10" fontFamily="Manrope" fontWeight="700">YOU</text>
+                                        {/* Connecting lines */}
+                                        {[[30, 20, '#4ade80'], [30, 60, '#dab9ff'], [230, 15, '#ffb68b'], [230, 65, '#dab9ff'], [80, 75, '#cfc2d9'], [180, 75, '#cfc2d9']].map(([cx, cy, color], i) => (
+                                            <g key={i}>
+                                                <line x1="130" y1="40" x2={cx} y2={cy} stroke="url(#flowGrad)" strokeWidth="1.5" strokeDasharray="4,3" opacity="0.5">
+                                                    <animate attributeName="stroke-dashoffset" from="0" to="-14" dur={`${1.5 + i * 0.3}s`} repeatCount="indefinite" />
+                                                </line>
+                                                <circle cx={cx} cy={cy} r="8" fill={color} opacity="0.8" />
+                                            </g>
+                                        ))}
+                                    </svg>
+                                </div>
+
+                                {/* Flow Health */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.25rem' }}>
+                                    {[{ l: 'Active', v: '12', c: '#4ade80' }, { l: 'Pending', v: '4', c: 'var(--primary)' }, { l: 'Completed', v: '38', c: 'var(--on-surface-var)' }].map(s => (
+                                        <div key={s.l} style={{ textAlign: 'center', padding: '0.75rem', background: 'var(--surface-lowest)', borderRadius: 'var(--radius-md)' }}>
+                                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.5rem', color: s.c }}>{s.v}</div>
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--on-surface-var)', marginTop: '2px' }}>{s.l}</div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Recent */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    {RECENT.map(r => (
+                                        <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: 'var(--radius)', background: 'var(--surface-lowest)' }}>
+                                            <span className="material-icons" style={{ color: r.color, fontSize: '18px' }}>{r.icon}</span>
+                                            <div>
+                                                <div style={{ fontSize: '0.85rem', fontWeight: 600, fontFamily: 'var(--font-display)' }}>{r.label}</div>
+                                                <div style={{ fontSize: '0.72rem', color: 'var(--on-surface-var)' }}>{r.sub}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right — Curator Summary + Bookings */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            {/* Curator Summary */}
+                            <div className="card" style={{ background: 'rgba(143,0,255,0.06)', border: '1px solid rgba(218,185,255,0.1)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
+                                    <span className="material-icons" style={{ color: 'var(--primary)' }}>psychology</span>
+                                    <h3>Curator Summary</h3>
+                                </div>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--on-surface-var)', marginBottom: '1.25rem', display: 'block' }}>Next Briefing — Sarah Jenkins (Project Zenith)</span>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.5rem' }}>
+                                    {CURATOR_NOTES.map((note, i) => (
+                                        <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
+                                            <span className="material-icons" style={{ color: '#4ade80', fontSize: '14px', marginTop: '3px', flexShrink: 0 }}>check_circle</span>
+                                            <span style={{ fontSize: '0.82rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>{note}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: '10px', fontSize: '0.85rem' }}>
+                                    <span className="material-icons" style={{ fontSize: 16 }}>menu_book</span>
+                                    View Briefing Journal
+                                </button>
+                            </div>
+
+                            {/* Bookings from API */}
+                            <div className="card">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                                    <span className="material-icons" style={{ color: 'var(--primary)' }}>event</span>
+                                    <h3 style={{ fontSize: '1rem' }}>Upcoming Sessions</h3>
+                                </div>
+                                {bookings.length === 0 ? (
+                                    <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--on-surface-var)' }}>
+                                        <span className="material-icons" style={{ fontSize: '2rem', display: 'block', marginBottom: '8px', color: 'var(--outline)' }}>calendar_today</span>
+                                        <p style={{ fontSize: '0.82rem' }}>No upcoming sessions yet.</p>
+                                        <Link to="/explore" className="btn-ghost" style={{ marginTop: '8px', textDecoration: 'none', display: 'inline-flex', fontSize: '0.8rem' }}>Explore experts</Link>
                                     </div>
                                 ) : (
-                                    <div className="flex-1">
-                                        <span className="text-slate-400 text-sm font-medium px-4 py-2 bg-slate-100 rounded-xl inline-block">Unavailable</span>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                        {bookings.slice(0, 4).map(b => (
+                                            <div key={b.id} style={{ padding: '10px', borderRadius: 'var(--radius)', background: 'var(--surface-lowest)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                <div>
+                                                    <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{b.event_types?.title || 'Session'}</div>
+                                                    <div style={{ fontSize: '0.72rem', color: 'var(--on-surface-var)' }}>
+                                                        {new Date(b.start_time).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                    </div>
+                                                </div>
+                                                <span style={{ fontSize: '0.7rem', padding: '3px 10px', borderRadius: 'var(--radius-full)', background: b.status === 'confirmed' ? 'rgba(74,222,128,0.1)' : 'rgba(218,185,255,0.1)', color: b.status === 'confirmed' ? '#4ade80' : 'var(--primary)', fontWeight: 600, textTransform: 'capitalize' }}>
+                                                    {b.status}
+                                                </span>
+                                            </div>
+                                        ))}
                                     </div>
                                 )}
                             </div>
-                        ))}
-                    </div>
-
-                    <div className="flex justify-end pt-6 border-t border-slate-100">
-                        <button
-                            onClick={handleSaveAvailability}
-                            disabled={savingAvailability}
-                            className="px-8 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition flex items-center gap-2"
-                        >
-                            {savingAvailability ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Changes"}
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {activeTab === 'integrations' && (
-                <div className="bg-white border border-slate-200 rounded-3xl p-8 max-w-4xl shadow-sm">
-                    <div className="mb-8 border-b border-slate-100 pb-6">
-                        <h2 className="text-2xl font-bold text-slate-800">Integrations</h2>
-                        <p className="text-slate-500 mt-1">Connect your favorite tools to streamline your workflow.</p>
-                    </div>
-
-                    <div className="flex items-center justify-between p-6 border border-slate-200 rounded-2xl hover:border-indigo-200 transition">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 flex items-center justify-center bg-slate-50 rounded-xl">
-                                <CalendarIcon className="w-6 h-6 text-indigo-600" />
-                            </div>
-                            <div>
-                                <h3 className="text-lg font-bold text-slate-800">Google Calendar</h3>
-                                <p className="text-slate-500 text-sm">Automatically add new bookings to your calendar and prevent double bookings.</p>
-                            </div>
                         </div>
-                        <button
-                            onClick={handleConnectGoogle}
-                            className="px-6 py-2.5 bg-indigo-50 text-indigo-700 font-bold rounded-xl hover:bg-indigo-100 transition whitespace-nowrap"
-                        >
-                            {expertData.googleRefreshToken ? 'Connected' : 'Connect'}
-                        </button>
                     </div>
                 </div>
-            )}
-
-            {showModal && (
-                <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-                    <div className="bg-white rounded-3xl p-8 w-full max-w-md shadow-xl animate-in fade-in zoom-in-95 duration-200">
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-2xl font-bold">Add Event Type</h2>
-                            <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-slate-600 p-2 text-xl">&times;</button>
-                        </div>
-
-                        <form onSubmit={handleCreateEvent} className="space-y-5">
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Event Name</label>
-                                <input type="text" value={title} onChange={e => { setTitle(e.target.value); setUrlSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-')); }} placeholder="e.g. 30 Minute Interview" required className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none" />
-                            </div>
-                            <div className="flex gap-4">
-                                <div className="flex-1">
-                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Duration (mins)</label>
-                                    <select value={duration} onChange={e => setDuration(Number(e.target.value))} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none bg-white">
-                                        <option value={15}>15</option>
-                                        <option value={30}>30</option>
-                                        <option value={45}>45</option>
-                                        <option value={60}>60</option>
-                                        <option value={90}>90</option>
-                                        <option value={120}>120</option>
-                                    </select>
-                                </div>
-                                <div className="flex-1">
-                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Location</label>
-                                    <select value={location} onChange={e => setLocation(e.target.value)} className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none bg-white">
-                                        <option value="Video Call">Video Call</option>
-                                        <option value="Phone Call">Phone Call</option>
-                                        <option value="In-Person">In-Person</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">URL Slug</label>
-                                <div className="flex items-center border border-slate-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-indigo-200">
-                                    <span className="bg-slate-50 text-slate-500 px-3 py-3 border-r border-slate-200 text-sm">/{expertData.username || 'expert'}/</span>
-                                    <input type="text" value={urlSlug} onChange={e => setUrlSlug(e.target.value)} required placeholder="30min" className="w-full px-3 py-3 outline-none" />
-                                </div>
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Description / Instructions</label>
-                                <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="Please prepare questions..." className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none h-24 resize-none" />
-                            </div>
-                            <button type="submit" disabled={formLoading} className="w-full py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-md hover:bg-indigo-700 transition flex items-center justify-center gap-2">
-                                {formLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Save Event Type"}
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            )}
-        </div>
+            </div>
+        </Layout>
     );
-};
-
-export default ExpertDashboard;
+}

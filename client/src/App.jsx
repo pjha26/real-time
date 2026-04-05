@@ -1,33 +1,35 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Layout from './components/Layout';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuthStore } from './store/useStore';
+import LandingPage from './pages/LandingPage';
 import ExpertListing from './pages/ExpertListing';
 import ExpertDetail from './pages/ExpertDetail';
-import MyBookings from './pages/MyBookings';
-import LandingPage from './pages/LandingPage';
+import PublicBookingPage from './pages/PublicBookingPage';
+import ExpertDashboard from './pages/ExpertDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import Profile from './pages/Profile';
-import ExpertDashboard from './pages/ExpertDashboard';
-import PublicBookingPage from './pages/PublicBookingPage';
+import './index.css';
 
-function App() {
-  return (
-    <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/experts" element={<ExpertListing />} />
-          <Route path="/expert/:id" element={<ExpertDetail />} />
-          <Route path="/expert-dashboard" element={<ExpertDashboard />} />
-          <Route path="/my-bookings" element={<MyBookings />} />
-          <Route path="/:username/:urlSlug" element={<PublicBookingPage />} />
-        </Routes>
-      </Layout>
-    </Router>
-  );
+function ProtectedRoute({ children }) {
+  const { token } = useAuthStore();
+  return token ? children : <Navigate to="/login" replace />;
 }
 
-export default App;
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/explore" element={<ExpertListing />} />
+        <Route path="/experts/:id" element={<ExpertDetail />} />
+        <Route path="/book/:expertId" element={<PublicBookingPage />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/workspace" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
+        <Route path="/collaborations" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
+        <Route path="/curator" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
+        <Route path="/bookings" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}

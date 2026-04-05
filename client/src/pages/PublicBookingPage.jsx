@@ -1,292 +1,221 @@
-import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { Calendar, Clock, MapPin, User, Loader2, ArrowRight } from 'lucide-react';
-import useAuthStore from '../store/useAuthStore';
-import { format, addMinutes, isBefore, endOfDay, parseISO } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz';
+import { useState } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useBookingStore, useAuthStore } from '../store/useStore';
+import Layout from '../components/Layout';
 
-// Note: This MVP component handles the public booking view `/:username/:urlSlug` 
-// It simulates the Calendly public link booking flow.
+const EXPERTS = {
+    '1': { name: 'Marcus Thorne', specialty: 'Product Strategy', hourly_rate: 450 },
+    '2': { name: 'Elena Vance', specialty: 'UI/UX Architecture', hourly_rate: 380 },
+    '3': { name: 'David Chen', specialty: 'Cloud Infrastructure', hourly_rate: 420 },
+    '4': { name: 'Zoe Nakamura', specialty: 'AI/ML', hourly_rate: 500 },
+    '5': { name: 'Alex Rivera', specialty: 'Blockchain', hourly_rate: 460 },
+    '6': { name: 'Sarah Kim', specialty: 'Growth Marketing', hourly_rate: 340 },
+};
 
-const PublicBookingPage = () => {
-    const { username, urlSlug } = useParams();
+const TIME_SLOTS = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'];
+
+const SCOPE_ITEMS = [
+    'Audit of current atomic components and accessibility gaps in existing library.',
+    'Definition of a multi-brand token strategy for 2024 compliance.',
+    'Live pairing session to establish 3 core dashboard templates.',
+];
+
+export default function PublicBookingPage() {
+    const { expertId } = useParams();
+    const { user } = useAuthStore();
+    const { createBooking, loading } = useBookingStore();
     const navigate = useNavigate();
-    const [expert, setExpert] = useState(null);
-    const [eventType, setEventType] = useState(null);
-    const [loading, setLoading] = useState(true);
+
+    const expert = EXPERTS[expertId] || { name: 'Elena Vance', specialty: 'UI/UX Architecture', hourly_rate: 380 };
+    const initials = expert.name.split(' ').map(n => n[0]).join('');
+
+    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedTime, setSelectedTime] = useState(null);
+    const [notes, setNotes] = useState('');
+    const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState('');
 
-    // Booking Form State
-    const { user } = useAuthStore();
-    const [name, setName] = useState(user?.name || '');
-    const [email, setEmail] = useState(user?.email || '');
-    const [phone, setPhone] = useState('');
-    const [notes, setNotes] = useState('');
-    const [selectedDate, setSelectedDate] = useState('');
-    const [selectedTime, setSelectedTime] = useState('');
-    const [availableTimes, setAvailableTimes] = useState([]);
+    const days = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date();
+        d.setDate(d.getDate() + i);
+        return d;
+    });
 
-    const [submitting, setSubmitting] = useState(false);
-    const [success, setSuccess] = useState(false);
-
-    useEffect(() => {
-        const fetchDetails = async () => {
-            try {
-                // Fetch all experts (MVP workaround instead of strict username lookup)
-                const { data: experts } = await axios.get('https://real-time-x3n3.onrender.com/api/experts?limit=100');
-
-                // Find expert by username OR fallback to matching by the ID string if the username route parameter was an ID
-                const foundExpert = experts.find(e => e.username === username || e._id === username);
-
-                if (!foundExpert) {
-                    setError('Expert not found.');
-                    setLoading(false);
-                    return;
-                }
-                setExpert(foundExpert);
-
-                const { data: events } = await axios.get(`https://real-time-x3n3.onrender.com/api/event-types/expert/${foundExpert._id}`);
-                const foundEvent = events.find(e => e.urlSlug === urlSlug);
-
-                if (!foundEvent) {
-                    setError('Event type not found or is no longer available.');
-                    setLoading(false);
-                    return;
-                }
-                setEventType(foundEvent);
-            } catch (err) {
-                setError('Failed to load booking page.');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchDetails();
-    }, [username, urlSlug]);
-
-    useEffect(() => {
-        if (!expert || !eventType || !selectedDate) return;
-
-        const expertTz = expert.timezone || 'UTC';
-        const duration = eventType.duration || 30;
-
-        // Parse the selected date in the user's local timezone (start of that day)
-        const dateUser = parseISO(`${selectedDate}T00:00:00`);
-        const newAvailableTimes = [];
-        let currentSlot = dateUser;
-        const end = endOfDay(dateUser);
-
-        while (isBefore(currentSlot, end)) {
-            // Get the time in the expert's timezone
-            const expertTimeStr = formatInTimeZone(currentSlot, expertTz, 'HH:mm');
-            // Get the day of the week in the expert's timezone (1=Mon ... 7=Sun)
-            const expertIsoDay = parseInt(formatInTimeZone(currentSlot, expertTz, 'i'), 10);
-            const expertDayOfWeek = expertIsoDay === 7 ? 0 : expertIsoDay; // convert to 0=Sun
-
-            // Check if expert is available at this time in their timezone
-            const dayRule = expert.availability?.find(a => a.dayOfWeek === expertDayOfWeek);
-
-            if (dayRule && dayRule.isAvailable) {
-                if (expertTimeStr >= dayRule.startTime && expertTimeStr < dayRule.endTime) {
-                    // For a complete MVP, we should also check if currentSlot+duration < endTime
-                    // We'll add the slot mapped to the user's local timezone
-                    newAvailableTimes.push(format(currentSlot, 'HH:mm'));
-                }
-            }
-
-            currentSlot = addMinutes(currentSlot, duration);
-        }
-
-        setAvailableTimes(newAvailableTimes);
-    }, [selectedDate, expert, eventType]);
-
-    const handleBooking = async (e) => {
-        e.preventDefault();
-
-        // MVP Check: Must be logged in to book for simplicity in this demo,
-        // though true Calendly lets anyone book. Our backend currently requires a User ID for Bookings.
-        if (!user) {
-            alert("You must log in or register before booking. Redirecting to login...");
-            navigate('/login');
-            return;
-        }
-
-        if (!selectedDate || !selectedTime) {
-            alert('Please select a date and time.');
-            return;
-        }
-
-        setSubmitting(true);
+    const handleSubmit = async () => {
+        if (!user) { navigate('/login'); return; }
+        if (!selectedDate || !selectedTime) { setError('Please select a date and time.'); return; }
+        setError('');
         try {
-            await axios.post('https://real-time-x3n3.onrender.com/api/bookings', {
-                expertId: expert._id,
-                email,
-                name,
-                phone,
-                date: selectedDate,
-                timeSlot: selectedTime,
-                notes,
-            }, {
-                headers: { Authorization: `Bearer ${user.token}` }
-            });
-
-            setSuccess(true);
+            const start = new Date(selectedDate);
+            const [h, m] = selectedTime.replace(' AM', '').replace(' PM', '').split(':');
+            start.setHours(parseInt(h) + (selectedTime.includes('PM') && h !== '12' ? 12 : 0), parseInt(m));
+            const end = new Date(start.getTime() + 60 * 60 * 1000);
+            await createBooking({ expert_id: expertId, start_time: start.toISOString(), end_time: end.toISOString(), scope: { notes } });
+            setSubmitted(true);
         } catch (err) {
-            alert(err.response?.data?.message || 'Booking failed');
-        } finally {
-            setSubmitting(false);
+            setError(err.response?.data?.error || 'Booking failed. Please try again.');
         }
     };
 
-    if (loading) {
-        return <div className="flex justify-center py-32"><Loader2 className="w-12 h-12 animate-spin text-indigo-500" /></div>;
-    }
-
-    if (error || !expert || !eventType) {
+    if (submitted) {
         return (
-            <div className="flex justify-center items-center py-32">
-                <div className="bg-red-50 text-red-600 p-8 rounded-3xl text-center max-w-md w-full border border-red-100 shadow-sm">
-                    <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                    <h2 className="text-xl font-bold mb-2">Unavailable</h2>
-                    <p>{error}</p>
-                    <button onClick={() => navigate('/')} className="mt-6 px-6 py-2 bg-white text-red-600 font-semibold rounded-xl hover:bg-red-50 transition shadow-sm border border-red-100">Go Home</button>
-                </div>
-            </div>
-        );
-    }
-
-    // Generate dummy time slots for demo
-    // const availableTimes = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00'];
-
-    if (success) {
-        return (
-            <div className="max-w-2xl mx-auto py-20 px-4 animate-in fade-in zoom-in-95 duration-500">
-                <div className="bg-white rounded-3xl p-10 shadow-sm border border-slate-100 text-center">
-                    <div className="w-20 h-20 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <CheckCircle className="w-10 h-10" />
-                    </div>
-                    <h1 className="text-3xl font-extrabold text-slate-900 mb-4">You are scheduled</h1>
-                    <p className="text-slate-600 mb-8 max-w-md mx-auto">
-                        A calendar invitation has been sent to your email address.
-                    </p>
-
-                    <div className="bg-slate-50 border border-slate-200 rounded-2xl p-6 mb-8 text-left max-w-sm mx-auto">
-                        <h3 className="font-bold text-slate-900 mb-4">{eventType.title}</h3>
-                        <div className="space-y-3 text-sm text-slate-600">
-                            <div className="flex items-center gap-3"><User className="w-4 h-4 text-slate-400" /> {expert.name}</div>
-                            <div className="flex items-center gap-3"><Calendar className="w-4 h-4 text-slate-400" /> {selectedDate}</div>
-                            <div className="flex items-center gap-3"><Clock className="w-4 h-4 text-slate-400" /> {selectedTime}</div>
-                            <div className="flex items-center gap-3"><MapPin className="w-4 h-4 text-slate-400" /> {eventType.location}</div>
+            <Layout>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
+                    <div className="card animate-fadeInUp" style={{ textAlign: 'center', maxWidth: '480px', padding: '3rem', border: '1px solid rgba(218,185,255,0.15)' }}>
+                        <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                            <span className="material-icons" style={{ fontSize: '2rem', color: '#fff' }}>check</span>
                         </div>
+                        <h2 style={{ marginBottom: '0.75rem' }}>Workspace Initialized!</h2>
+                        <p style={{ marginBottom: '2rem' }}>Your session with <strong style={{ color: 'var(--primary)' }}>{expert.name}</strong> has been confirmed. The Curator has sent prep materials to your inbox.</p>
+                        <div style={{ background: 'rgba(143,0,255,0.08)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '2rem', fontSize: '0.85rem', color: 'var(--on-surface-var)' }}>
+                            💡 Curator Tip: {expert.name.split(' ')[0]} prefers having access to Figma files 24 hours in advance. Your prep list has been updated.
+                        </div>
+                        <Link to="/workspace" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex' }}>
+                            <span className="material-icons" style={{ fontSize: 18 }}>grid_view</span>
+                            Go to Workspace
+                        </Link>
                     </div>
-
-                    <button onClick={() => navigate('/my-bookings')} className="px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition">
-                        View My Bookings
-                    </button>
                 </div>
-            </div>
+            </Layout>
         );
     }
 
     return (
-        <div className="max-w-5xl mx-auto py-10 px-4">
-            <div className="bg-white rounded-[2rem] shadow-sm border border-slate-200 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
+        <Layout>
+            <div style={{ position: 'relative', overflow: 'hidden' }}>
+                <div className="blob blob-1" style={{ width: '400px', height: '400px', top: '-100px' }} />
 
-                {/* Left side: Event Details */}
-                <div className="w-full md:w-1/3 bg-slate-50 p-8 md:p-10 border-r border-slate-200 flex flex-col">
-                    <h4 className="text-slate-500 font-bold tracking-wider uppercase text-xs mb-3">{expert.name}</h4>
-                    <h1 className="text-3xl font-extrabold text-slate-900 mb-6">{eventType.title}</h1>
+                <div style={{ padding: '2.5rem 2rem', position: 'relative', zIndex: 1 }}>
+                    <span className="section-label">DYNAMIC BOOKING</span>
+                    <h1 style={{ marginTop: '0.5rem', marginBottom: '0.5rem', fontSize: '1.8rem' }}>
+                        Finalizing your workspace with{' '}
+                        <span style={{ color: 'var(--primary)' }}>{expert.name}</span>
+                    </h1>
+                    <p style={{ marginBottom: '2.5rem', color: 'var(--on-surface-var)' }}>AI-curated scope + intelligent availability sync.</p>
 
-                    <div className="space-y-4 mb-8">
-                        <div className="flex items-center gap-3 text-slate-600 font-medium">
-                            <Clock className="w-5 h-5 text-slate-400" />
-                            {eventType.duration} min
-                        </div>
-                        <div className="flex items-center gap-3 text-slate-600 font-medium">
-                            <MapPin className="w-5 h-5 text-slate-400" />
-                            {eventType.location}
-                        </div>
-                    </div>
-
-                    <p className="text-slate-600 leading-relaxed mb-auto whitespace-pre-wrap">
-                        {eventType.description || "Join me for this session."}
-                    </p>
-                </div>
-
-                {/* Right side: Form & Selection */}
-                <div className="w-full md:w-2/3 p-8 md:p-10 flex flex-col">
-                    <h2 className="text-xl font-bold text-slate-900 mb-6">Select a Date & Time</h2>
-
-                    {!selectedDate || !selectedTime ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-auto">
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-3">Date</label>
-                                <input
-                                    type="date"
-                                    min={new Date().toISOString().split('T')[0]}
-                                    value={selectedDate}
-                                    onChange={e => setSelectedDate(e.target.value)}
-                                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-3">Time Slot</label>
-                                <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto pr-2">
-                                    {availableTimes.map((t) => (
-                                        <button
-                                            key={t}
-                                            disabled={!selectedDate}
-                                            onClick={() => setSelectedTime(t)}
-                                            className={`py-3 px-2 rounded-xl border text-sm font-bold transition-all ${!selectedDate ? 'opacity-50 cursor-not-allowed bg-slate-50 border-slate-200 text-slate-400' : selectedTime === t ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-white border-indigo-100 text-indigo-600 hover:border-indigo-600 hover:bg-indigo-50'}`}
-                                        >
-                                            {t}
-                                        </button>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start' }}>
+                        {/* Left */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            {/* AI Scope */}
+                            <div className="card" style={{ background: 'rgba(143,0,255,0.06)', border: '1px solid rgba(218,185,255,0.1)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                                    <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '20px' }}>auto_awesome</span>
+                                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>AI-Drafted Project Scope</span>
+                                </div>
+                                <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', marginBottom: '1rem' }}>Based on your inquiry about "Scalable Design Systems", the Curator has synthesized:</p>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    {SCOPE_ITEMS.map((item, i) => (
+                                        <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                                            <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '16px', marginTop: '2px', flexShrink: 0 }}>check_circle</span>
+                                            <span style={{ fontSize: '0.85rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>{item}</span>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Notes */}
+                            <div className="card">
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--on-surface-var)', marginBottom: '8px', fontFamily: 'var(--font-body)' }}>
+                                    Additional Context (optional)
+                                </label>
+                                <textarea
+                                    className="input"
+                                    rows={4}
+                                    placeholder="Describe your project goals, deliverables, or questions for the expert…"
+                                    value={notes}
+                                    onChange={e => setNotes(e.target.value)}
+                                    style={{ resize: 'vertical' }}
+                                />
+                            </div>
                         </div>
-                    ) : (
-                        <form onSubmit={handleBooking} className="space-y-5 animate-in slide-in-from-right-4 duration-300">
 
-                            <div className="bg-indigo-50 border border-indigo-100 rounded-xl p-4 flex justify-between items-center mb-6">
-                                <div>
-                                    <p className="text-sm text-slate-500 font-medium">Selected Slot</p>
-                                    <p className="text-indigo-900 font-bold">{selectedDate} at {selectedTime}</p>
+                        {/* Right */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            {/* Calendar */}
+                            <div className="card">
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                                    <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '20px' }}>calendar_month</span>
+                                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>Intelligent Availability</span>
                                 </div>
-                                <button type="button" onClick={() => setSelectedTime('')} className="text-sm font-semibold text-indigo-600 hover:underline">Change</button>
-                            </div>
+                                <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginBottom: '1rem' }}>Synchronizing your work cycles with {expert.name.split(' ')[0]}'s peak creative flow.</p>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Name *</label>
-                                    <input type="text" value={name} onChange={e => setName(e.target.value)} required className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none" />
+                                {/* Day picker */}
+                                <div style={{ display: 'flex', gap: '8px', marginBottom: '1.25rem', overflowX: 'auto', paddingBottom: '4px' }}>
+                                    {days.map((d, i) => {
+                                        const isSelected = selectedDate?.toDateString() === d.toDateString();
+                                        return (
+                                            <button
+                                                key={i}
+                                                onClick={() => setSelectedDate(d)}
+                                                style={{
+                                                    flexShrink: 0, padding: '10px 14px', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer',
+                                                    background: isSelected ? 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))' : 'var(--surface-lowest)',
+                                                    color: isSelected ? '#fff' : 'var(--on-surface-var)',
+                                                    fontFamily: 'var(--font-display)', fontWeight: isSelected ? 700 : 500, fontSize: '0.8rem',
+                                                    transition: 'all var(--transition)', textAlign: 'center', minWidth: '52px',
+                                                }}
+                                            >
+                                                <div style={{ fontSize: '0.65rem', opacity: 0.7, marginBottom: '2px' }}>
+                                                    {d.toLocaleDateString('en', { weekday: 'short' })}
+                                                </div>
+                                                <div>{d.getDate()}</div>
+                                            </button>
+                                        );
+                                    })}
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email *</label>
-                                    <input type="email" value={email} onChange={e => setEmail(e.target.value)} required className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none" />
+
+                                {/* Time slots */}
+                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                                    {TIME_SLOTS.map(time => {
+                                        const isSelected = selectedTime === time;
+                                        return (
+                                            <button
+                                                key={time}
+                                                onClick={() => setSelectedTime(time)}
+                                                style={{
+                                                    padding: '8px 4px', borderRadius: 'var(--radius)', border: 'none', cursor: 'pointer',
+                                                    background: isSelected ? 'rgba(218,185,255,0.15)' : 'var(--surface-lowest)',
+                                                    color: isSelected ? 'var(--primary)' : 'var(--on-surface-var)',
+                                                    fontFamily: 'var(--font-body)', fontSize: '0.75rem', fontWeight: isSelected ? 600 : 400,
+                                                    transition: 'all var(--transition)',
+                                                    border: isSelected ? '1px solid rgba(218,185,255,0.3)' : '1px solid transparent',
+                                                }}
+                                            >
+                                                {time}
+                                            </button>
+                                        );
+                                    })}
                                 </div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Phone Number *</label>
-                                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} required placeholder="+1 (555) 000-0000" className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none" />
+                            {/* Expert summary */}
+                            <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                <div className="avatar" style={{ width: 44, height: 44, fontSize: '1rem', flexShrink: 0 }}>{initials}</div>
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, marginBottom: '2px' }}>{expert.name}</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)' }}>{expert.specialty}</div>
+                                </div>
+                                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--primary)', fontSize: '1.1rem' }}>${expert.hourly_rate}/hr</div>
                             </div>
 
-                            <div>
-                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Please share anything that will help prepare for our meeting.</label>
-                                <textarea value={notes} onChange={e => setNotes(e.target.value)} className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none h-24 resize-none" />
-                            </div>
+                            {/* CTA */}
+                            {error && <div style={{ background: 'rgba(255,180,171,0.1)', border: '1px solid rgba(255,180,171,0.2)', color: 'var(--error)', padding: '10px 14px', borderRadius: 'var(--radius)', fontSize: '0.85rem' }}>{error}</div>}
 
-                            <button type="submit" disabled={submitting} className="w-full py-4 bg-indigo-600 text-white font-bold text-lg rounded-xl shadow-md hover:bg-indigo-700 transition flex items-center justify-center gap-2 mt-4">
-                                {submitting ? <Loader2 className="w-6 h-6 animate-spin" /> : "Confirm Reservation"}
+                            <button className="btn-primary" onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '14px', fontSize: '1rem', justifyContent: 'center', opacity: loading ? 0.7 : 1 }}>
+                                {loading ? <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} /> : (
+                                    <>
+                                        <span className="material-icons" style={{ fontSize: 20 }}>rocket_launch</span>
+                                        Initialize Workspace
+                                    </>
+                                )}
                             </button>
-                        </form>
-                    )}
+                            <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', textAlign: 'center', lineHeight: 1.5 }}>
+                                By initializing, you agree to the Workspace Protocols and the AI data processing agreement.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </Layout>
     );
-};
-
-export default PublicBookingPage;
+}

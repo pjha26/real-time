@@ -1,311 +1,156 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import axios from 'axios';
-import { io } from 'socket.io-client';
-import { User, Briefcase, Star, ArrowLeft, Loader2, Calendar as CalendarIcon, Clock, CheckCircle } from 'lucide-react';
-import useAuthStore from '../store/useAuthStore';
-import { format, addDays, startOfDay, endOfDay, addMinutes, isBefore } from 'date-fns';
-import { formatInTimeZone } from 'date-fns-tz';
+import { useExpertStore } from '../store/useStore';
+import Layout from '../components/Layout';
 
-const socket = io('https://real-time-x3n3.onrender.com');
+const MOCK = {
+    '1': { id: '1', name: 'Marcus Thorne', specialty: ['Product Strategy', 'Growth', 'FinTech'], bio: 'Ex-Apple strategist specializing in fluid transactional experiences and high-growth ecosystems. Former Head of Product at two unicorn startups.', match_score: 97, hourly_rate: 450, retention: 96, impact: 'Top 2%', velocity: '+110%', case_studies: ['Zenith Growth Platform', 'NovaPay UX Overhaul', 'Global Sync Engine'] },
+    '2': { id: '2', name: 'Elena Vance', specialty: ['UI/UX', 'Motion Systems', 'Accessibility'], bio: 'Senior UI Architect with focus on accessibility and motion systems. Creator of the Flux Framework, adopted by 12 enterprise teams.', match_score: 94, hourly_rate: 380, retention: 94, impact: 'Top 1%', velocity: '+120%', case_studies: ['Aether Wallet Core', 'CloudOS Interface', 'Global Sync Engine'] },
+    '3': { id: '3', name: 'David Chen', specialty: ['Cloud Infrastructure', 'AWS', 'Azure'], bio: 'Cloud Infrastructure expert. AWS/Azure specialist for scaling SaaS platforms to millions of concurrent users. 8 years in distributed systems.', match_score: 91, hourly_rate: 420, retention: 91, impact: 'Top 3%', velocity: '+90%', case_studies: ['CloudOS Migration', 'DataStream v3', 'EdgeNet Deployment'] },
+    '4': { id: '4', name: 'Zoe Nakamura', specialty: ['AI/ML', 'Python', 'Data Science'], bio: 'Lead AI researcher. Deployed ML pipelines for 3 Fortune 500 companies. Ethics-first approach to model governance.', match_score: 89, hourly_rate: 500, retention: 92, impact: 'Top 1%', velocity: '+140%', case_studies: ['Momentum AI Engine', 'PredictIQ System', 'Ethical ML Framework'] },
+    '5': { id: '5', name: 'Alex Rivera', specialty: ['Blockchain', 'DeFi', 'Smart Contracts'], bio: 'Web3 pioneer with 6 years building decentralized finance infrastructure at scale. Audited 40+ smart contracts.', match_score: 87, hourly_rate: 460, retention: 88, impact: 'Top 4%', velocity: '+95%', case_studies: ['DeFi Liquidity Protocol', 'NFT Marketplace Core', 'DAO Governance Tools'] },
+    '6': { id: '6', name: 'Sarah Kim', specialty: ['Growth Marketing', 'SEO', 'Analytics'], bio: 'Growth architect who scaled 4 SaaS companies from 0 to $10M ARR. Data-obsessed, ROI-driven.', match_score: 85, hourly_rate: 340, retention: 90, impact: 'Top 5%', velocity: '+80%', case_studies: ['SaaS Launch Sprint', 'SEO Architecture v2', 'Funnel Optimization Suite'] },
+};
 
-const ExpertDetail = () => {
+export default function ExpertDetail() {
     const { id } = useParams();
-    const { user } = useAuthStore();
-    const [expert, setExpert] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const { expert, fetchExpert, loading } = useExpertStore();
 
-    // Bookings state
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [selectedSlot, setSelectedSlot] = useState(null);
-    const [groupedSlots, setGroupedSlots] = useState({});
-    const [bookedSlots, setBookedSlots] = useState([]); // Array of {date, time}
+    useEffect(() => { if (id) fetchExpert(id).catch(() => { }); }, [id]);
 
-    // Form State
-    const [formData, setFormData] = useState({ name: '', email: '', phone: '', notes: '' });
-    const [bookingLoading, setBookingLoading] = useState(false);
-    const [bookingSuccess, setBookingSuccess] = useState(false);
-    const [bookingError, setBookingError] = useState(null);
+    const data = expert || MOCK[id] || MOCK['2'];
+    const initials = data.name?.split(' ').map(n => n[0]).join('') || '?';
 
-    useEffect(() => {
-        const fetchExpert = async () => {
-            try {
-                const res = await axios.get(`https://real-time-x3n3.onrender.com/api/experts/${id}`);
-                setExpert(res.data);
-
-                // Generate dynamic slots for the next 7 days in User's timezone based on Expert's timezone availability
-                const expertTz = res.data.timezone || 'UTC';
-                const grouped = {};
-                const today = new Date();
-
-                for (let i = 0; i < 7; i++) {
-                    const checkDate = addDays(today, i);
-                    const dateStr = format(checkDate, 'yyyy-MM-dd');
-                    const dayStart = startOfDay(checkDate);
-                    const dayEnd = endOfDay(checkDate);
-
-                    const newAvailableTimes = [];
-                    let currentSlot = dayStart;
-
-                    while (isBefore(currentSlot, dayEnd)) {
-                        const expertTimeStr = formatInTimeZone(currentSlot, expertTz, 'HH:mm');
-                        const expertIsoDay = parseInt(formatInTimeZone(currentSlot, expertTz, 'i'), 10);
-                        const expertDayOfWeek = expertIsoDay === 7 ? 0 : expertIsoDay;
-
-                        const dayRule = res.data.availability?.find(a => a.dayOfWeek === expertDayOfWeek);
-
-                        if (dayRule && dayRule.isAvailable) {
-                            if (expertTimeStr >= dayRule.startTime && expertTimeStr < dayRule.endTime) {
-                                newAvailableTimes.push(format(currentSlot, 'HH:mm'));
-                            }
-                        }
-                        // Default generic 30 min duration for profile booking
-                        currentSlot = addMinutes(currentSlot, 30);
-                    }
-
-                    if (newAvailableTimes.length > 0) {
-                        grouped[dateStr] = newAvailableTimes;
-                    }
-                }
-
-                setGroupedSlots(grouped);
-
-                if (Object.keys(grouped).length > 0) {
-                    setSelectedDate(Object.keys(grouped).sort()[0]);
-                }
-            } catch (err) {
-                setError('Failed to fetch expert details.');
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchExpert();
-    }, [id]);
-
-    useEffect(() => {
-        // Listen for real-time slot booking updates
-        socket.on('slotBooked', (data) => {
-            if (data.expertId === id) {
-                setBookedSlots(prev => {
-                    // Avoid duplicates
-                    if (prev.some(s => s.date === data.date && s.time === data.timeSlot)) return prev;
-                    return [...prev, { date: data.date, time: data.timeSlot }];
-                });
-
-                if (selectedDate === data.date && selectedSlot === data.timeSlot) {
-                    setSelectedSlot(null);
-                    setBookingError('The slot you selected was just booked by someone else!');
-                }
-            }
-        });
-
-        return () => {
-            socket.off('slotBooked');
-        };
-    }, [id, selectedDate, selectedSlot]);
-
-    const isSlotBooked = (date, time) => {
-        return bookedSlots.some(slot => slot.date === date && slot.time === time);
-    };
-
-    const handleBooking = async (e) => {
-        e.preventDefault();
-        setBookingError(null);
-        setBookingLoading(true);
-
-        try {
-            await axios.post('https://real-time-x3n3.onrender.com/api/bookings', {
-                expertId: id,
-                date: selectedDate,
-                timeSlot: selectedSlot,
-                ...formData
-            });
-            setBookingSuccess(true);
-        } catch (err) {
-            setBookingError(err.response?.data?.message || 'Booking failed');
-        } finally {
-            setBookingLoading(false);
-        }
-    };
-
-    if (loading) return (
-        <div className="flex justify-center items-center h-64">
-            <Loader2 className="w-10 h-10 text-indigo-500 animate-spin" />
-        </div>
-    );
-
-    if (error || !expert) return (
-        <div className="bg-red-50 text-red-600 p-6 rounded-2xl border border-red-100 text-center">
-            <p className="font-medium">{error || 'Expert not found'}</p>
-            <Link to="/" className="text-indigo-600 hover:underline mt-4 inline-block">Back to listings</Link>
-        </div>
-    );
+    if (loading) {
+        return (
+            <Layout>
+                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
+                    <div className="spinner" />
+                </div>
+            </Layout>
+        );
+    }
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
-            {/* Left Column: Details */}
-            <div className="lg:col-span-1 space-y-6">
-                <Link to="/" className="inline-flex items-center text-sm font-medium text-slate-500 hover:text-indigo-600 transition-colors">
-                    <ArrowLeft className="w-4 h-4 mr-1" /> Back to experts
-                </Link>
+        <Layout>
+            <div style={{ position: 'relative', overflow: 'hidden', minHeight: '100vh' }}>
+                <div className="blob blob-1" style={{ width: '500px', height: '500px', top: '-150px' }} />
 
-                <div className="bg-white rounded-2xl p-6 border border-slate-100 shadow-sm">
-                    <h1 className="text-2xl font-bold text-slate-900 mb-2">{expert.name}</h1>
-                    <div className="flex items-center gap-1 bg-amber-50 text-amber-600 px-3 py-1 rounded-md text-sm font-bold w-max mb-6">
-                        <Star className="w-4 h-4 fill-amber-500" />
-                        <span>{expert.rating} Rating</span>
-                    </div>
+                {/* Hero — asymmetric 60/40 */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '2rem', padding: '2.5rem 2rem', alignItems: 'start', position: 'relative', zIndex: 1 }}>
 
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-3 text-slate-600">
-                            <div className="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
-                                <User className="w-5 h-5" />
-                            </div>
+                    {/* Left — Expert profile */}
+                    <div>
+                        <span className="section-label" style={{ marginBottom: '1rem', display: 'block' }}>EXPERT LIVE PORTFOLIO</span>
+
+                        <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '2rem' }}>
+                            <div className="avatar" style={{ width: 80, height: 80, fontSize: '1.8rem', flexShrink: 0 }}>{initials}</div>
                             <div>
-                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Category</p>
-                                <p className="font-medium">{expert.category}</p>
+                                <h1 style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>{data.name}</h1>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--on-surface-var)', marginBottom: '0.75rem' }}>
+                                    {data.specialty?.[0]} · {data.specialty?.[1]}
+                                </p>
+                                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                    <div className="pulse-dot" />
+                                    <span style={{ fontSize: '0.8rem', color: '#4ade80' }}>Available today</span>
+                                    <span style={{ color: 'var(--outline-var)', margin: '0 4px' }}>·</span>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>${data.hourly_rate}/hr</span>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3 text-slate-600">
-                            <div className="w-10 h-10 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
-                                <Briefcase className="w-5 h-5" />
-                            </div>
-                            <div>
-                                <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Experience</p>
-                                <p className="font-medium">{expert.experience} years</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+                        <p style={{ fontSize: '1rem', lineHeight: 1.7, marginBottom: '2rem', color: 'var(--on-surface-var)' }}>{data.bio}</p>
 
-            {/* Right Column: Booking System */}
-            <div className="lg:col-span-2">
-                <div className="bg-white rounded-2xl p-6 md:p-8 border border-slate-100 shadow-sm">
-                    {bookingSuccess ? (
-                        <div className="text-center py-12 px-4 animate-in zoom-in duration-300">
-                            <div className="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                                <CheckCircle className="w-10 h-10 text-emerald-600" />
+                        {/* Specialties */}
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '2rem' }}>
+                            {(data.specialty || []).map(s => <span key={s} className="chip">{s}</span>)}
+                        </div>
+
+                        {/* AI Skill Insight */}
+                        <div className="card" style={{ background: 'rgba(143,0,255,0.06)', marginBottom: '2rem', border: '1px solid rgba(218,185,255,0.1)' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                                <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '20px' }}>psychology</span>
+                                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem' }}>AI Skill Insight</span>
                             </div>
-                            <h2 className="text-3xl font-bold text-slate-900 mb-4">Booking Confirmed!</h2>
-                            <p className="text-slate-600 mb-8 max-w-md mx-auto">
-                                Your session with {expert.name} on {selectedDate} at {selectedSlot} has been successfully scheduled.
+                            <p style={{ fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+                                Peer analysis indicates {data.name?.split(' ')[0]} excels in Abstract Systems Thinking. Recent contributions resulted in a 40% reduction in interaction latency across 12 verified projects.
                             </p>
-                            <div className="flex justify-center gap-4">
-                                <Link to="/my-bookings" className="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200">
-                                    View My Bookings
-                                </Link>
-                                <Link to="/" className="px-6 py-3 bg-white text-slate-700 border border-slate-200 font-semibold rounded-xl hover:bg-slate-50 transition-colors">
-                                    Browse More
-                                </Link>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                                {[
+                                    { label: 'Retention', value: `${data.retention || 94}%` },
+                                    { label: 'Impact', value: data.impact || 'Top 1%' },
+                                    { label: 'Velocity', value: data.velocity || '+120%' },
+                                ].map(stat => (
+                                    <div key={stat.label} style={{ textAlign: 'center' }}>
+                                        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.5rem', color: 'var(--primary)' }}>{stat.value}</div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginTop: '2px' }}>{stat.label}</div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    ) : (
-                        <div className="space-y-8">
-                            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2 pb-4 border-b border-slate-100">
-                                <CalendarIcon className="w-6 h-6 text-indigo-500" />
-                                Select a Time
-                            </h2>
 
-                            {/* Date Selector */}
-                            {Object.keys(groupedSlots).length > 0 ? (
-                                <div className="flex gap-2 p-1 bg-slate-100 rounded-xl overflow-x-auto w-max">
-                                    {Object.keys(groupedSlots).sort().map(dateStr => (
-                                        <button
-                                            type="button"
-                                            key={dateStr}
-                                            onClick={() => { setSelectedDate(dateStr); setSelectedSlot(null); setBookingError(null); }}
-                                            className={`px-5 py-2.5 rounded-lg font-semibold text-sm whitespace-nowrap transition-all ${selectedDate === dateStr ? 'bg-white shadow-sm text-indigo-600' : 'text-slate-500 hover:text-slate-900'}`}
-                                        >
-                                            {new Date(dateStr).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                                        </button>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="text-slate-500 italic">No available slots.</p>
-                            )}
-
-                            {/* Slots Selector */}
-                            {selectedDate && groupedSlots[selectedDate] && (
-                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                                    {groupedSlots[selectedDate].sort().map(time => {
-                                        const booked = isSlotBooked(selectedDate, time);
-                                        return (
-                                            <button
-                                                key={time}
-                                                type="button"
-                                                disabled={booked}
-                                                onClick={() => { setSelectedSlot(time); setBookingError(null); }}
-                                                className={`flex items-center justify-center gap-1.5 py-3 rounded-xl border font-medium text-sm transition-all ${booked ? 'bg-slate-50 border-slate-100 text-slate-400 cursor-not-allowed opacity-50 relative'
-                                                    : selectedSlot === time
-                                                        ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-200 scale-[1.02]'
-                                                        : 'bg-white border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-indigo-50'
-                                                    }`}
-                                            >
-                                                {!booked && <Clock className="w-3.5 h-3.5 opacity-70" />}
-                                                <span className={booked ? 'line-through' : ''}>{time}</span>
-                                                {booked && <div className="absolute inset-0 flex items-center justify-center opacity-0 hover:opacity-100 bg-slate-800 text-white rounded-xl text-[10px] uppercase font-bold tracking-widest transition-opacity">Booked</div>}
-                                            </button>
-                                        )
-                                    })}
-                                </div>
-                            )}
-
-                            {/* Booking Form */}
-                            {selectedSlot && (
-                                <div className="pt-8 mt-8 border-t border-slate-100 animate-in fade-in duration-300 slide-in-from-bottom-4">
-                                    <h3 className="text-lg font-bold text-slate-900 mb-6">Complete Booking</h3>
-
-                                    {bookingError && (
-                                        <div className="mb-6 bg-red-50 text-red-600 px-4 py-3 rounded-xl border border-red-100 font-medium text-sm">
-                                            {bookingError}
+                        {/* Case Studies */}
+                        <div>
+                            <span className="section-label" style={{ marginBottom: '1rem', display: 'block' }}>SELECTED CASE STUDIES</span>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                                {(data.case_studies || ['Project Alpha', 'Interface Redesign', 'Scaling Engine']).map((study, i) => (
+                                    <div key={study} className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem' }}>
+                                        <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                            <span className="material-icons" style={{ fontSize: 18, color: '#fff' }}>folder_open</span>
                                         </div>
-                                    )}
-
-                                    {!user ? (
-                                        <div className="text-center p-6 bg-indigo-50 rounded-2xl border border-indigo-100">
-                                            <p className="text-slate-700 font-medium mb-4">You need an account to book sessions with experts.</p>
-                                            <Link to="/login" className="inline-block bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-sm">Log In to Book</Link>
+                                        <div>
+                                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>{study}</div>
+                                            <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)' }}>Reimagining through a lens of extreme simplicity.</div>
                                         </div>
-                                    ) : (
-                                        <form onSubmit={handleBooking} className="space-y-4">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <div>
-                                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
-                                                    <input required type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all" placeholder="John Doe" />
-                                                </div>
-                                                <div>
-                                                    <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email Address</label>
-                                                    <input required type="email" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all" placeholder="john@example.com" />
-                                                </div>
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Phone Number</label>
-                                                <input required type="tel" value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all" placeholder="+1 (555) 000-0000" />
-                                            </div>
-                                            <div>
-                                                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Additional Notes</label>
-                                                <textarea value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} rows="3" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none transition-all resize-none" placeholder="Any topics you'd like to discuss..."></textarea>
-                                            </div>
-                                            <button
-                                                type="submit"
-                                                disabled={bookingLoading}
-                                                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl mt-4 transition-all shadow-sm shadow-indigo-200 disabled:opacity-70 disabled:cursor-wait flex justify-center items-center"
-                                            >
-                                                {bookingLoading ? <Loader2 className="w-6 h-6 animate-spin" /> : `Confirm Session for ${selectedSlot}`}
-                                            </button>
-                                        </form>
-                                    )}
-                                </div>
-                            )}
+                                        <span className="material-icons" style={{ marginLeft: 'auto', color: 'var(--outline)', fontSize: 18 }}>arrow_forward</span>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                    )}
+                    </div>
+
+                    {/* Right — Sidebar actions */}
+                    <div style={{ position: 'sticky', top: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        {/* Match score */}
+                        <div className="card" style={{ textAlign: 'center', background: 'linear-gradient(135deg, rgba(143,0,255,0.1), rgba(94,40,153,0.1))', border: '1px solid rgba(218,185,255,0.15)' }}>
+                            <span className="section-label">COMPATIBILITY SCORE</span>
+                            <div style={{ fontFamily: 'var(--font-display)', fontSize: '4rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1, margin: '0.75rem 0' }}>
+                                {data.match_score || 94}%
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>
+                                "{data.name?.split(' ')[0]}'s expertise perfectly bridges your project's technical gap."
+                            </p>
+                        </div>
+
+                        {/* Live Availability */}
+                        <div className="card">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem' }}>Live Availability</span>
+                                <div className="pulse-dot" />
+                            </div>
+                            <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1rem', textAlign: 'center' }}>
+                                <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '2rem', display: 'block' }}>schedule</span>
+                                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--on-surface)', marginTop: '4px' }}>Next Slot: Today, 3:00 PM</div>
+                                <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginTop: '4px' }}>60-min session · ${data.hourly_rate}</div>
+                            </div>
+                            <Link to={`/book/${data.id}`} className="btn-primary" style={{ display: 'flex', justifyContent: 'center', textDecoration: 'none', width: '100%' }}>
+                                <span className="material-icons" style={{ fontSize: 18 }}>rocket_launch</span>
+                                Initialize Workspace
+                            </Link>
+                        </div>
+
+                        {/* Project velocity */}
+                        <div className="card" style={{ padding: '1.25rem' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
+                                <span className="material-icons" style={{ color: 'var(--tertiary)', fontSize: '20px' }}>trending_up</span>
+                                <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--on-surface-var)' }}>Project Velocity Impact</span>
+                            </div>
+                            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', fontWeight: 800, color: 'var(--tertiary)' }}>{data.velocity || '+120%'}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)' }}>Efficiency boost in sprint delivery</div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </Layout>
     );
 }
-
-export default ExpertDetail;

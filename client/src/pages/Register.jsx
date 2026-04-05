@@ -1,117 +1,106 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Mail, Lock, Loader2, Calendar } from 'lucide-react';
-import useAuthStore from '../store/useAuthStore';
+import { useAuthStore } from '../store/useStore';
 
-const Register = () => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const { register, user, loading, error, clearError } = useAuthStore();
+export default function Register() {
+    const { register, loading, error } = useAuthStore();
     const navigate = useNavigate();
+    const [form, setForm] = useState({ name: '', email: '', password: '', role: 'client' });
+    const [showPass, setShowPass] = useState(false);
 
-    useEffect(() => {
-        if (user) navigate('/experts');
-        return () => clearError();
-    }, [user, navigate, clearError]);
+    const set = (k) => (e) => setForm(f => ({ ...f, [k]: e.target.value }));
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await register(name, email, password);
+        try {
+            await register(form.name, form.email, form.password, form.role);
+            navigate('/workspace');
+        } catch (_) { }
     };
 
     return (
-        <div className="min-h-[80vh] flex flex-col justify-center items-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50">
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="flex justify-center text-indigo-600 mb-6">
-                    <Calendar className="w-12 h-12" />
+        <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+            <div className="blob blob-1" />
+            <div className="blob blob-2" />
+
+            <div style={{ width: '100%', maxWidth: '440px', padding: '2rem', position: 'relative', zIndex: 1 }}>
+                <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+                    <div style={{ fontFamily: 'var(--font-display)', fontSize: '1.5rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '0.5rem' }}>⚡ Match & Flow</div>
+                    <h2 style={{ fontSize: '1.5rem', marginBottom: '0.5rem' }}>Create your workspace</h2>
+                    <p style={{ fontSize: '0.875rem', color: 'var(--on-surface-var)' }}>Join the collaborative intelligence platform</p>
                 </div>
-                <h2 className="text-center text-3xl font-extrabold text-slate-900 mb-2">Create an account</h2>
-                <p className="text-center text-sm text-slate-600 mb-8">
-                    Join ExpertBook to schedule your direct sessions
-                </p>
-            </div>
 
-            <div className="sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-10 px-8 shadow-sm border border-slate-100 rounded-2xl sm:px-10">
-                    {error && (
-                        <div className="mb-6 bg-red-50 border border-red-100 text-red-600 px-4 py-3 rounded-xl text-sm font-medium">
-                            {error}
+                <div className="card" style={{ padding: '2rem', border: '1px solid rgba(218,185,255,0.08)' }}>
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                        {error && (
+                            <div style={{ background: 'rgba(255,180,171,0.1)', border: '1px solid rgba(255,180,171,0.2)', color: 'var(--error)', padding: '10px 14px', borderRadius: 'var(--radius)', fontSize: '0.85rem' }}>
+                                {error}
+                            </div>
+                        )}
+
+                        <div className="form-group">
+                            <label className="form-label">Full name</label>
+                            <input className="input" type="text" placeholder="Your name" value={form.name} onChange={set('name')} required />
                         </div>
-                    )}
 
-                    <form className="space-y-5" onSubmit={handleSubmit}>
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Full Name</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <User className="h-5 w-5 text-slate-400" />
-                                </div>
-                                <input
-                                    type="text"
-                                    required
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    className="block w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all outline-none"
-                                    placeholder="John Doe"
-                                />
+                        <div className="form-group">
+                            <label className="form-label">Email address</label>
+                            <input className="input" type="email" placeholder="you@example.com" value={form.email} onChange={set('email')} required />
+                        </div>
+
+                        <div className="form-group">
+                            <label className="form-label">Password</label>
+                            <div style={{ position: 'relative' }}>
+                                <input className="input" type={showPass ? 'text' : 'password'} placeholder="Min. 8 characters" value={form.password} onChange={set('password')} required minLength={8} style={{ paddingRight: '48px' }} />
+                                <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: 'absolute', right: '14px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--outline)', padding: 0 }}>
+                                    <span className="material-icons" style={{ fontSize: 20 }}>{showPass ? 'visibility_off' : 'visibility'}</span>
+                                </button>
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email address</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Mail className="h-5 w-5 text-slate-400" />
-                                </div>
-                                <input
-                                    type="email"
-                                    required
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="block w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all outline-none"
-                                    placeholder="you@example.com"
-                                />
+                        {/* Role toggle */}
+                        <div className="form-group">
+                            <label className="form-label">I am joining as</label>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                                {['client', 'expert'].map(role => (
+                                    <button
+                                        key={role}
+                                        type="button"
+                                        onClick={() => setForm(f => ({ ...f, role }))}
+                                        style={{
+                                            padding: '12px', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer',
+                                            background: form.role === role ? 'rgba(218,185,255,0.15)' : 'var(--surface-lowest)',
+                                            color: form.role === role ? 'var(--primary)' : 'var(--on-surface-var)',
+                                            fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: '0.875rem',
+                                            border: form.role === role ? '1px solid rgba(218,185,255,0.3)' : '1px solid transparent',
+                                            transition: 'all var(--transition)',
+                                        }}
+                                    >
+                                        <span className="material-icons" style={{ fontSize: 18, display: 'block', margin: '0 auto 4px' }}>
+                                            {role === 'client' ? 'person_search' : 'workspace_premium'}
+                                        </span>
+                                        {role === 'client' ? 'Seeker' : 'Expert'}
+                                    </button>
+                                ))}
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
-                            <div className="relative">
-                                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <Lock className="h-5 w-5 text-slate-400" />
-                                </div>
-                                <input
-                                    type="password"
-                                    required
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="block w-full pl-10 pr-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 transition-all outline-none"
-                                    placeholder="••••••••"
-                                    minLength={6}
-                                />
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="w-full mt-2 flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-70 disabled:cursor-wait transition-all"
-                        >
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Create Account'}
+                        <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%', justifyContent: 'center', padding: '13px', fontSize: '0.95rem', marginTop: '0.25rem', opacity: loading ? 0.7 : 1 }}>
+                            {loading ? <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} /> : (
+                                <>
+                                    <span className="material-icons" style={{ fontSize: 18 }}>rocket_launch</span>
+                                    Initialize Workspace
+                                </>
+                            )}
                         </button>
                     </form>
-
-                    <div className="mt-8 text-center text-sm">
-                        <span className="text-slate-500">Already have an account? </span>
-                        <Link to="/login" className="font-semibold text-indigo-600 hover:text-indigo-500">
-                            Sign in
-                        </Link>
-                    </div>
                 </div>
+
+                <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--on-surface-var)' }}>
+                    Already a member?{' '}
+                    <Link to="/login" style={{ color: 'var(--primary)', fontWeight: 600 }}>Sign in</Link>
+                </p>
             </div>
         </div>
     );
-};
-
-export default Register;
+}
