@@ -24,8 +24,32 @@ export default function ExpertDetail() {
     if (loading) {
         return (
             <Layout>
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
-                    <div className="spinner" />
+                <div style={{ padding: '2.5rem 2rem' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '2rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                            <div className="skeleton skeleton-text" style={{ width: 120 }} />
+                            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                                <div className="skeleton skeleton-avatar" style={{ width: 80, height: 80, flexShrink: 0 }} />
+                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                                    <div className="skeleton skeleton-title" style={{ width: '50%' }} />
+                                    <div className="skeleton skeleton-text" style={{ width: '35%' }} />
+                                    <div className="skeleton skeleton-text" style={{ width: '45%' }} />
+                                </div>
+                            </div>
+                            <div className="skeleton skeleton-text" style={{ width: '100%' }} />
+                            <div className="skeleton skeleton-text" style={{ width: '90%' }} />
+                            <div className="skeleton skeleton-text" style={{ width: '75%' }} />
+                            <div style={{ display: 'flex', gap: 8 }}>
+                                {[80, 100, 70].map(w => <div key={w} className="skeleton" style={{ height: 22, width: w, borderRadius: 'var(--radius-sm)' }} />)}
+                            </div>
+                            <div className="skeleton skeleton-card" style={{ height: 160 }} />
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            <div className="skeleton skeleton-card" style={{ height: 140 }} />
+                            <div className="skeleton skeleton-card" style={{ height: 180 }} />
+                            <div className="skeleton skeleton-card" style={{ height: 80 }} />
+                        </div>
+                    </div>
                 </div>
             </Layout>
         );

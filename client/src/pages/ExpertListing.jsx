@@ -91,8 +91,8 @@ export default function ExpertListing() {
                 {/* Grid */}
                 <div style={{ padding: '0 2rem 3rem', position: 'relative', zIndex: 1 }}>
                     {loading ? (
-                        <div style={{ display: 'flex', justifyContent: 'center', padding: '4rem' }}>
-                            <div className="spinner" />
+                        <div className="grid-auto stagger">
+                            {Array.from({ length: 6 }).map((_, i) => <ExpertCardSkeleton key={i} />)}
                         </div>
                     ) : (
                         <>
@@ -115,6 +115,28 @@ export default function ExpertListing() {
                 </div>
             </div>
         </Layout>
+    );
+}
+
+function ExpertCardSkeleton() {
+    return (
+        <div className="card skeleton-card" style={{ height: '260px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <div className="skeleton skeleton-avatar" style={{ width: 48, height: 48 }} />
+                <div className="skeleton skeleton-text" style={{ width: 64 }} />
+            </div>
+            <div className="skeleton skeleton-title" style={{ width: '60%' }} />
+            <div className="skeleton skeleton-text" style={{ width: '100%' }} />
+            <div className="skeleton skeleton-text" style={{ width: '80%' }} />
+            <div style={{ display: 'flex', gap: '8px' }}>
+                <div className="skeleton" style={{ height: 22, width: 70, borderRadius: 'var(--radius-sm)' }} />
+                <div className="skeleton" style={{ height: 22, width: 90, borderRadius: 'var(--radius-sm)' }} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 'auto' }}>
+                <div className="skeleton skeleton-text" style={{ width: 80 }} />
+                <div className="skeleton" style={{ height: 32, width: 100, borderRadius: 'var(--radius-full)' }} />
+            </div>
+        </div>
     );
 }
 
