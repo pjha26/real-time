@@ -1,5 +1,13 @@
 import { useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import {
+    Brain,
+    FolderOpen,
+    ArrowRight,
+    Clock,
+    Rocket,
+    TrendingUp
+} from 'lucide-react';
 import { useExpertStore } from '../store/useStore';
 import Layout from '../components/Layout';
 
@@ -93,7 +101,7 @@ export default function ExpertDetail() {
                         {/* AI Skill Insight */}
                         <div className="card" style={{ background: 'rgba(143,0,255,0.06)', marginBottom: '2rem', border: '1px solid rgba(218,185,255,0.1)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                                <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '20px' }}>psychology</span>
+                                <Brain size={20} color="var(--primary)" />
                                 <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem' }}>AI Skill Insight</span>
                             </div>
                             <p style={{ fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
@@ -120,13 +128,13 @@ export default function ExpertDetail() {
                                 {(data.case_studies || ['Project Alpha', 'Interface Redesign', 'Scaling Engine']).map((study, i) => (
                                     <div key={study} className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem' }}>
                                         <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                            <span className="material-icons" style={{ fontSize: 18, color: '#fff' }}>folder_open</span>
+                                            <FolderOpen size={18} color="#fff" />
                                         </div>
                                         <div>
                                             <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>{study}</div>
                                             <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)' }}>Reimagining through a lens of extreme simplicity.</div>
                                         </div>
-                                        <span className="material-icons" style={{ marginLeft: 'auto', color: 'var(--outline)', fontSize: 18 }}>arrow_forward</span>
+                                        <ArrowRight size={18} style={{ marginLeft: 'auto', color: 'var(--outline)' }} />
                                     </div>
                                 ))}
                             </div>
@@ -152,13 +160,13 @@ export default function ExpertDetail() {
                                 <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem' }}>Live Availability</span>
                                 <div className="pulse-dot" />
                             </div>
-                            <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1rem', textAlign: 'center' }}>
-                                <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '2rem', display: 'block' }}>schedule</span>
+                            <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1.25rem', textAlign: 'center', border: '1px solid rgba(255,255,255,0.03)' }}>
+                                <Clock size={32} color="var(--primary)" style={{ display: 'block', margin: '0 auto 8px' }} />
                                 <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--on-surface)', marginTop: '4px' }}>Next Slot: Today, 3:00 PM</div>
                                 <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginTop: '4px' }}>60-min session · ${data.hourly_rate}</div>
                             </div>
-                            <Link to={`/book/${data.id}`} className="btn-primary" style={{ display: 'flex', justifyContent: 'center', textDecoration: 'none', width: '100%' }}>
-                                <span className="material-icons" style={{ fontSize: 18 }}>rocket_launch</span>
+                            <Link to={`/book/${data.id}`} className="btn-primary" style={{ display: 'flex', justifyContent: 'center', textDecoration: 'none', width: '100%', gap: '10px' }}>
+                                <Rocket size={18} />
                                 Initialize Workspace
                             </Link>
                         </div>
@@ -166,7 +174,7 @@ export default function ExpertDetail() {
                         {/* Project velocity */}
                         <div className="card" style={{ padding: '1.25rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
-                                <span className="material-icons" style={{ color: 'var(--tertiary)', fontSize: '20px' }}>trending_up</span>
+                                <TrendingUp size={20} color="var(--tertiary)" />
                                 <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--on-surface-var)' }}>Project Velocity Impact</span>
                             </div>
                             <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', fontWeight: 800, color: 'var(--tertiary)' }}>{data.velocity || '+120%'}</div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Rocket, Search, Zap, ArrowRight } from 'lucide-react';
 import { useExpertStore } from '../store/useStore';
 
 const EXPERTS = [
@@ -45,8 +46,8 @@ export default function LuminalLanding() {
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <Link to="/login" className="btn-ghost" style={{ textDecoration: 'none' }}>Sign in</Link>
-                    <Link to="/register" className="btn-primary" style={{ textDecoration: 'none' }}>
-                        <span className="material-icons" style={{ fontSize: 16 }}>rocket_launch</span>Get started
+                    <Link to="/register" className="btn-primary" style={{ textDecoration: 'none', gap: '8px' }}>
+                        <Rocket size={16} />Get started
                     </Link>
                 </div>
             </nav>
@@ -82,7 +83,7 @@ export default function LuminalLanding() {
                         <form onSubmit={handleSearch} className="animate-fadeInUp" style={{ animationDelay: '240ms', marginBottom: '3rem' }}>
                             <div style={{ display: 'flex', gap: '12px', maxWidth: '640px' }}>
                                 <div style={{ flex: 1, position: 'relative' }}>
-                                    <span className="material-icons" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)', fontSize: '20px' }}>search</span>
+                                    <Search size={20} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)' }} />
                                     <input
                                         className="input"
                                         style={{ paddingLeft: '44px', height: '52px', fontSize: '0.95rem' }}
@@ -92,7 +93,7 @@ export default function LuminalLanding() {
                                     />
                                 </div>
                                 <button type="submit" className="btn-primary" style={{ padding: '0 24px', height: '52px', flexShrink: 0 }}>
-                                    <span className="material-icons" style={{ fontSize: 20 }}>bolt</span>
+                                    <Zap size={20} fill="currentColor" />
                                     Find Match
                                 </button>
                             </div>
@@ -119,8 +120,8 @@ export default function LuminalLanding() {
                             <span className="section-label">TOP EXPERT MATCHES</span>
                             <p style={{ marginTop: '0.5rem', fontSize: '0.875rem', maxWidth: '480px' }}>Real-time matching based on global innovation trends and collaborative performance.</p>
                         </div>
-                        <Link to="/search" className="btn-ghost" style={{ textDecoration: 'none', flexShrink: 0 }}>
-                            View all <span className="material-icons" style={{ fontSize: 16 }}>arrow_forward</span>
+                        <Link to="/search" className="btn-ghost" style={{ textDecoration: 'none', flexShrink: 0, gap: '8px' }}>
+                            View all <ArrowRight size={16} />
                         </Link>
                     </div>
 
@@ -143,7 +144,7 @@ export default function LuminalLanding() {
                                         </div>
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <span style={{ fontSize: '0.85rem', fontFamily: 'var(--font-display)', fontWeight: 700 }}>${expert.hourly_rate}/hr</span>
-                                            <span style={{ color: 'var(--primary)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4 }}>View profile <span className="material-icons" style={{ fontSize: 14 }}>arrow_forward</span></span>
+                                            <span style={{ color: 'var(--primary)', fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4 }}>View profile <ArrowRight size={14} /></span>
                                         </div>
                                     </div>
                                 </Link>

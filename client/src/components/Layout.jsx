@@ -1,17 +1,28 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
+import {
+    LayoutDashboard,
+    Search,
+    Calendar,
+    Users,
+    Brain,
+    Settings,
+    HelpCircle,
+    LogOut,
+    Zap
+} from 'lucide-react';
 import { useAuthStore } from '../store/useStore';
 
 const navItems = [
-    { to: '/workspace', icon: 'grid_view', label: 'Dashboard' },
-    { to: '/explore', icon: 'explore', label: 'Explore' },
-    { to: '/bookings', icon: 'event', label: 'My Bookings' },
-    { to: '/collaborations', icon: 'group', label: 'Collaborations' },
-    { to: '/curator', icon: 'psychology', label: 'AI Curator' },
+    { to: '/workspace', icon: LayoutDashboard, label: 'Dashboard' },
+    { to: '/explore', icon: Search, label: 'Explore' },
+    { to: '/bookings', icon: Calendar, label: 'My Bookings' },
+    { to: '/collaborations', icon: Users, label: 'Collaborations' },
+    { to: '/curator', icon: Brain, label: 'AI Curator' },
 ];
 
 const bottomItems = [
-    { to: '/settings', icon: 'settings', label: 'Settings' },
-    { to: '/support', icon: 'help_outline', label: 'Support' },
+    { to: '/settings', icon: Settings, label: 'Settings' },
+    { to: '/support', icon: HelpCircle, label: 'Support' },
 ];
 
 export default function Layout({ children }) {
@@ -29,7 +40,7 @@ export default function Layout({ children }) {
             <aside className="sidebar">
                 {/* Logo */}
                 <Link to="/" className="sidebar-logo" style={{ textDecoration: 'none' }}>
-                    <span style={{ fontSize: '1.4rem' }}>📘</span>
+                    <Zap size={22} color="var(--primary)" fill="var(--primary)" opacity={0.8} />
                     ExpertBook
                     <span className="sidebar-ai-badge">AI Online</span>
                 </Link>
@@ -51,7 +62,7 @@ export default function Layout({ children }) {
                             to={item.to}
                             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
                         >
-                            <span className="material-icons">{item.icon}</span>
+                            <item.icon size={20} />
                             {item.label}
                         </NavLink>
                     ))}
@@ -65,7 +76,7 @@ export default function Layout({ children }) {
                             to={item.to}
                             className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
                         >
-                            <span className="material-icons">{item.icon}</span>
+                            <item.icon size={20} />
                             {item.label}
                         </NavLink>
                     ))}
@@ -83,8 +94,8 @@ export default function Layout({ children }) {
                                     <div style={{ fontSize: '0.65rem', color: 'var(--outline)', textTransform: 'capitalize' }}>{user.role}</div>
                                 </div>
                             </div>
-                            <button className="btn-ghost" style={{ width: '100%', fontSize: '0.75rem', padding: '6px' }} onClick={handleLogout}>
-                                <span className="material-icons" style={{ fontSize: 16 }}>logout</span>
+                            <button className="btn-ghost" style={{ width: '100%', fontSize: '0.75rem', padding: '6px', gap: '8px' }} onClick={handleLogout}>
+                                <LogOut size={16} />
                                 Sign out
                             </button>
                         </div>

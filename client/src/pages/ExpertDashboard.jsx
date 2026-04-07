@@ -2,11 +2,25 @@ import { useEffect, useState } from 'react';
 import { useAuthStore, useBookingStore } from '../store/useStore';
 import Layout from '../components/Layout';
 import { Link } from 'react-router-dom';
+import {
+    PencilRuler,
+    AlignLeft,
+    Code2,
+    Phone,
+    FileText,
+    Sparkles,
+    Network,
+    Brain,
+    CheckCircle2,
+    BookOpen,
+    Calendar,
+    ArrowRight
+} from 'lucide-react';
 
 const FLOW_TASKS = [
-    { id: 1, title: 'Architectural Review: Project Zenith', client: 'Sarah Jenkins', type: 'Technical Consultation', time: '10:00 AM', icon: 'architecture' },
-    { id: 2, title: 'Strategy Alignment Call', client: 'Neo-Tech Corp', type: 'Strategy Brief', time: '2:00 PM', icon: 'align_horizontal_left' },
-    { id: 3, title: 'Deep Work: Algorithm Refinement', client: '', type: 'Scheduled block · No interruptions enabled', time: '4:00 PM', icon: 'code' },
+    { id: 1, title: 'Architectural Review: Project Zenith', client: 'Sarah Jenkins', type: 'Technical Consultation', time: '10:00 AM', icon: PencilRuler },
+    { id: 2, title: 'Strategy Alignment Call', client: 'Neo-Tech Corp', type: 'Strategy Brief', time: '2:00 PM', icon: AlignLeft },
+    { id: 3, title: 'Deep Work: Algorithm Refinement', client: '', type: 'Scheduled block · No interruptions enabled', time: '4:00 PM', icon: Code2 },
 ];
 
 const CURATOR_NOTES = [
@@ -16,8 +30,8 @@ const CURATOR_NOTES = [
 ];
 
 const RECENT = [
-    { label: 'Call with David', sub: 'Completed 2h ago · Summary ready', icon: 'call', color: '#4ade80' },
-    { label: 'New Brief: AI Ethics', sub: 'Received from Horizon Corp', icon: 'description', color: 'var(--primary)' },
+    { label: 'Call with David', sub: 'Completed 2h ago · Summary ready', icon: Phone, color: '#4ade80' },
+    { label: 'New Brief: AI Ethics', sub: 'Received from Horizon Corp', icon: FileText, color: 'var(--primary)' },
 ];
 
 export default function ExpertDashboard() {
@@ -64,9 +78,9 @@ export default function ExpertDashboard() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
                             {/* Intelligent Flow */}
-                            <div className="card" style={{ background: 'rgba(143,0,255,0.05)', border: '1px solid rgba(218,185,255,0.08)' }}>
+                            <div className="card" style={{ background: 'rgba(143,0,255,0.03)', border: '1px solid rgba(218,185,255,0.1)', backdropFilter: 'blur(10px)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
-                                    <span className="material-icons" style={{ color: 'var(--primary)' }}>auto_awesome</span>
+                                    <Sparkles size={20} color="var(--primary)" />
                                     <h3>Intelligent Flow</h3>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} className="stagger">
@@ -75,8 +89,8 @@ export default function ExpertDashboard() {
                                             onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-chh)'}
                                             onMouseLeave={e => e.currentTarget.style.background = 'var(--surface-ch)'}
                                         >
-                                            <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                <span className="material-icons" style={{ fontSize: 18, color: '#fff' }}>{task.icon}</span>
+                                            <div style={{ width: 42, height: 42, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--primary), #b06eff)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(143,0,255,0.2)' }}>
+                                                <task.icon size={20} color="#fff" />
                                             </div>
                                             <div style={{ flex: 1 }}>
                                                 <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, marginBottom: '2px', fontSize: '0.9rem' }}>{task.title}</div>
@@ -96,7 +110,7 @@ export default function ExpertDashboard() {
                             <div className="card">
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                        <span className="material-icons" style={{ color: 'var(--primary)' }}>hub</span>
+                                        <Network size={20} color="var(--primary)" />
                                         <h3>Network Flow</h3>
                                     </div>
                                     <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)' }}>12 active · 4 pending</span>
@@ -139,8 +153,8 @@ export default function ExpertDashboard() {
                                 {/* Recent */}
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     {RECENT.map(r => (
-                                        <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: 'var(--radius)', background: 'var(--surface-lowest)' }}>
-                                            <span className="material-icons" style={{ color: r.color, fontSize: '18px' }}>{r.icon}</span>
+                                        <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: 'var(--radius)', background: 'var(--surface-lowest)', border: '1px solid rgba(255,255,255,0.03)' }}>
+                                            <r.icon size={18} color={r.color} />
                                             <div>
                                                 <div style={{ fontSize: '0.85rem', fontWeight: 600, fontFamily: 'var(--font-display)' }}>{r.label}</div>
                                                 <div style={{ fontSize: '0.72rem', color: 'var(--on-surface-var)' }}>{r.sub}</div>
@@ -154,22 +168,22 @@ export default function ExpertDashboard() {
                         {/* Right — Curator Summary + Bookings */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {/* Curator Summary */}
-                            <div className="card" style={{ background: 'rgba(143,0,255,0.06)', border: '1px solid rgba(218,185,255,0.1)' }}>
+                            <div className="card" style={{ background: 'rgba(143,0,255,0.05)', border: '1px solid rgba(218,185,255,0.1)', backdropFilter: 'blur(8px)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
-                                    <span className="material-icons" style={{ color: 'var(--primary)' }}>psychology</span>
+                                    <Brain size={20} color="var(--primary)" />
                                     <h3>Curator Summary</h3>
                                 </div>
                                 <span style={{ fontSize: '0.7rem', color: 'var(--on-surface-var)', marginBottom: '1.25rem', display: 'block' }}>Next Briefing — Sarah Jenkins (Project Zenith)</span>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.5rem' }}>
                                     {CURATOR_NOTES.map((note, i) => (
                                         <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                                            <span className="material-icons" style={{ color: '#4ade80', fontSize: '14px', marginTop: '3px', flexShrink: 0 }}>check_circle</span>
+                                            <CheckCircle2 size={14} color="#4ade80" style={{ marginTop: '3px', flexShrink: 0 }} />
                                             <span style={{ fontSize: '0.82rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>{note}</span>
                                         </div>
                                     ))}
                                 </div>
-                                <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: '10px', fontSize: '0.85rem' }}>
-                                    <span className="material-icons" style={{ fontSize: 16 }}>menu_book</span>
+                                <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: '10px', fontSize: '0.85rem', gap: '8px' }}>
+                                    <BookOpen size={16} />
                                     View Briefing Journal
                                 </button>
                             </div>
@@ -177,14 +191,16 @@ export default function ExpertDashboard() {
                             {/* Bookings from API */}
                             <div className="card">
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                                    <span className="material-icons" style={{ color: 'var(--primary)' }}>event</span>
+                                    <Calendar size={20} color="var(--primary)" />
                                     <h3 style={{ fontSize: '1rem' }}>Upcoming Sessions</h3>
                                 </div>
                                 {bookings.length === 0 ? (
                                     <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--on-surface-var)' }}>
-                                        <span className="material-icons" style={{ fontSize: '2rem', display: 'block', marginBottom: '8px', color: 'var(--outline)' }}>calendar_today</span>
+                                        <Calendar size={32} style={{ display: 'block', margin: '0 auto 8px', color: 'var(--outline)', opacity: 0.5 }} />
                                         <p style={{ fontSize: '0.82rem' }}>No upcoming sessions yet.</p>
-                                        <Link to="/explore" className="btn-ghost" style={{ marginTop: '8px', textDecoration: 'none', display: 'inline-flex', fontSize: '0.8rem' }}>Explore experts</Link>
+                                        <Link to="/explore" className="btn-ghost" style={{ marginTop: '12px', textDecoration: 'none', display: 'inline-flex', fontSize: '0.8rem', gap: '6px' }}>
+                                            Explore experts <ArrowRight size={14} />
+                                        </Link>
                                     </div>
                                 ) : (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

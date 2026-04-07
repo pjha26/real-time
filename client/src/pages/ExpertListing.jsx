@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import { Search, SearchX } from 'lucide-react';
 import { useExpertStore } from '../store/useStore';
 import Layout from '../components/Layout';
 
@@ -58,7 +59,7 @@ export default function ExpertListing() {
 
                     {/* Search */}
                     <div style={{ position: 'relative', marginBottom: '1.5rem', maxWidth: '500px' }}>
-                        <span className="material-icons" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)', fontSize: '20px' }}>search</span>
+                        <Search size={20} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)' }} />
                         <input
                             className="input"
                             placeholder="Search experts, skills, domains…"
@@ -106,7 +107,7 @@ export default function ExpertListing() {
                             </div>
                             {filtered.length === 0 && (
                                 <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--on-surface-var)' }}>
-                                    <span className="material-icons" style={{ fontSize: '3rem', marginBottom: '1rem', display: 'block', color: 'var(--outline)' }}>search_off</span>
+                                    <SearchX size={48} style={{ display: 'block', margin: '0 auto 1rem', color: 'var(--outline)' }} />
                                     <p>No experts match your search. Try different filters.</p>
                                 </div>
                             )}

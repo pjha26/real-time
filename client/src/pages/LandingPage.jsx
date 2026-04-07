@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { Activity, BookOpen, Network, Brain, Rocket, ArrowRight, Star, ShieldCheck, Zap } from 'lucide-react';
 import { useExpertStore } from '../store/useStore';
 
 const MOCK_EXPERTS = [
@@ -9,16 +10,16 @@ const MOCK_EXPERTS = [
 ];
 
 const IMPACT_STATS = [
-    { icon: 'bolt', label: 'Compatibility Scores', val: '98%', desc: 'Deep-level chemistry and technical overlap before the first meeting.' },
-    { icon: 'verified', label: 'AI Skill Endorsements', val: '40+', desc: 'Dynamic verification through portfolio analysis and peer-review scanning.' },
-    { icon: 'speed', label: 'Velocity Metrics', val: '84%', desc: 'Reduce time-to-hire. Our system automates vetting and delivers pre-aligned results.' },
+    { icon: Zap, label: 'Compatibility Scores', val: '98%', desc: 'Deep-level chemistry and technical overlap before the first meeting.' },
+    { icon: ShieldCheck, label: 'AI Skill Endorsements', val: '40+', desc: 'Dynamic verification through portfolio analysis and peer-review scanning.' },
+    { icon: Activity, label: 'Velocity Metrics', val: '84%', desc: 'Reduce time-to-hire. Our system automates vetting and delivers pre-aligned results.' },
 ];
 
 const WORKSPACE_FEATURES = [
-    { icon: 'dynamic_feed', title: 'Flow Prioritization', desc: 'AI-sorted tasks based on your peak productivity cycles.' },
-    { icon: 'auto_stories', title: 'Automated Prep Summaries', desc: 'Instant briefings on stakeholders and project context.' },
-    { icon: 'hub', title: 'Network Intelligence', desc: 'Live map of your active collaborations and connection health.' },
-    { icon: 'psychology', title: 'AI Curator', desc: 'Proactive suggestions to keep your work sessions uninterrupted.' },
+    { icon: Activity, title: 'Flow Prioritization', desc: 'AI-sorted tasks based on your peak productivity cycles.', color: '#8f00ff' },
+    { icon: BookOpen, title: 'Automated Prep Summaries', desc: 'Instant briefings on stakeholders and project context.', color: '#00d4ff' },
+    { icon: Network, title: 'Network Intelligence', desc: 'Live map of your active collaborations and connection health.', color: '#4ade80' },
+    { icon: Brain, title: 'AI Curator', desc: 'Proactive suggestions to keep your work sessions uninterrupted.', color: '#ffb68b' },
 ];
 
 export default function LandingPage() {
@@ -107,13 +108,13 @@ export default function LandingPage() {
 
                         {/* CTA row */}
                         <div className="animate-fadeInUp" style={{ animationDelay: '240ms', display: 'flex', gap: '1rem', marginBottom: '3.5rem', flexWrap: 'wrap' }}>
-                            <Link to="/register" className="btn-primary" style={{ textDecoration: 'none', padding: '14px 32px', fontSize: '1rem' }}>
-                                <span className="material-icons" style={{ fontSize: 20 }}>rocket_launch</span>
+                            <Link to="/register" className="btn-primary" style={{ textDecoration: 'none', padding: '14px 32px', fontSize: '1rem', gap: '10px' }}>
+                                <Rocket size={20} />
                                 Enter your flow state
                             </Link>
-                            <Link to="/explore" className="btn-secondary" style={{ textDecoration: 'none', padding: '14px 28px', fontSize: '1rem' }}>
+                            <Link to="/explore" className="btn-secondary" style={{ textDecoration: 'none', padding: '14px 28px', fontSize: '1rem', gap: '10px' }}>
                                 Explore the network
-                                <span className="material-icons" style={{ fontSize: 18 }}>arrow_forward</span>
+                                <ArrowRight size={18} />
                             </Link>
                         </div>
 
@@ -211,8 +212,8 @@ export default function LandingPage() {
                                     </svg>
                                 </div>
 
-                                <Link to="/experts/1" className="btn-primary" style={{ textDecoration: 'none', display: 'flex', justifyContent: 'center', width: '100%' }}>
-                                    <span className="material-icons" style={{ fontSize: 18 }}>workspace_premium</span>
+                                <Link to="/experts/1" className="btn-primary" style={{ textDecoration: 'none', display: 'flex', justifyContent: 'center', width: '100%', gap: '10px' }}>
+                                    <Star size={18} />
                                     Initialize Workspace
                                 </Link>
                             </div>
@@ -231,8 +232,8 @@ export default function LandingPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }} className="stagger">
                         {IMPACT_STATS.map((stat, i) => (
                             <div key={stat.label} className="card animate-fadeInUp" style={{ textAlign: 'center', padding: '2.5rem 2rem' }}>
-                                <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(143,0,255,0.2), rgba(94,40,153,0.2))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', overflow: 'hidden' }}>
-                                    <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '24px' }}>{stat.icon}</span>
+                                <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(143,0,255,0.1), rgba(143,0,255,0.05))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', border: '1px solid rgba(143,0,255,0.2)' }}>
+                                    <stat.icon size={26} color="var(--primary)" strokeWidth={2.5} />
                                 </div>
                                 <div className="stat-number" style={{ fontSize: '2.5rem', marginBottom: '0.25rem' }}>{stat.val}</div>
                                 <h3 style={{ fontSize: '1rem', marginBottom: '0.75rem' }}>{stat.label}</h3>
@@ -273,13 +274,15 @@ export default function LandingPage() {
                             <p style={{ marginBottom: '2rem' }}>It's not just a list of tasks. It's an intelligent workspace that prioritizes your cognitive energy and keeps your flow state uninterrupted.</p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {WORKSPACE_FEATURES.map(f => (
-                                    <div key={f.title} style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
-                                        <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'rgba(143,0,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
-                                            <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '20px', fontFamily: "'Material Icons', sans-serif" }}>{f.icon}</span>
+                                    <div key={f.title} style={{ display: 'flex', gap: '1.25rem', alignItems: 'center', padding: '1rem', background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: 'var(--radius-lg)', transition: 'transform 0.2s ease' }}
+                                        onMouseEnter={e => e.currentTarget.style.transform = 'translateX(8px)'}
+                                        onMouseLeave={e => e.currentTarget.style.transform = 'translateX(0)'}>
+                                        <div style={{ width: 44, height: 44, borderRadius: '14px', background: `${f.color}15`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: `1px solid ${f.color}30` }}>
+                                            <f.icon size={20} color={f.color} />
                                         </div>
-                                        <div style={{ flex: 1 }}>
-                                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, marginBottom: '4px', fontSize: '0.95rem' }}>{f.title}</div>
-                                            <div style={{ fontSize: '0.875rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>{f.desc}</div>
+                                        <div>
+                                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, marginBottom: '2px', fontSize: '0.95rem', color: 'var(--on-surface)' }}>{f.title}</div>
+                                            <div style={{ fontSize: '0.85rem', color: 'var(--on-surface-var)', lineHeight: 1.4 }}>{f.desc}</div>
                                         </div>
                                     </div>
                                 ))}

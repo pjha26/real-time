@@ -1,5 +1,13 @@
 import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import {
+    Check,
+    LayoutGrid,
+    Sparkles,
+    CheckCircle2,
+    Calendar,
+    Rocket
+} from 'lucide-react';
 import { useBookingStore, useAuthStore } from '../store/useStore';
 import Layout from '../components/Layout';
 
@@ -74,15 +82,15 @@ export default function PublicBookingPage() {
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
                     <div className="card animate-fadeInUp" style={{ textAlign: 'center', maxWidth: '480px', padding: '3rem', border: '1px solid rgba(218,185,255,0.15)' }}>
                         <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                            <span className="material-icons" style={{ fontSize: '2rem', color: '#fff' }}>check</span>
+                            <Check size={32} color="#fff" />
                         </div>
                         <h2 style={{ marginBottom: '0.75rem' }}>Workspace Initialized!</h2>
                         <p style={{ marginBottom: '2rem' }}>Your session with <strong style={{ color: 'var(--primary)' }}>{expert.name}</strong> has been confirmed. The Curator has sent prep materials to your inbox.</p>
                         <div style={{ background: 'rgba(143,0,255,0.08)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '2rem', fontSize: '0.85rem', color: 'var(--on-surface-var)' }}>
                             💡 Curator Tip: {expert.name.split(' ')[0]} prefers having access to Figma files 24 hours in advance. Your prep list has been updated.
                         </div>
-                        <Link to="/workspace" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex' }}>
-                            <span className="material-icons" style={{ fontSize: 18 }}>grid_view</span>
+                        <Link to="/workspace" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', gap: '8px' }}>
+                            <LayoutGrid size={18} />
                             Go to Workspace
                         </Link>
                     </div>
@@ -110,14 +118,14 @@ export default function PublicBookingPage() {
                             {/* AI Scope */}
                             <div className="card" style={{ background: 'rgba(143,0,255,0.06)', border: '1px solid rgba(218,185,255,0.1)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                                    <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '20px' }}>auto_awesome</span>
+                                    <Sparkles size={20} color="var(--primary)" />
                                     <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>AI-Drafted Project Scope</span>
                                 </div>
                                 <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', marginBottom: '1rem' }}>Based on your inquiry about "Scalable Design Systems", the Curator has synthesized:</p>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                     {SCOPE_ITEMS.map((item, i) => (
                                         <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
-                                            <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '16px', marginTop: '2px', flexShrink: 0 }}>check_circle</span>
+                                            <CheckCircle2 size={16} color="var(--primary)" style={{ marginTop: '2px', flexShrink: 0 }} />
                                             <span style={{ fontSize: '0.85rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>{item}</span>
                                         </div>
                                     ))}
@@ -145,7 +153,7 @@ export default function PublicBookingPage() {
                             {/* Calendar */}
                             <div className="card">
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                                    <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '20px' }}>calendar_month</span>
+                                    <Calendar size={20} color="var(--primary)" />
                                     <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>Intelligent Availability</span>
                                 </div>
                                 <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginBottom: '1rem' }}>Synchronizing your work cycles with {expert.name.split(' ')[0]}'s peak creative flow.</p>
@@ -212,10 +220,10 @@ export default function PublicBookingPage() {
                             {/* CTA */}
                             {error && <div style={{ background: 'rgba(255,180,171,0.1)', border: '1px solid rgba(255,180,171,0.2)', color: 'var(--error)', padding: '10px 14px', borderRadius: 'var(--radius)', fontSize: '0.85rem' }}>{error}</div>}
 
-                            <button className="btn-primary" onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '14px', fontSize: '1rem', justifyContent: 'center', opacity: loading ? 0.7 : 1 }}>
+                            <button className="btn-primary" onClick={handleSubmit} disabled={loading} style={{ width: '100%', padding: '14px', fontSize: '1rem', justifyContent: 'center', opacity: loading ? 0.7 : 1, gap: '10px' }}>
                                 {loading ? <div className="spinner" style={{ width: 20, height: 20, borderWidth: 2 }} /> : (
                                     <>
-                                        <span className="material-icons" style={{ fontSize: 20 }}>rocket_launch</span>
+                                        <Rocket size={20} />
                                         Initialize Workspace
                                     </>
                                 )}

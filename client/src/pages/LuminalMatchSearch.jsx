@@ -1,5 +1,21 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
+import {
+    Search,
+    Compass,
+    LayoutDashboard,
+    Award,
+    Activity,
+    Sparkles,
+    Handshake,
+    BarChart3,
+    Settings,
+    HelpCircle,
+    Info,
+    CheckCircle2,
+    SearchX,
+    ArrowRight
+} from 'lucide-react';
 import { useExpertStore } from '../store/useStore';
 
 const MOCK = [
@@ -47,13 +63,13 @@ export default function LuminalMatchSearch() {
                 {/* Nav */}
                 <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     {[
-                        { icon: 'explore', label: 'Explore', to: '/search', active: true },
-                        { icon: 'grid_view', label: 'Workspace', to: '/workspace' },
-                        { icon: 'workspace_premium', label: 'Experts', to: '/explore' },
+                        { icon: Compass, label: 'Explore', to: '/search', active: true },
+                        { icon: LayoutDashboard, label: 'Workspace', to: '/workspace' },
+                        { icon: Award, label: 'Experts', to: '/explore' },
                     ].map(item => (
                         <Link key={item.label} to={item.to} style={{ textDecoration: 'none' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: 'var(--radius-md)', background: item.active ? 'rgba(218,185,255,0.08)' : 'transparent', color: item.active ? 'var(--primary)' : 'var(--on-surface-var)', fontFamily: 'var(--font-body)', fontSize: '0.875rem', fontWeight: item.active ? 600 : 400, transition: 'all var(--transition)' }}>
-                                <span className="material-icons" style={{ fontSize: 18 }}>{item.icon}</span>
+                                <item.icon size={18} />
                                 {item.label}
                             </div>
                         </Link>
@@ -65,19 +81,19 @@ export default function LuminalMatchSearch() {
                     <div style={{ fontSize: '0.68rem', color: 'var(--outline)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem', fontFamily: 'var(--font-body)' }}>Expert Portal</div>
                     <div style={{ fontSize: '0.85rem', fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--on-surface)', marginBottom: '1rem' }}>ExpertBook</div>
                     {[
-                        { icon: 'waves', label: 'Flow', to: '/workspace' },
-                        { icon: 'auto_awesome', label: 'Opportunities', to: '/portal' },
-                        { icon: 'handshake', label: 'Engagements', to: '/workspace' },
-                        { icon: 'analytics', label: 'Analytics', to: '/workspace' },
-                        { icon: 'settings', label: 'Settings', to: '/workspace' },
-                        { icon: 'help', label: 'Support', to: '#' },
+                        { icon: Activity, label: 'Flow', to: '/workspace' },
+                        { icon: Sparkles, label: 'Opportunities', to: '/portal' },
+                        { icon: Handshake, label: 'Engagements', to: '/workspace' },
+                        { icon: BarChart3, label: 'Analytics', to: '/workspace' },
+                        { icon: Settings, label: 'Settings', to: '/workspace' },
+                        { icon: HelpCircle, label: 'Support', to: '#' },
                     ].map(item => (
                         <Link key={item.label} to={item.to} style={{ textDecoration: 'none' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 10px', borderRadius: 'var(--radius)', color: 'var(--on-surface-var)', fontSize: '0.82rem', transition: 'all var(--transition)' }}
                                 onMouseEnter={e => e.currentTarget.style.color = 'var(--primary)'}
                                 onMouseLeave={e => e.currentTarget.style.color = 'var(--on-surface-var)'}
                             >
-                                <span className="material-icons" style={{ fontSize: 16 }}>{item.icon}</span>
+                                <item.icon size={16} />
                                 {item.label}
                             </div>
                         </Link>
@@ -100,7 +116,7 @@ export default function LuminalMatchSearch() {
                 <div style={{ marginBottom: '2rem' }}>
                     <h1 style={{ fontSize: '1.75rem', marginBottom: '1rem' }}>Who do you need to flow with today?</h1>
                     <div style={{ position: 'relative', maxWidth: '600px' }}>
-                        <span className="material-icons" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)', fontSize: '20px' }}>search</span>
+                        <Search size={20} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)' }} />
                         <input
                             className="input"
                             style={{ paddingLeft: '44px', height: '50px' }}
@@ -117,8 +133,8 @@ export default function LuminalMatchSearch() {
                         <span className="section-label">TOP EXPERT MATCHES</span>
                         <p style={{ marginTop: '0.25rem', fontSize: '0.82rem' }}>Real-time matching based on global innovation trends and collaborative performance.</p>
                     </div>
-                    <button className="btn-ghost" onClick={() => setShowWhy(!showWhy)} style={{ fontSize: '0.8rem' }}>
-                        <span className="material-icons" style={{ fontSize: 16 }}>info</span>
+                    <button className="btn-ghost" onClick={() => setShowWhy(!showWhy)} style={{ fontSize: '0.8rem', gap: '8px' }}>
+                        <Info size={16} />
                         Why Match Scoring?
                     </button>
                 </div>
@@ -130,7 +146,7 @@ export default function LuminalMatchSearch() {
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
                             {WHY_ITEMS.map(item => (
                                 <div key={item} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                    <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '16px' }}>check_circle</span>
+                                    <CheckCircle2 size={16} color="var(--primary)" />
                                     <span style={{ fontSize: '0.82rem' }}>{item}</span>
                                 </div>
                             ))}
@@ -147,7 +163,7 @@ export default function LuminalMatchSearch() {
                     </div>
                 ) : filtered.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--on-surface-var)' }}>
-                        <span className="material-icons" style={{ fontSize: '3rem', display: 'block', marginBottom: '1rem', color: 'var(--outline)' }}>search_off</span>
+                        <SearchX size={48} style={{ display: 'block', margin: '0 auto 1rem', color: 'var(--outline)' }} />
                         <p>No experts found matching "<strong>{query}</strong>"</p>
                         <button className="btn-ghost" onClick={() => setQuery('')} style={{ marginTop: '1rem' }}>Clear search</button>
                     </div>
@@ -173,7 +189,7 @@ export default function LuminalMatchSearch() {
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                             <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.85rem' }}>${expert.hourly_rate || 400}/hr</span>
                                             <span style={{ color: 'var(--primary)', fontSize: '0.78rem', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                                View profile <span className="material-icons" style={{ fontSize: 14 }}>arrow_forward</span>
+                                                View profile <ArrowRight size={14} />
                                             </span>
                                         </div>
                                     </div>
