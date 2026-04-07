@@ -39,19 +39,19 @@ export default function Layout({ children }) {
             {/* Sidebar */}
             <aside className="sidebar">
                 {/* Logo */}
-                <Link to="/" className="sidebar-logo" style={{ textDecoration: 'none' }}>
-                    <Zap size={22} color="var(--primary)" fill="var(--primary)" opacity={0.8} />
-                    ExpertBook
-                    <span className="sidebar-ai-badge">AI Online</span>
+                <Link to="/" className="sidebar-logo" style={{ textDecoration: 'none', marginBottom: '1.5rem' }}>
+                    <img src="/src/assets/logo.svg" alt="ExpertBook" style={{ width: 28, height: 28 }} />
+                    <span style={{ color: 'var(--on-surface)', fontWeight: 800 }}>ExpertBook</span>
+                    <span className="sidebar-ai-badge" style={{ color: 'var(--primary)', background: 'var(--tertiary-c)' }}>Live</span>
                 </Link>
 
                 {/* Curator card */}
-                <div className="card" style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', background: 'rgba(143,0,255,0.08)' }}>
+                <div className="card" style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
                     <div className="flex items-center gap-1" style={{ gap: '8px' }}>
                         <div className="pulse-dot"></div>
-                        <span style={{ fontSize: '0.8rem', fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--primary)' }}>The Curator</span>
+                        <span style={{ fontSize: '0.8rem', fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--primary)' }}>THE CURATOR</span>
                     </div>
-                    <p style={{ fontSize: '0.7rem', marginTop: '4px', color: 'var(--on-surface-var)' }}>AI synthesizing connections…</p>
+                    <p style={{ fontSize: '0.65rem', marginTop: '4px', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>Synthesizing network flow…</p>
                 </div>
 
                 {/* Main nav */}
@@ -82,16 +82,16 @@ export default function Layout({ children }) {
                     ))}
 
                     {user && (
-                        <div style={{ marginTop: '1rem', padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-ch)' }}>
+                        <div style={{ marginTop: '1rem', padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
                             <div className="flex items-center" style={{ gap: '10px', marginBottom: '8px' }}>
-                                <div className="avatar" style={{ width: 32, height: 32, fontSize: '0.8rem' }}>
+                                <div className="avatar" style={{ width: 32, height: 32, fontSize: '0.8rem', background: 'var(--primary-c)', color: 'var(--on-primary-c)' }}>
                                     {user.name?.[0]?.toUpperCase()}
                                 </div>
                                 <div>
                                     <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--on-surface)', fontFamily: 'var(--font-display)' }}>
                                         {user.name}
                                     </div>
-                                    <div style={{ fontSize: '0.65rem', color: 'var(--outline)', textTransform: 'capitalize' }}>{user.role}</div>
+                                    <div style={{ fontSize: '0.65rem', color: 'var(--on-surface-var)', textTransform: 'capitalize' }}>{user.role}</div>
                                 </div>
                             </div>
                             <button className="btn-ghost" style={{ width: '100%', fontSize: '0.75rem', padding: '6px', gap: '8px' }} onClick={handleLogout}>

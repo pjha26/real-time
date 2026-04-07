@@ -1,51 +1,48 @@
-/* ═══════════════════════════════════════════════════
-   MATCH & FLOW — Design System (Fluid Intelligence)
-   ═══════════════════════════════════════════════════ */
-
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 
 /* ── Tokens ── */
 :root {
-  --bg: #131315;
-  --surface: #131315;
-  --surface-low: #1b1b1d;
-  --surface-lowest: #0e0e10;
-  --surface-c: #201f21;
-  --surface-ch: #2a2a2c;
-  --surface-chh: #353437;
-  --surface-bright: #39393b;
-  --surface-variant: #353437;
+  --bg: #f5f6f7;
+  --surface: #f5f6f7;
+  --surface-low: #eff1f2;
+  --surface-lowest: #ffffff;
+  --surface-c: #e6e8ea;
+  --surface-ch: #e0e3e4;
+  --surface-chh: #dadddf;
+  --surface-bright: #f5f6f7;
+  --surface-variant: #dadddf;
 
-  --primary: #dab9ff;
-  --primary-c: #8f00ff;
-  --secondary: #dab9ff;
-  --secondary-c: #5e2899;
-  --tertiary: #ffb68b;
-  --tertiary-c: #a44c00;
+  --primary: #006a2e;
+  --primary-c: #2efd7c;
+  --secondary: #006571;
+  --secondary-c: #26e6ff;
+  --tertiary: #4a6152;
+  --tertiary-c: #e3fdea;
 
-  --on-bg: #e5e1e4;
-  --on-surface: #e5e1e4;
-  --on-surface-var: #cfc2d9;
-  --on-primary: #470083;
-  --on-primary-c: #efddff;
-  --on-secondary-c: #cea2ff;
-  --outline: #988ca2;
-  --outline-var: #4d4356;
-  --error: #ffb4ab;
+  --on-bg: #2c2f30;
+  --on-surface: #2c2f30;
+  --on-surface-var: #595c5d;
+  --on-primary: #ceffd0;
+  --on-primary-c: #005b26;
+  --on-secondary-c: #004f59;
+  --outline: #757778;
+  --outline-var: #abadae;
+  --error: #b02500;
 
-  --font-display: 'Manrope', sans-serif;
+  --font-display: 'Inter', sans-serif;
   --font-body: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
   --radius-sm: 4px;
   --radius: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
-  --radius-xl: 24px;
+  --radius-xl: 1.5rem;
   --radius-full: 9999px;
 
-  --shadow-float: 0 20px 40px rgba(0, 0, 0, 0.4);
-  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
-  --glow-primary: 0 0 20px rgba(143, 0, 255, 0.25);
+  --shadow-float: 0 20px 40px rgba(0, 106, 46, 0.06);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.04);
+  --glow-primary: 0 0 20px rgba(46, 253, 124, 0.2);
 
   --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -144,8 +141,8 @@ a:hover {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: linear-gradient(135deg, var(--primary-c), var(--secondary-c));
-  color: #fff;
+  background: linear-gradient(135deg, var(--primary), var(--primary-c));
+  color: var(--on-primary);
   border: none;
   padding: 12px 28px;
   border-radius: var(--radius-full);
@@ -225,10 +222,10 @@ a:hover {
 
 /* ── Glass ── */
 .glass {
-  background: rgba(53, 52, 55, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(218, 185, 255, 0.08);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(0, 106, 46, 0.08);
 }
 
 /* ── Cards ── */
