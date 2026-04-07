@@ -1,5 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import {
+    Timer,
+    ShieldCheck,
+    Clock,
+    Brain,
+    CheckCircle2,
+    Sparkles,
+    BarChart3,
+    Calendar,
+    BookOpen,
+    FileText,
+    PenTool
+} from 'lucide-react';
 import { useAuthStore, useBookingStore } from '../store/useStore';
 import Layout from '../components/Layout';
 
@@ -9,9 +22,9 @@ const OPPORTUNITIES = [
 ];
 
 const SESSIONS = [
-    { title: 'Architecture Review', org: 'Project Zenith Core Team', time: '14:00 - 14:45', urgency: 'In 15 Minutes', icon: 'auto_stories', action: 'Quick Prep', color: 'var(--primary)' },
-    { title: 'Matching Interview', org: 'Fintech Protocol Candidate', time: '16:30 - 17:30', urgency: 'Today', icon: 'history_edu', action: 'Briefing Docs', color: '#ffb68b' },
-    { title: 'Strategy Sync', org: 'Global Payments Corp', time: 'Tomorrow', urgency: '', icon: 'description', action: 'View Specs', color: '#4ade80' },
+    { title: 'Architecture Review', org: 'Project Zenith Core Team', time: '14:00 - 14:45', urgency: 'In 15 Minutes', icon: BookOpen, action: 'Quick Prep', color: 'var(--primary)' },
+    { title: 'Matching Interview', org: 'Fintech Protocol Candidate', time: '16:30 - 17:30', urgency: 'Today', icon: PenTool, action: 'Briefing Docs', color: '#ffb68b' },
+    { title: 'Strategy Sync', org: 'Global Payments Corp', time: 'Tomorrow', urgency: '', icon: FileText, action: 'View Specs', color: '#4ade80' },
 ];
 
 const PULSE = [
@@ -62,12 +75,12 @@ export default function LuminalExpertPortal() {
                     {/* KPI strip */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, auto) 1fr', gap: '1rem', marginTop: '1.25rem', marginBottom: '2rem', flexWrap: 'wrap', maxWidth: 640 }}>
                         {[
-                            { label: 'Time in Flow', val: timer, icon: 'timer', mono: true },
-                            { label: 'Match Quality', val: '99.2%', icon: 'verified', mono: false },
-                            { label: 'Next Session', val: '14:00', icon: 'schedule', mono: false },
+                            { label: 'Time in Flow', val: timer, icon: Timer, mono: true },
+                            { label: 'Match Quality', val: '99.2%', icon: ShieldCheck, mono: false },
+                            { label: 'Next Session', val: '14:00', icon: Clock, mono: false },
                         ].map(k => (
                             <div key={k.label} style={{ background: 'rgba(218,185,255,0.06)', border: '1px solid rgba(218,185,255,0.1)', borderRadius: 'var(--radius-lg)', padding: '1rem 1.5rem', textAlign: 'center' }}>
-                                <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '20px', marginBottom: '4px', display: 'block' }}>{k.icon}</span>
+                                <k.icon size={20} color="var(--primary)" style={{ marginBottom: '4px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }} />
                                 <div style={{ fontFamily: k.mono ? 'monospace' : 'var(--font-display)', fontWeight: 800, fontSize: k.mono ? '1.3rem' : '1.6rem', color: 'var(--primary)', letterSpacing: k.mono ? '0.05em' : 0 }}>{k.val}</div>
                                 <div style={{ fontSize: '0.7rem', color: 'var(--on-surface-var)', marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{k.label}</div>
                             </div>
@@ -81,7 +94,7 @@ export default function LuminalExpertPortal() {
                     {/* AI Concierge */}
                     <div className="card" style={{ background: 'rgba(143,0,255,0.06)', border: '1px solid rgba(218,185,255,0.1)' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                            <span className="material-icons" style={{ color: 'var(--primary)' }}>psychology</span>
+                            <Brain size={20} color="var(--primary)" />
                             <h3>AI Concierge</h3>
                             <div className="pulse-dot" style={{ marginLeft: 'auto' }} />
                         </div>
@@ -94,7 +107,7 @@ export default function LuminalExpertPortal() {
                                 'Review 2 new high-match contract offers.',
                             ].map((task, i) => (
                                 <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                                    <span className="material-icons" style={{ color: '#4ade80', fontSize: '16px', marginTop: '2px', flexShrink: 0 }}>check_circle</span>
+                                    <CheckCircle2 size={16} color="#4ade80" style={{ marginTop: '2px', flexShrink: 0 }} />
                                     <span style={{ fontSize: '0.82rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>{task}</span>
                                 </div>
                             ))}
@@ -105,7 +118,7 @@ export default function LuminalExpertPortal() {
                     <div className="card">
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span className="material-icons" style={{ color: 'var(--primary)' }}>auto_awesome</span>
+                                <Sparkles size={20} color="var(--primary)" />
                                 <h3>High-Match Opportunities</h3>
                             </div>
                             <Link to="/search" className="btn-ghost" style={{ textDecoration: 'none', fontSize: '0.78rem', padding: '4px 10px' }}>View All</Link>
@@ -132,7 +145,7 @@ export default function LuminalExpertPortal() {
                         {/* Pulse */}
                         <div className="card">
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                                <span className="material-icons" style={{ color: 'var(--primary)' }}>analytics</span>
+                                <BarChart3 size={20} color="var(--primary)" />
                                 <h3>Collaboration Pulse</h3>
                             </div>
                             <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginBottom: '1rem' }}>Engagement performance metrics across current ecosystem</p>
@@ -149,7 +162,7 @@ export default function LuminalExpertPortal() {
                         {/* Upcoming Sessions */}
                         <div className="card" style={{ flex: 1 }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                                <span className="material-icons" style={{ color: 'var(--primary)' }}>event</span>
+                                <Calendar size={20} color="var(--primary)" />
                                 <h3>Upcoming Sessions</h3>
                             </div>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -159,7 +172,7 @@ export default function LuminalExpertPortal() {
                                         <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.875rem', marginBottom: '2px' }}>{s.title}</div>
                                         <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginBottom: '8px' }}>{s.org} · {s.time}</div>
                                         <button className="btn-secondary" style={{ padding: '5px 12px', fontSize: '0.75rem', display: 'inline-flex', gap: '5px' }}>
-                                            <span className="material-icons" style={{ fontSize: 14 }}>{s.icon}</span>
+                                            <s.icon size={14} />
                                             {s.action}
                                         </button>
                                     </div>
