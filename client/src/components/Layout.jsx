@@ -10,6 +10,7 @@ import {
     LogOut,
     Zap
 } from 'lucide-react';
+import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
 import { useAuthStore } from '../store/useStore';
 
 const navItems = [
@@ -81,25 +82,11 @@ export default function Layout({ children }) {
                         </NavLink>
                     ))}
 
-                    {user && (
-                        <div style={{ marginTop: '1rem', padding: '12px', borderRadius: 'var(--radius-md)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
-                            <div className="flex items-center" style={{ gap: '10px', marginBottom: '8px' }}>
-                                <div className="avatar" style={{ width: 32, height: 32, fontSize: '0.8rem', background: 'var(--primary-c)', color: 'var(--on-primary-c)' }}>
-                                    {user.name?.[0]?.toUpperCase()}
-                                </div>
-                                <div>
-                                    <div style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--on-surface)', fontFamily: 'var(--font-display)' }}>
-                                        {user.name}
-                                    </div>
-                                    <div style={{ fontSize: '0.65rem', color: 'var(--on-surface-var)', textTransform: 'capitalize' }}>{user.role}</div>
-                                </div>
-                            </div>
-                            <button className="btn-ghost" style={{ width: '100%', fontSize: '0.75rem', padding: '6px', gap: '8px' }} onClick={handleLogout}>
-                                <LogOut size={16} />
-                                Sign out
-                            </button>
+                    <SignedIn>
+                        <div style={{ marginTop: '1rem', padding: '12px', borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <UserButton afterSignOutUrl="/" showName />
                         </div>
-                    )}
+                    </SignedIn>
                 </div>
             </aside>
 

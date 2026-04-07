@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ClerkProvider, useAuth } from '@clerk/clerk-react';
 import LandingPage from './pages/LandingPage';
@@ -21,9 +21,12 @@ class ErrorBoundary extends React.Component {
     if (this.state.hasError) {
       return (
         <div style={{ padding: '2rem', textAlign: 'center', background: '#f5f6f7', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <h2 style={{ color: '#006a2e', marginBottom: '1rem' }}>Something went wrong</h2>
-          <pre style={{ background: '#eee', padding: '1rem', borderRadius: '8px', fontSize: '0.8rem', maxWidth: '80%' }}>{this.state.error?.message}</pre>
-          <button onClick={() => window.location.reload()} className="btn-primary" style={{ marginTop: '1rem' }}>Reload Platform</button>
+          <h2 style={{ color: '#006a2e', marginBottom: '1rem' }}>ExpertBook Initialization Error</h2>
+          <div style={{ background: '#fff', border: '1px solid #e0e3e4', padding: '1.5rem', borderRadius: '1.5rem', maxWidth: '420px', boxShadow: '0 4px 24px rgba(0,0,0,0.04)' }}>
+            <p style={{ color: '#595c5d', fontSize: '0.9rem', marginBottom: '1.5rem' }}>The platform could not initialize authentication. This usually happens if the Clerk key in your .env file is unauthorized or has expired.</p>
+            <pre style={{ background: '#f8f9fa', padding: '12px', borderRadius: '8px', fontSize: '0.75rem', overflow: 'auto', marginBottom: '1.5rem', textAlign: 'left', border: '1px solid #eee' }}>{this.state.error?.message || 'Unauthorized Key'}</pre>
+            <button onClick={() => window.location.reload()} className="btn-primary" style={{ width: '100%' }}>Reload Platform</button>
+          </div>
         </div>
       );
     }
@@ -87,30 +90,15 @@ function AppRoutes() {
 }
 
 export default function App() {
-  const [clerkError, setClerkError] = React.useState(false);
-
-  if (clerkEnabled && !clerkError) {
-    return (
-      <ErrorBoundary>
-        <ClerkProvider
-          publishableKey={CLERK_KEY}
-          afterSignOutUrl="/"
-          onError={() => setClerkError(true)}
-        >
-          <AppRoutes />
-        </ClerkProvider>
-      </ErrorBoundary>
-    );
-  }
-
   return (
     <ErrorBoundary>
-      {clerkEnabled && clerkError && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, background: '#ff6b6b', color: 'white', padding: '8px', textAlign: 'center', fontSize: '0.8rem' }}>
-          Clerk Authentication Error: Please check your Publishable Key in .env
-        </div>
+      {clerkEnabled ? (
+        <ClerkProvider publishableKey={CLERK_KEY} afterSignOutUrl="/">
+          <AppRoutes />
+        </ClerkProvider>
+      ) : (
+        <AppRoutes />
       )}
-      <AppRoutes />
     </ErrorBoundary>
   );
 }

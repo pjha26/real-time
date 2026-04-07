@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Activity, BookOpen, Network, Brain, Rocket, ArrowRight, Star, ShieldCheck, Zap } from 'lucide-react';
+import { Activity, BookOpen, Network, Brain, Rocket, ArrowRight, Star, ShieldCheck, Zap, LayoutDashboard } from 'lucide-react';
+import { SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
 import { useExpertStore } from '../store/useStore';
 
 const MOCK_EXPERTS = [
@@ -80,12 +81,20 @@ export default function LandingPage() {
                     <Link to="/workspace" className="topnav-link">Workspace</Link>
                     <a href="#pricing" className="topnav-link">Pricing</a>
                 </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                    <Link to="/login" className="btn-ghost" style={{ textDecoration: 'none' }}>Sign in</Link>
-                    <Link to="/register" className="btn-primary" style={{ textDecoration: 'none', gap: '8px' }}>
-                        <Rocket size={16} />
-                        Get started
-                    </Link>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <SignedOut>
+                        <Link to="/login" className="btn-ghost" style={{ textDecoration: 'none' }}>Sign in</Link>
+                        <Link to="/register" className="btn-primary" style={{ textDecoration: 'none', gap: '8px' }}>
+                            <Rocket size={16} />
+                            Get started
+                        </Link>
+                    </SignedOut>
+                    <SignedIn>
+                        <UserButton afterSignOutUrl="/" />
+                        <Link to="/workspace" className="btn-secondary" style={{ textDecoration: 'none', padding: '8px 16px', fontSize: '0.85rem' }}>
+                            Workspace
+                        </Link>
+                    </SignedIn>
                 </div>
             </nav>
 
@@ -113,10 +122,18 @@ export default function LandingPage() {
 
                         {/* CTA row */}
                         <div className="animate-fadeInUp" style={{ animationDelay: '240ms', display: 'flex', gap: '1rem', marginBottom: '3.5rem', flexWrap: 'wrap' }}>
-                            <Link to="/register" className="btn-primary" style={{ textDecoration: 'none', padding: '14px 32px', fontSize: '1rem', gap: '10px' }}>
-                                <Rocket size={20} />
-                                Enter your flow state
-                            </Link>
+                            <SignedOut>
+                                <Link to="/register" className="btn-primary" style={{ textDecoration: 'none', padding: '14px 32px', fontSize: '1rem', gap: '10px' }}>
+                                    <Rocket size={20} />
+                                    Enter your flow state
+                                </Link>
+                            </SignedOut>
+                            <SignedIn>
+                                <Link to="/workspace" className="btn-primary" style={{ textDecoration: 'none', padding: '14px 32px', fontSize: '1rem', gap: '10px' }}>
+                                    <LayoutDashboard size={20} />
+                                    Go to Workspace
+                                </Link>
+                            </SignedIn>
                             <Link to="/explore" className="btn-secondary" style={{ textDecoration: 'none', padding: '14px 28px', fontSize: '1rem', gap: '10px' }}>
                                 Explore the network
                                 <ArrowRight size={18} />
@@ -335,10 +352,18 @@ export default function LandingPage() {
                         </h2>
                         <p style={{ marginBottom: '3rem', fontSize: '1.05rem' }}>Join 12,000+ collaborations already happening at the speed of thought.</p>
                         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                            <Link to="/register" className="btn-primary" style={{ textDecoration: 'none', padding: '16px 40px', fontSize: '1.05rem' }}>
-                                <span className="material-icons" style={{ fontSize: 20 }}>rocket_launch</span>
-                                Start for free
-                            </Link>
+                            <SignedOut>
+                                <Link to="/register" className="btn-primary" style={{ textDecoration: 'none', padding: '16px 40px', fontSize: '1.05rem' }}>
+                                    <Rocket size={20} />
+                                    Start for free
+                                </Link>
+                            </SignedOut>
+                            <SignedIn>
+                                <Link to="/workspace" className="btn-primary" style={{ textDecoration: 'none', padding: '16px 40px', fontSize: '1.05rem' }}>
+                                    <LayoutDashboard size={20} />
+                                    Open Workspace
+                                </Link>
+                            </SignedIn>
                             <Link to="/explore" className="btn-secondary" style={{ textDecoration: 'none', padding: '16px 32px', fontSize: '1.05rem' }}>Browse experts</Link>
                         </div>
                     </div>
