@@ -12,7 +12,7 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.61.4",
     "@tailwindcss/vite": "^4.2.0",
-    "axios": "^1.13.5",
+    "axios": "^1.14.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
     "lucide-react": "^0.575.0",

@@ -46,6 +46,7 @@ app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/experts', require('./routes/expertRoutes'));
 app.use('/api/bookings', require('./routes/bookingRoutes'));
 app.use('/api/event-types', require('./routes/eventTypeRoutes'));
+app.use('/api/ai', require('./routes/aiRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', db: 'supabase', auth: 'clerk' }));

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { Search, SearchX } from 'lucide-react';
+import { Search, SearchX, Brain, Sparkles, Loader2 } from 'lucide-react';
+import axios from 'axios';
 import { useExpertStore } from '../store/useStore';
 import Layout from '../components/Layout';
 
@@ -102,7 +103,7 @@ export default function ExpertListing() {
                             </p>
                             <div className="grid-auto stagger">
                                 {filtered.map((expert, i) => (
-                                    <ExpertCard key={expert.id || i} expert={expert} />
+                                    <ExpertCard key={expert.id || i} expert={expert} currentSearch={search} />
                                 ))}
                             </div>
                             {filtered.length === 0 && (
@@ -141,11 +142,33 @@ function ExpertCardSkeleton() {
     );
 }
 
-function ExpertCard({ expert }) {
+function ExpertCard({ expert, currentSearch }) {
     const initials = expert.name?.split(' ').map(n => n[0]).join('') || '?';
+    const [insight, setInsight] = useState('');
+    const [loadingAI, setLoadingAI] = useState(false);
+
+    const generateAIInsight = async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setLoadingAI(true);
+        try {
+            const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+            const { data } = await axios.post(`${API}/api/ai/analyze`, {
+                userQuery: currentSearch || 'General business growth and strategy',
+                expertData: expert
+            });
+            setInsight(data.justification);
+        } catch (err) {
+            console.error('AI Insight Error:', err);
+            setInsight('Unable to generate AI match justification at this time.');
+        } finally {
+            setLoadingAI(false);
+        }
+    };
+
     return (
-        <Link to={`/experts/${expert.id}`} style={{ textDecoration: 'none' }}>
-            <div className="card animate-fadeInUp" style={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
+        <div className="card animate-fadeInUp" style={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)', position: 'relative', transition: 'all 0.3s ease' }}>
+            <Link to={`/experts/${expert.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'flex', flexDirection: 'column', flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
                     <div className="avatar" style={{ width: 48, height: 48, fontSize: '1rem', background: 'var(--primary-c)', color: 'var(--on-primary-c)' }}>{initials}</div>
                     <div style={{ background: 'var(--tertiary-c)', color: 'var(--primary)', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'var(--font-mono)', alignSelf: 'flex-start' }}>
@@ -157,13 +180,41 @@ function ExpertCard({ expert }) {
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '1.25rem' }}>
                     {(expert.specialty || []).slice(0, 3).map(s => <span key={s} className="chip" style={{ background: 'var(--surface-low)', color: 'var(--on-surface-var)', borderRadius: 'var(--radius-sm)', fontSize: '0.7rem' }}>{s}</span>)}
                 </div>
+            </Link>
+
+            {/* AI Insights Section */}
+            <div style={{ marginTop: 'auto' }}>
+                {insight ? (
+                    <div className="animate-fadeIn" style={{ marginBottom: '1rem', padding: '12px', background: 'var(--tertiary-c)', border: '1px solid var(--primary-var)', borderRadius: 'var(--radius-lg)', fontSize: '0.8rem', color: 'var(--on-surface)', lineHeight: 1.4 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '6px', color: 'var(--primary)', fontWeight: 700, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                            <Brain size={14} />
+                            AI Match Insight
+                        </div>
+                        {insight}
+                    </div>
+                ) : (
+                    <button
+                        onClick={generateAIInsight}
+                        disabled={loadingAI}
+                        className="btn-ghost"
+                        style={{ width: '100%', marginBottom: '1rem', border: '1px dashed var(--primary-var)', color: 'var(--primary)', fontSize: '0.75rem', gap: '8px', padding: '10px' }}
+                    >
+                        {loadingAI ? (
+                            <Loader2 size={16} className="animate-spin" />
+                        ) : (
+                            <Sparkles size={16} />
+                        )}
+                        {loadingAI ? 'Analyzing connection…' : 'Generate AI Match Insight'}
+                    </button>
+                )}
+
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.9rem', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--on-surface)' }}>${expert.hourly_rate || 400}/hr</span>
-                    <button className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.75rem', borderRadius: 'var(--radius-md)' }}>
+                    <Link to={`/experts/${expert.id}`} className="btn-primary" style={{ textDecoration: 'none', padding: '8px 16px', fontSize: '0.75rem', borderRadius: 'var(--radius-md)' }}>
                         View Profile
-                    </button>
+                    </Link>
                 </div>
             </div>
-        </Link>
+        </div>
     );
 }
