@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthStore } from './store/useStore';
+import { useAuth } from '@clerk/clerk-react';
 import LandingPage from './pages/LandingPage';
 import LuminalLanding from './pages/LuminalLanding';
 import LuminalMatchSearch from './pages/LuminalMatchSearch';
@@ -13,8 +13,9 @@ import Register from './pages/Register';
 import './index.css';
 
 function ProtectedRoute({ children }) {
-  const { token } = useAuthStore();
-  return token ? children : <Navigate to="/login" replace />;
+  const { isSignedIn, isLoaded } = useAuth();
+  if (!isLoaded) return null; // Wait for Clerk to initialize
+  return isSignedIn ? children : <Navigate to="/login" replace />;
 }
 
 export default function App() {
