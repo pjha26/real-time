@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '@clerk/clerk-react';
 import LandingPage from './pages/LandingPage';
 import LuminalLanding from './pages/LuminalLanding';
 import LuminalMatchSearch from './pages/LuminalMatchSearch';
@@ -12,13 +11,22 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import './index.css';
 
-function ProtectedRoute({ children }) {
-  const { isSignedIn, isLoaded } = useAuth();
-  if (!isLoaded) return null; // Wait for Clerk to initialize
-  return isSignedIn ? children : <Navigate to="/login" replace />;
+// ProtectedRoute: uses Clerk if available, falls back to Zustand token
+function ProtectedRoute({ children, clerkEnabled }) {
+  if (clerkEnabled) {
+    const { useAuth } = require('@clerk/clerk-react');
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { isSignedIn, isLoaded } = useAuth();
+    if (!isLoaded) return null;
+    return isSignedIn ? children : <Navigate to="/login" replace />;
+  }
+  // fallback: check localStorage token
+  const token = localStorage.getItem('token');
+  return token ? children : <Navigate to="/login" replace />;
 }
 
-export default function App() {
+export default function App({ clerkEnabled = false }) {
+  const PR = ({ children }) => <ProtectedRoute clerkEnabled={clerkEnabled}>{children}</ProtectedRoute>;
   return (
     <BrowserRouter>
       <Routes>
@@ -28,15 +36,16 @@ export default function App() {
         <Route path="/explore" element={<ExpertListing />} />
         <Route path="/experts/:id" element={<ExpertDetail />} />
         <Route path="/book/:expertId" element={<PublicBookingPage />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/workspace" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
-        <Route path="/portal" element={<ProtectedRoute><LuminalExpertPortal /></ProtectedRoute>} />
-        <Route path="/collaborations" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
-        <Route path="/curator" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
-        <Route path="/bookings" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
+        <Route path="/login" element={<Login clerkEnabled={clerkEnabled} />} />
+        <Route path="/register" element={<Register clerkEnabled={clerkEnabled} />} />
+        <Route path="/workspace" element={<PR><ExpertDashboard /></PR>} />
+        <Route path="/portal" element={<PR><LuminalExpertPortal /></PR>} />
+        <Route path="/collaborations" element={<PR><ExpertDashboard /></PR>} />
+        <Route path="/curator" element={<PR><ExpertDashboard /></PR>} />
+        <Route path="/bookings" element={<PR><ExpertDashboard /></PR>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
 }
+
