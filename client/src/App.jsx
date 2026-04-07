@@ -28,6 +28,16 @@ function TokenProtected({ children }) {
   return token ? children : <Navigate to="/login" replace />;
 }
 
+function PublicOnlyRoute({ children }) {
+  if (clerkEnabled) {
+    const { isSignedIn, isLoaded } = useAuth();
+    if (!isLoaded) return null;
+    return isSignedIn ? <Navigate to="/workspace" replace /> : children;
+  }
+  const token = localStorage.getItem('token');
+  return token ? <Navigate to="/workspace" replace /> : children;
+}
+
 function ProtectedRoute({ children }) {
   return clerkEnabled
     ? <ClerkProtected>{children}</ClerkProtected>
@@ -44,8 +54,8 @@ function AppRoutes() {
         <Route path="/explore" element={<ExpertListing />} />
         <Route path="/experts/:id" element={<ExpertDetail />} />
         <Route path="/book/:expertId" element={<PublicBookingPage />} />
-        <Route path="/login" element={<Login clerkEnabled={clerkEnabled} />} />
-        <Route path="/register" element={<Register clerkEnabled={clerkEnabled} />} />
+        <Route path="/login" element={<PublicOnlyRoute><Login clerkEnabled={clerkEnabled} /></PublicOnlyRoute>} />
+        <Route path="/register" element={<PublicOnlyRoute><Register clerkEnabled={clerkEnabled} /></PublicOnlyRoute>} />
         <Route path="/workspace" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
         <Route path="/portal" element={<ProtectedRoute><LuminalExpertPortal /></ProtectedRoute>} />
         <Route path="/collaborations" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />

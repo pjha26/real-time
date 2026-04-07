@@ -59,6 +59,9 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
     try {
         // Guard: must be a UUID
+        if (!UUID_RE.test(req.params.id)) {
+            return res.status(404).json({ error: 'Expert not found' });
+        }
         const { data, error } = await supabase
             .from('experts')
             .select(`

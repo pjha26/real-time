@@ -54,6 +54,8 @@ export default function Register({ clerkEnabled = false }) {
                     <SignUp
                         routing="hash"
                         signInUrl="/login"
+                        forceRedirectUrl="/workspace"
+                        fallbackRedirectUrl="/workspace"
                         appearance={{
                             variables: {
                                 colorPrimary: '#8f00ff', colorBackground: '#0e0a1a',
