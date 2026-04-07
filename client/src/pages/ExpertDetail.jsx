@@ -76,17 +76,17 @@ export default function ExpertDetail() {
                         <span className="section-label" style={{ marginBottom: '1rem', display: 'block' }}>EXPERT LIVE PORTFOLIO</span>
 
                         <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', marginBottom: '2rem' }}>
-                            <div className="avatar" style={{ width: 80, height: 80, fontSize: '1.8rem', flexShrink: 0 }}>{initials}</div>
+                            <div className="avatar" style={{ width: 80, height: 80, fontSize: '1.8rem', flexShrink: 0, background: 'var(--primary-c)', color: 'var(--on-primary-c)' }}>{initials}</div>
                             <div>
-                                <h1 style={{ fontSize: '2rem', marginBottom: '0.25rem' }}>{data.name}</h1>
-                                <p style={{ fontSize: '0.9rem', color: 'var(--on-surface-var)', marginBottom: '0.75rem' }}>
+                                <h1 style={{ fontSize: '2rem', marginBottom: '0.25rem', color: 'var(--on-surface)' }}>{data.name}</h1>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--on-surface-var)', marginBottom: '0.75rem', fontFamily: 'var(--font-mono)' }}>
                                     {data.specialty?.[0]} · {data.specialty?.[1]}
                                 </p>
                                 <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                                     <div className="pulse-dot" />
-                                    <span style={{ fontSize: '0.8rem', color: '#4ade80' }}>Available today</span>
-                                    <span style={{ color: 'var(--outline-var)', margin: '0 4px' }}>·</span>
-                                    <span style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-display)', fontWeight: 700 }}>${data.hourly_rate}/hr</span>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600 }}>Available today</span>
+                                    <span style={{ color: 'var(--surface-ch)', margin: '0 4px' }}>·</span>
+                                    <span style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>${data.hourly_rate}/hr</span>
                                 </div>
                             </div>
                         </div>
@@ -99,12 +99,12 @@ export default function ExpertDetail() {
                         </div>
 
                         {/* AI Skill Insight */}
-                        <div className="card" style={{ background: 'rgba(143,0,255,0.06)', marginBottom: '2rem', border: '1px solid rgba(218,185,255,0.1)' }}>
+                        <div className="card" style={{ background: 'var(--surface-lowest)', marginBottom: '2rem', border: '1px solid var(--surface-ch)', borderRadius: 'var(--radius-xl)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
                                 <Brain size={20} color="var(--primary)" />
-                                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem' }}>AI Skill Insight</span>
+                                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: '0.9rem', color: 'var(--on-surface)' }}>AI Skill Insight</span>
                             </div>
-                            <p style={{ fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '1.25rem' }}>
+                            <p style={{ fontSize: '0.875rem', lineHeight: 1.6, marginBottom: '1.25rem', color: 'var(--on-surface-var)' }}>
                                 Peer analysis indicates {data.name?.split(' ')[0]} excels in Abstract Systems Thinking. Recent contributions resulted in a 40% reduction in interaction latency across 12 verified projects.
                             </p>
                             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
@@ -114,7 +114,7 @@ export default function ExpertDetail() {
                                     { label: 'Velocity', value: data.velocity || '+120%' },
                                 ].map(stat => (
                                     <div key={stat.label} style={{ textAlign: 'center' }}>
-                                        <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.5rem', color: 'var(--primary)' }}>{stat.value}</div>
+                                        <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.5rem', color: 'var(--primary)' }}>{stat.value}</div>
                                         <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginTop: '2px' }}>{stat.label}</div>
                                     </div>
                                 ))}
@@ -126,15 +126,15 @@ export default function ExpertDetail() {
                             <span className="section-label" style={{ marginBottom: '1rem', display: 'block' }}>SELECTED CASE STUDIES</span>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                                 {(data.case_studies || ['Project Alpha', 'Interface Redesign', 'Scaling Engine']).map((study, i) => (
-                                    <div key={study} className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem' }}>
-                                        <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                            <FolderOpen size={18} color="#fff" />
+                                    <div key={study} className="card" style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 1.25rem', borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
+                                        <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--primary), var(--primary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                            <FolderOpen size={18} color="var(--on-primary)" />
                                         </div>
                                         <div>
-                                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '0.9rem' }}>{study}</div>
+                                            <div style={{ fontFamily: 'var(--font-body)', fontWeight: 600, fontSize: '0.9rem', color: 'var(--on-surface)' }}>{study}</div>
                                             <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)' }}>Reimagining through a lens of extreme simplicity.</div>
                                         </div>
-                                        <ArrowRight size={18} style={{ marginLeft: 'auto', color: 'var(--outline)' }} />
+                                        <ArrowRight size={18} style={{ marginLeft: 'auto', color: 'var(--on-surface-var)' }} />
                                     </div>
                                 ))}
                             </div>
@@ -144,41 +144,41 @@ export default function ExpertDetail() {
                     {/* Right — Sidebar actions */}
                     <div style={{ position: 'sticky', top: '2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {/* Match score */}
-                        <div className="card" style={{ textAlign: 'center', background: 'linear-gradient(135deg, rgba(143,0,255,0.1), rgba(94,40,153,0.1))', border: '1px solid rgba(218,185,255,0.15)' }}>
+                        <div className="card" style={{ textAlign: 'center', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)', borderRadius: 'var(--radius-xl)' }}>
                             <span className="section-label">COMPATIBILITY SCORE</span>
-                            <div style={{ fontFamily: 'var(--font-display)', fontSize: '4rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1, margin: '0.75rem 0' }}>
+                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '4rem', fontWeight: 800, color: 'var(--primary)', lineHeight: 1, margin: '0.75rem 0' }}>
                                 {data.match_score || 94}%
                             </div>
-                            <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>
+                            <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', lineHeight: 1.5, fontFamily: 'var(--font-mono)' }}>
                                 "{data.name?.split(' ')[0]}'s expertise perfectly bridges your project's technical gap."
                             </p>
                         </div>
 
                         {/* Live Availability */}
-                        <div className="card">
+                        <div className="card" style={{ borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.9rem' }}>Live Availability</span>
+                                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: '0.9rem', color: 'var(--on-surface)' }}>Live Availability</span>
                                 <div className="pulse-dot" />
                             </div>
-                            <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1.25rem', textAlign: 'center', border: '1px solid rgba(255,255,255,0.03)' }}>
+                            <div style={{ background: 'var(--surface-low)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '1.25rem', textAlign: 'center', border: '1px solid var(--surface-ch)' }}>
                                 <Clock size={32} color="var(--primary)" style={{ display: 'block', margin: '0 auto 8px' }} />
-                                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--on-surface)', marginTop: '4px' }}>Next Slot: Today, 3:00 PM</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginTop: '4px' }}>60-min session · ${data.hourly_rate}</div>
+                                <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--on-surface)', marginTop: '4px', fontSize: '0.85rem' }}>Next Slot: Today, 3:00 PM</div>
+                                <div style={{ fontSize: '0.7rem', color: 'var(--on-surface-var)', marginTop: '4px', fontFamily: 'var(--font-mono)' }}>60-min session · ${data.hourly_rate}</div>
                             </div>
-                            <Link to={`/book/${data.id}`} className="btn-primary" style={{ display: 'flex', justifyContent: 'center', textDecoration: 'none', width: '100%', gap: '10px' }}>
+                            <Link to={`/book/${data.id}`} className="btn-primary" style={{ display: 'flex', justifyContent: 'center', textDecoration: 'none', width: '100%', gap: '10px', borderRadius: 'var(--radius-md)' }}>
                                 <Rocket size={18} />
                                 Initialize Workspace
                             </Link>
                         </div>
 
                         {/* Project velocity */}
-                        <div className="card" style={{ padding: '1.25rem' }}>
+                        <div className="card" style={{ padding: '1.25rem', borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
-                                <TrendingUp size={20} color="var(--tertiary)" />
+                                <TrendingUp size={20} color="var(--primary)" />
                                 <span style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--on-surface-var)' }}>Project Velocity Impact</span>
                             </div>
-                            <div style={{ fontFamily: 'var(--font-display)', fontSize: '2.5rem', fontWeight: 800, color: 'var(--tertiary)' }}>{data.velocity || '+120%'}</div>
-                            <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)' }}>Efficiency boost in sprint delivery</div>
+                            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary)' }}>{data.velocity || '+120%'}</div>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>Efficiency boost in sprint delivery</div>
                         </div>
                     </div>
                 </div>

@@ -9,17 +9,11 @@ const MOCK_EXPERTS = [
     { id: '3', name: 'David Chen', specialty: ['Cloud Infrastructure', 'AWS'], bio: 'Cloud Infrastructure expert. AWS/Azure specialist for scaling SaaS platforms to millions.', match_score: 91, hourly_rate: 420 },
 ];
 
-const IMPACT_STATS = [
-    { icon: Zap, label: 'Compatibility Scores', val: '98%', desc: 'Deep-level chemistry and technical overlap before the first meeting.' },
-    { icon: ShieldCheck, label: 'AI Skill Endorsements', val: '40+', desc: 'Dynamic verification through portfolio analysis and peer-review scanning.' },
-    { icon: Activity, label: 'Velocity Metrics', val: '84%', desc: 'Reduce time-to-hire. Our system automates vetting and delivers pre-aligned results.' },
-];
-
 const WORKSPACE_FEATURES = [
-    { icon: Activity, title: 'Flow Prioritization', desc: 'AI-sorted tasks based on your peak productivity cycles.', color: '#8f00ff' },
-    { icon: BookOpen, title: 'Automated Prep Summaries', desc: 'Instant briefings on stakeholders and project context.', color: '#00d4ff' },
-    { icon: Network, title: 'Network Intelligence', desc: 'Live map of your active collaborations and connection health.', color: '#4ade80' },
-    { icon: Brain, title: 'AI Curator', desc: 'Proactive suggestions to keep your work sessions uninterrupted.', color: '#ffb68b' },
+    { icon: Activity, title: 'Flow Prioritization', desc: 'AI-sorted tasks based on your peak productivity cycles.', color: '#006a2e' },
+    { icon: BookOpen, title: 'Automated Prep Summaries', desc: 'Instant briefings on stakeholders and project context.', color: '#00E5FF' },
+    { icon: Network, title: 'Network Intelligence', desc: 'Live map of your active collaborations and connection health.', color: '#32FF7E' },
+    { icon: Brain, title: 'AI Curator', desc: 'Proactive suggestions to keep your work sessions uninterrupted.', color: '#006a2e' },
 ];
 
 export default function LandingPage() {
@@ -67,8 +61,11 @@ export default function LandingPage() {
             <div className="blob" style={{ width: 300, height: 300, background: 'rgba(255,182,139,0.04)', top: '60%', left: '60%', animation: 'floatBlob 12s ease-in-out infinite' }} />
 
             {/* ── Navbar ── */}
-            <nav className="topnav">
-                <div className="topnav-logo">⚡ ExpertBook</div>
+            <nav className="topnav" style={{ background: 'rgba(255, 255, 255, 0.7)', borderBottom: '1px solid var(--surface-ch)' }}>
+                <Link to="/" className="topnav-logo" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <img src="/src/assets/logo.svg" alt="ExpertBook" style={{ width: 28, height: 28 }} />
+                    <span style={{ color: 'var(--on-surface)', fontWeight: 800 }}>ExpertBook</span>
+                </Link>
                 <div className="topnav-links">
                     <Link to="/explore" className="topnav-link">Expert Network</Link>
                     <a href="#concierge" className="topnav-link">AI Concierge</a>
@@ -96,7 +93,7 @@ export default function LandingPage() {
 
                         <h1 className="animate-fadeInUp" style={{ animationDelay: '80ms', marginBottom: '1.5rem', fontSize: 'clamp(2.8rem, 5vw, 4rem)' }}>
                             The{' '}
-                            <span style={{ background: 'linear-gradient(135deg, var(--primary-c), var(--primary))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
+                            <span style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-c))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
                                 Intelligent
                             </span>{' '}
                             Flow State
@@ -143,7 +140,7 @@ export default function LandingPage() {
 
                             {/* NLP Input demo */}
                             <div style={{ position: 'relative', marginBottom: '1.5rem' }}>
-                                <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-md)', padding: '16px 20px', border: '1.5px solid rgba(218,185,255,0.2)', minHeight: '80px', fontSize: '0.9rem', color: 'var(--on-surface-var)', lineHeight: 1.6, fontFamily: 'var(--font-body)', fontStyle: 'italic' }}>
+                                <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-xl)', padding: '16px 20px', border: '1.5px solid var(--surface-ch)', minHeight: '80px', fontSize: '0.9rem', color: 'var(--on-surface-var)', lineHeight: 1.6, fontFamily: 'var(--font-mono)', fontStyle: 'italic' }}>
                                     "{typed}<span style={{ display: 'inline-block', width: 2, height: '1em', background: 'var(--primary)', marginLeft: 2, animation: 'pulse 1s infinite', verticalAlign: 'middle' }} />"
                                 </div>
                             </div>
@@ -170,17 +167,17 @@ export default function LandingPage() {
                             <div style={{ marginBottom: '1rem' }}>
                                 <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)' }}>AI Match Result</span>
                             </div>
-                            <div className="card" style={{ border: '1px solid rgba(218,185,255,0.15)', background: 'var(--surface-ch)', position: 'relative', overflow: 'visible' }}>
+                            <div className="card" style={{ border: '1px solid var(--surface-ch)', background: 'var(--surface-lowest)', position: 'relative', overflow: 'visible' }}>
                                 {/* Glow ring */}
-                                <div style={{ position: 'absolute', inset: -1, borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(143,0,255,0.3), transparent)', zIndex: -1, filter: 'blur(8px)' }} />
+                                <div style={{ position: 'absolute', inset: -1, borderRadius: 'var(--radius-xl)', background: 'linear-gradient(135deg, rgba(50,255,126,0.1), transparent)', zIndex: -1, filter: 'blur(8px)' }} />
 
                                 <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
-                                    <div className="avatar" style={{ width: 56, height: 56, fontSize: '1.2rem', flexShrink: 0 }}>AV</div>
+                                    <div className="avatar" style={{ width: 56, height: 56, fontSize: '1.2rem', flexShrink: 0, background: 'var(--primary-c)', color: 'var(--on-primary-c)' }}>AV</div>
                                     <div style={{ flex: 1 }}>
                                         <h3 style={{ marginBottom: '2px' }}>Dr. Aris Varma</h3>
-                                        <p style={{ fontSize: '0.82rem', color: 'var(--on-surface-var)', margin: 0 }}>Principal Quant Architect</p>
+                                        <p style={{ fontSize: '0.82rem', color: 'var(--on-surface-var)', margin: 0, fontFamily: 'var(--font-mono)' }}>Principal Quant Architect</p>
                                     </div>
-                                    <div style={{ background: 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))', color: '#fff', padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', fontWeight: 800, fontFamily: 'var(--font-display)', flexShrink: 0 }}>
+                                    <div style={{ background: 'linear-gradient(135deg, var(--primary), var(--primary-c))', color: 'var(--on-primary)', padding: '6px 14px', borderRadius: 'var(--radius-full)', fontSize: '0.8rem', fontWeight: 800, fontFamily: 'var(--font-mono)', flexShrink: 0 }}>
                                         98% Match
                                     </div>
                                 </div>
@@ -199,15 +196,15 @@ export default function LandingPage() {
                                     <svg width="100%" height="40" viewBox="0 0 300 40">
                                         <defs>
                                             <linearGradient id="mfGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                <stop offset="0%" stopColor="#8f00ff" />
-                                                <stop offset="100%" stopColor="#dab9ff" />
+                                                <stop offset="0%" stopColor="#006a2e" />
+                                                <stop offset="100%" stopColor="#2efd7c" />
                                             </linearGradient>
                                         </defs>
                                         <path d="M 0 20 Q 75 5 150 20 Q 225 35 300 20" stroke="url(#mfGrad)" strokeWidth="2.5" fill="none" strokeDasharray="6,3">
                                             <animate attributeName="stroke-dashoffset" from="0" to="-36" dur="1.5s" repeatCount="indefinite" />
                                         </path>
                                         {[0, 60, 120, 180, 240, 300].map((x, i) => (
-                                            <circle key={i} cx={x} cy={20} r="4" fill="#8f00ff" opacity="0.7" />
+                                            <circle key={i} cx={x} cy={20} r="4" fill="#006a2e" opacity="0.7" />
                                         ))}
                                     </svg>
                                 </div>

@@ -59,14 +59,14 @@ export default function Login({ clerkEnabled = false }) {
                         fallbackRedirectUrl="/workspace"
                         appearance={{
                             variables: {
-                                colorPrimary: '#8f00ff', colorBackground: '#0e0a1a',
-                                colorText: '#e8deff', colorTextSecondary: '#a394c8',
-                                colorInputBackground: '#1a1230', colorInputText: '#e8deff',
-                                borderRadius: '12px', fontFamily: 'Inter, sans-serif',
+                                colorPrimary: '#006a2e', colorBackground: '#f5f6f7',
+                                colorText: '#131315', colorTextSecondary: '#4b5563',
+                                colorInputBackground: '#ffffff', colorInputText: '#131315',
+                                borderRadius: '1.5rem', fontFamily: 'Inter, sans-serif',
                             },
                             elements: {
-                                card: { boxShadow: '0 0 40px rgba(143,0,255,0.15)', border: '1px solid rgba(218,185,255,0.1)' },
-                                formButtonPrimary: { background: 'linear-gradient(135deg, #8f00ff, #b96aff)' },
+                                card: { boxShadow: '0 8px 32px rgba(0,0,0,0.05)', border: '1px solid var(--surface-ch)' },
+                                formButtonPrimary: { background: 'linear-gradient(135deg, var(--primary), var(--primary-c))' },
                             }
                         }}
                     />

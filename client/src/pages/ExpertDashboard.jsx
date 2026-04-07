@@ -53,18 +53,18 @@ export default function ExpertDashboard() {
 
                 <div style={{ position: 'relative', zIndex: 1 }}>
                     {/* Header */}
-                    <div style={{ padding: '2.5rem 2rem 1.5rem', borderBottom: '1px solid rgba(218,185,255,0.06)' }}>
+                    <div style={{ padding: '2.5rem 2rem 1.5rem', borderBottom: '1px solid var(--surface-ch)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                             <div>
                                 <span className="section-label">WORKSPACE CENTRAL</span>
-                                <h1 style={{ marginTop: '0.5rem', fontSize: '2rem' }}>
+                                <h1 style={{ marginTop: '0.5rem', fontSize: '2rem', color: 'var(--on-surface)' }}>
                                     {greeting}, <span style={{ color: 'var(--primary)' }}>{user?.name?.split(' ')[0] || 'Alex'}</span>.
                                 </h1>
-                                <p style={{ marginTop: '0.5rem', color: 'var(--on-surface-var)' }}>The Curator has prioritized 3 critical tasks for your peak flow state today.</p>
+                                <p style={{ marginTop: '0.5rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>The Curator has prioritized 3 critical tasks for your peak flow state today.</p>
                             </div>
                             <div style={{ textAlign: 'right' }}>
-                                <div style={{ background: 'rgba(218,185,255,0.08)', borderRadius: 'var(--radius-lg)', padding: '1rem 1.5rem', border: '1px solid rgba(218,185,255,0.12)' }}>
-                                    <div className="stat-number">98.4%</div>
+                                <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-xl)', padding: '1rem 1.5rem', border: '1px solid var(--surface-ch)' }}>
+                                    <div className="stat-number" style={{ fontFamily: 'var(--font-mono)', color: 'var(--primary)' }}>98.4%</div>
                                     <div className="stat-label">Matching Rate</div>
                                 </div>
                             </div>
@@ -78,58 +78,58 @@ export default function ExpertDashboard() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
 
                             {/* Intelligent Flow */}
-                            <div className="card" style={{ background: 'rgba(143,0,255,0.03)', border: '1px solid rgba(218,185,255,0.1)', backdropFilter: 'blur(10px)' }}>
+                            <div className="card" style={{ background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)', borderRadius: 'var(--radius-xl)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
                                     <Sparkles size={20} color="var(--primary)" />
-                                    <h3>Intelligent Flow</h3>
+                                    <h3 style={{ color: 'var(--on-surface)', fontFamily: 'var(--font-body)', fontWeight: 700 }}>Intelligent Flow</h3>
                                 </div>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} className="stagger">
                                     {FLOW_TASKS.map((task, i) => (
-                                        <div key={task.id} className="animate-fadeInUp" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', padding: '1rem', borderRadius: 'var(--radius-md)', background: 'var(--surface-ch)', cursor: 'pointer', transition: 'all var(--transition)' }}
-                                            onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-chh)'}
-                                            onMouseLeave={e => e.currentTarget.style.background = 'var(--surface-ch)'}
+                                        <div key={task.id} className="animate-fadeInUp" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', padding: '1.25rem', borderRadius: 'var(--radius-xl)', background: 'var(--surface-low)', cursor: 'pointer', transition: 'all var(--transition)', border: '1px solid var(--surface-ch)' }}
+                                            onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-lowest)'}
+                                            onMouseLeave={e => e.currentTarget.style.background = 'var(--surface-low)'}
                                         >
-                                            <div style={{ width: 42, height: 42, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--primary), #b06eff)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 12px rgba(143,0,255,0.2)' }}>
-                                                <task.icon size={20} color="#fff" />
+                                            <div style={{ width: 42, height: 42, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--primary), var(--primary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                                                <task.icon size={20} color="var(--on-primary)" />
                                             </div>
                                             <div style={{ flex: 1 }}>
-                                                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 600, marginBottom: '2px', fontSize: '0.9rem' }}>{task.title}</div>
-                                                <div style={{ fontSize: '0.78rem', color: 'var(--on-surface-var)' }}>
-                                                    {task.client && <span style={{ color: 'var(--primary)' }}>{task.client}</span>}
+                                                <div style={{ fontFamily: 'var(--font-body)', fontWeight: 600, marginBottom: '2px', fontSize: '0.95rem', color: 'var(--on-surface)' }}>{task.title}</div>
+                                                <div style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>
+                                                    {task.client && <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{task.client}</span>}
                                                     {task.client && ' · '}
                                                     {task.type}
                                                 </div>
                                             </div>
-                                            <div style={{ fontSize: '0.8rem', fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--on-surface-var)', flexShrink: 0 }}>{task.time}</div>
+                                            <div style={{ fontSize: '0.85rem', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--primary)', flexShrink: 0 }}>{task.time}</div>
                                         </div>
                                     ))}
                                 </div>
                             </div>
 
                             {/* Network Flow */}
-                            <div className="card">
+                            <div className="card" style={{ borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem' }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                         <Network size={20} color="var(--primary)" />
-                                        <h3>Network Flow</h3>
+                                        <h3 style={{ color: 'var(--on-surface)', fontFamily: 'var(--font-body)', fontWeight: 700 }}>Network Flow</h3>
                                     </div>
-                                    <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)' }}>12 active · 4 pending</span>
+                                    <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>12 ACTIVE · 4 PENDING</span>
                                 </div>
 
                                 {/* Visual flow */}
-                                <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-md)', padding: '1.5rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'center' }}>
+                                <div style={{ background: 'var(--surface-low)', borderRadius: 'var(--radius-lg)', padding: '1.5rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'center', border: '1px solid var(--surface-ch)' }}>
                                     <svg width="260" height="80" viewBox="0 0 260 80">
                                         <defs>
                                             <linearGradient id="flowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                                                <stop offset="0%" stopColor="#8f00ff" />
-                                                <stop offset="100%" stopColor="#dab9ff" />
+                                                <stop offset="0%" stopColor="var(--primary)" />
+                                                <stop offset="100%" stopColor="var(--primary-c)" />
                                             </linearGradient>
                                         </defs>
                                         {/* Center node */}
-                                        <circle cx="130" cy="40" r="16" fill="#8f00ff" opacity="0.9" />
-                                        <text x="130" y="44" textAnchor="middle" fill="white" fontSize="10" fontFamily="Manrope" fontWeight="700">YOU</text>
+                                        <circle cx="130" cy="40" r="16" fill="var(--primary)" opacity="0.9" />
+                                        <text x="130" y="44" textAnchor="middle" fill="var(--on-primary)" fontSize="10" fontFamily="var(--font-mono)" fontWeight="700">YOU</text>
                                         {/* Connecting lines */}
-                                        {[[30, 20, '#4ade80'], [30, 60, '#dab9ff'], [230, 15, '#ffb68b'], [230, 65, '#dab9ff'], [80, 75, '#cfc2d9'], [180, 75, '#cfc2d9']].map(([cx, cy, color], i) => (
+                                        {[[30, 20, 'var(--primary-c)'], [30, 60, 'var(--accent)'], [230, 15, 'var(--primary)'], [230, 65, 'var(--tertiary)'], [80, 75, 'var(--outline)'], [180, 75, 'var(--outline)']].map(([cx, cy, color], i) => (
                                             <g key={i}>
                                                 <line x1="130" y1="40" x2={cx} y2={cy} stroke="url(#flowGrad)" strokeWidth="1.5" strokeDasharray="4,3" opacity="0.5">
                                                     <animate attributeName="stroke-dashoffset" from="0" to="-14" dur={`${1.5 + i * 0.3}s`} repeatCount="indefinite" />
@@ -142,10 +142,10 @@ export default function ExpertDashboard() {
 
                                 {/* Flow Health */}
                                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.25rem' }}>
-                                    {[{ l: 'Active', v: '12', c: '#4ade80' }, { l: 'Pending', v: '4', c: 'var(--primary)' }, { l: 'Completed', v: '38', c: 'var(--on-surface-var)' }].map(s => (
-                                        <div key={s.l} style={{ textAlign: 'center', padding: '0.75rem', background: 'var(--surface-lowest)', borderRadius: 'var(--radius-md)' }}>
-                                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.5rem', color: s.c }}>{s.v}</div>
-                                            <div style={{ fontSize: '0.7rem', color: 'var(--on-surface-var)', marginTop: '2px' }}>{s.l}</div>
+                                    {[{ l: 'Active', v: '12', c: 'var(--primary)' }, { l: 'Pending', v: '4', c: 'var(--tertiary)' }, { l: 'Completed', v: '38', c: 'var(--on-surface-var)' }].map(s => (
+                                        <div key={s.l} style={{ textAlign: 'center', padding: '0.75rem', background: 'var(--surface-low)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--surface-ch)' }}>
+                                            <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.5rem', color: s.c }}>{s.v}</div>
+                                            <div style={{ fontSize: '0.7rem', color: 'var(--on-surface-var)', marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.l}</div>
                                         </div>
                                     ))}
                                 </div>
@@ -153,11 +153,11 @@ export default function ExpertDashboard() {
                                 {/* Recent */}
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                                     {RECENT.map(r => (
-                                        <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: 'var(--radius)', background: 'var(--surface-lowest)', border: '1px solid rgba(255,255,255,0.03)' }}>
-                                            <r.icon size={18} color={r.color} />
+                                        <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px', borderRadius: 'var(--radius-lg)', background: 'var(--surface-low)', border: '1px solid var(--surface-ch)' }}>
+                                            <r.icon size={18} color="var(--primary)" />
                                             <div>
-                                                <div style={{ fontSize: '0.85rem', fontWeight: 600, fontFamily: 'var(--font-display)' }}>{r.label}</div>
-                                                <div style={{ fontSize: '0.72rem', color: 'var(--on-surface-var)' }}>{r.sub}</div>
+                                                <div style={{ fontSize: '0.85rem', fontWeight: 600, fontFamily: 'var(--font-body)', color: 'var(--on-surface)' }}>{r.label}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>{r.sub}</div>
                                             </div>
                                         </div>
                                     ))}
@@ -168,51 +168,51 @@ export default function ExpertDashboard() {
                         {/* Right — Curator Summary + Bookings */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {/* Curator Summary */}
-                            <div className="card" style={{ background: 'rgba(143,0,255,0.05)', border: '1px solid rgba(218,185,255,0.1)', backdropFilter: 'blur(8px)' }}>
+                            <div className="card" style={{ background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)', borderRadius: 'var(--radius-xl)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '0.5rem' }}>
                                     <Brain size={20} color="var(--primary)" />
-                                    <h3>Curator Summary</h3>
+                                    <h3 style={{ color: 'var(--on-surface)', fontFamily: 'var(--font-body)', fontWeight: 700 }}>Curator Summary</h3>
                                 </div>
-                                <span style={{ fontSize: '0.7rem', color: 'var(--on-surface-var)', marginBottom: '1.25rem', display: 'block' }}>Next Briefing — Sarah Jenkins (Project Zenith)</span>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1.5rem' }}>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginBottom: '1.25rem', display: 'block', fontFamily: 'var(--font-mono)' }}>NEXT BRIEFING — Project Zenith</span>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '1.5rem' }}>
                                     {CURATOR_NOTES.map((note, i) => (
-                                        <div key={i} style={{ display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
-                                            <CheckCircle2 size={14} color="#4ade80" style={{ marginTop: '3px', flexShrink: 0 }} />
-                                            <span style={{ fontSize: '0.82rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>{note}</span>
+                                        <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                                            <CheckCircle2 size={16} color="var(--primary)" style={{ marginTop: '2px', flexShrink: 0 }} />
+                                            <span style={{ fontSize: '0.85rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>{note}</span>
                                         </div>
                                     ))}
                                 </div>
-                                <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: '10px', fontSize: '0.85rem', gap: '8px' }}>
+                                <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', padding: '12px', fontSize: '0.85rem', gap: '8px', borderRadius: 'var(--radius-md)' }}>
                                     <BookOpen size={16} />
                                     View Briefing Journal
                                 </button>
                             </div>
 
                             {/* Bookings from API */}
-                            <div className="card">
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                            <div className="card" style={{ borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1.5rem' }}>
                                     <Calendar size={20} color="var(--primary)" />
-                                    <h3 style={{ fontSize: '1rem' }}>Upcoming Sessions</h3>
+                                    <h3 style={{ fontSize: '1rem', color: 'var(--on-surface)', fontFamily: 'var(--font-body)', fontWeight: 700 }}>Upcoming Sessions</h3>
                                 </div>
                                 {bookings.length === 0 ? (
-                                    <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--on-surface-var)' }}>
-                                        <Calendar size={32} style={{ display: 'block', margin: '0 auto 8px', color: 'var(--outline)', opacity: 0.5 }} />
-                                        <p style={{ fontSize: '0.82rem' }}>No upcoming sessions yet.</p>
-                                        <Link to="/explore" className="btn-ghost" style={{ marginTop: '12px', textDecoration: 'none', display: 'inline-flex', fontSize: '0.8rem', gap: '6px' }}>
-                                            Explore experts <ArrowRight size={14} />
+                                    <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--on-surface-var)' }}>
+                                        <Calendar size={32} style={{ display: 'block', margin: '0 auto 12px', color: 'var(--outline)', opacity: 0.5 }} />
+                                        <p style={{ fontSize: '0.85rem', fontFamily: 'var(--font-mono)' }}>No upcoming sessions found.</p>
+                                        <Link to="/explore" className="btn-ghost" style={{ marginTop: '16px', textDecoration: 'none', display: 'inline-flex', fontSize: '0.8rem', gap: '6px', borderRadius: 'var(--radius-md)' }}>
+                                            Initialize discovery <ArrowRight size={14} />
                                         </Link>
                                     </div>
                                 ) : (
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                                         {bookings.slice(0, 4).map(b => (
-                                            <div key={b.id} style={{ padding: '10px', borderRadius: 'var(--radius)', background: 'var(--surface-lowest)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                            <div key={b.id} style={{ padding: '12px', borderRadius: 'var(--radius-lg)', background: 'var(--surface-low)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--surface-ch)' }}>
                                                 <div>
-                                                    <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{b.event_types?.title || 'Session'}</div>
-                                                    <div style={{ fontSize: '0.72rem', color: 'var(--on-surface-var)' }}>
-                                                        {new Date(b.start_time).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                                                    <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--on-surface)' }}>{b.event_types?.title || 'Session'}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>
+                                                        {new Date(b.start_time).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).toUpperCase()}
                                                     </div>
                                                 </div>
-                                                <span style={{ fontSize: '0.7rem', padding: '3px 10px', borderRadius: 'var(--radius-full)', background: b.status === 'confirmed' ? 'rgba(74,222,128,0.1)' : 'rgba(218,185,255,0.1)', color: b.status === 'confirmed' ? '#4ade80' : 'var(--primary)', fontWeight: 600, textTransform: 'capitalize' }}>
+                                                <span style={{ fontSize: '0.7rem', padding: '4px 12px', borderRadius: 'var(--radius-full)', background: 'var(--primary-c)', color: 'var(--on-primary-c)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                                                     {b.status}
                                                 </span>
                                             </div>

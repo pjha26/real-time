@@ -48,24 +48,24 @@ export default function ExpertListing() {
                     <span className="section-label">EXPLORE</span>
                     <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginTop: '0.5rem', marginBottom: '2rem' }}>
                         <div>
-                            <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Discover Your Expert</h1>
-                            <p style={{ fontSize: '0.9rem' }}>AI-curated matches based on your project's unique fingerprint.</p>
+                            <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem', color: 'var(--on-surface)' }}>Discover Your Expert</h1>
+                            <p style={{ fontSize: '0.9rem', color: 'var(--on-surface-var)' }}>AI-curated matches based on your project's unique fingerprint.</p>
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(218,185,255,0.08)', padding: '8px 16px', borderRadius: 'var(--radius-full)' }}>
-                            <div className="pulse-dot" />
-                            <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600, fontFamily: 'var(--font-display)' }}>98.4% Match Rate</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--tertiary-c)', padding: '8px 16px', borderRadius: 'var(--radius-full)' }}>
+                            <div className="pulse-dot"></div>
+                            <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600, fontFamily: 'var(--font-mono)' }}>98.4% MATCH RATE</span>
                         </div>
                     </div>
 
                     {/* Search */}
                     <div style={{ position: 'relative', marginBottom: '1.5rem', maxWidth: '500px' }}>
-                        <Search size={20} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--outline)' }} />
+                        <Search size={20} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--on-surface-var)' }} />
                         <input
                             className="input"
                             placeholder="Search experts, skills, domains…"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
-                            style={{ paddingLeft: '48px' }}
+                            style={{ paddingLeft: '48px', borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}
                         />
                     </div>
 
@@ -76,11 +76,11 @@ export default function ExpertListing() {
                                 key={f}
                                 onClick={() => setActiveFilter(f)}
                                 style={{
-                                    padding: '6px 16px', borderRadius: 'var(--radius-sm)', border: 'none', cursor: 'pointer',
-                                    fontFamily: 'var(--font-body)', fontSize: '0.8rem', fontWeight: 600, letterSpacing: '0.04em',
+                                    padding: '8px 20px', borderRadius: 'var(--radius-full)', border: '1px solid var(--surface-ch)', cursor: 'pointer',
+                                    fontFamily: 'var(--font-body)', fontSize: '0.85rem', fontWeight: 600,
                                     transition: 'all var(--transition)',
-                                    background: activeFilter === f ? 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))' : 'var(--surface-ch)',
-                                    color: activeFilter === f ? '#fff' : 'var(--on-surface-var)',
+                                    background: activeFilter === f ? 'var(--primary)' : 'var(--surface-lowest)',
+                                    color: activeFilter === f ? 'var(--on-primary)' : 'var(--on-surface-var)',
                                 }}
                             >
                                 {f}
@@ -145,21 +145,21 @@ function ExpertCard({ expert }) {
     const initials = expert.name?.split(' ').map(n => n[0]).join('') || '?';
     return (
         <Link to={`/experts/${expert.id}`} style={{ textDecoration: 'none' }}>
-            <div className="card animate-fadeInUp" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+            <div className="card animate-fadeInUp" style={{ height: '100%', display: 'flex', flexDirection: 'column', borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-                    <div className="avatar" style={{ width: 48, height: 48, fontSize: '1rem' }}>{initials}</div>
-                    <div style={{ background: 'rgba(218,185,255,0.1)', color: 'var(--primary)', padding: '4px 10px', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'var(--font-display)', alignSelf: 'flex-start' }}>
-                        {expert.match_score || 90}%
+                    <div className="avatar" style={{ width: 48, height: 48, fontSize: '1rem', background: 'var(--primary-c)', color: 'var(--on-primary-c)' }}>{initials}</div>
+                    <div style={{ background: 'var(--tertiary-c)', color: 'var(--primary)', padding: '4px 12px', borderRadius: 'var(--radius-full)', fontSize: '0.75rem', fontWeight: 700, fontFamily: 'var(--font-mono)', alignSelf: 'flex-start' }}>
+                        {expert.match_score || 90}% MATCH
                     </div>
                 </div>
-                <h3 style={{ marginBottom: '0.25rem' }}>{expert.name}</h3>
-                <p style={{ fontSize: '0.85rem', marginBottom: '1rem', flex: 1, lineHeight: 1.5 }}>{expert.bio}</p>
+                <h3 style={{ marginBottom: '0.25rem', color: 'var(--on-surface)' }}>{expert.name}</h3>
+                <p style={{ fontSize: '0.85rem', marginBottom: '1rem', flex: 1, lineHeight: 1.5, color: 'var(--on-surface-var)' }}>{expert.bio}</p>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '1.25rem' }}>
-                    {(expert.specialty || []).slice(0, 3).map(s => <span key={s} className="chip">{s}</span>)}
+                    {(expert.specialty || []).slice(0, 3).map(s => <span key={s} className="chip" style={{ background: 'var(--surface-low)', color: 'var(--on-surface-var)', borderRadius: 'var(--radius-sm)', fontSize: '0.7rem' }}>{s}</span>)}
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '0.9rem', fontFamily: 'var(--font-display)', fontWeight: 700 }}>${expert.hourly_rate || 400}/hr</span>
-                    <button className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.8rem' }}>
+                    <span style={{ fontSize: '0.9rem', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--on-surface)' }}>${expert.hourly_rate || 400}/hr</span>
+                    <button className="btn-primary" style={{ padding: '8px 16px', fontSize: '0.75rem', borderRadius: 'var(--radius-md)' }}>
                         View Profile
                     </button>
                 </div>

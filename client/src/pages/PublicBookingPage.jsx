@@ -80,16 +80,16 @@ export default function PublicBookingPage() {
         return (
             <Layout>
                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '80vh' }}>
-                    <div className="card animate-fadeInUp" style={{ textAlign: 'center', maxWidth: '480px', padding: '3rem', border: '1px solid rgba(218,185,255,0.15)' }}>
-                        <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
-                            <Check size={32} color="#fff" />
+                    <div className="card animate-fadeInUp" style={{ textAlign: 'center', maxWidth: '480px', padding: '3rem', border: '1px solid var(--surface-ch)', borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)' }}>
+                        <div style={{ width: 72, height: 72, borderRadius: '50%', background: 'linear-gradient(135deg, var(--primary), var(--primary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                            <Check size={32} color="var(--on-primary)" />
                         </div>
-                        <h2 style={{ marginBottom: '0.75rem' }}>Workspace Initialized!</h2>
-                        <p style={{ marginBottom: '2rem' }}>Your session with <strong style={{ color: 'var(--primary)' }}>{expert.name}</strong> has been confirmed. The Curator has sent prep materials to your inbox.</p>
-                        <div style={{ background: 'rgba(143,0,255,0.08)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '2rem', fontSize: '0.85rem', color: 'var(--on-surface-var)' }}>
+                        <h2 style={{ marginBottom: '0.75rem', color: 'var(--on-surface)' }}>Workspace Initialized!</h2>
+                        <p style={{ marginBottom: '2rem', color: 'var(--on-surface-var)' }}>Your session with <strong style={{ color: 'var(--primary)' }}>{expert.name}</strong> has been confirmed. The Curator has sent prep materials to your inbox.</p>
+                        <div style={{ background: 'var(--surface-low)', borderRadius: 'var(--radius-md)', padding: '1rem', marginBottom: '2rem', fontSize: '0.85rem', color: 'var(--on-surface-var)', border: '1px solid var(--surface-ch)' }}>
                             💡 Curator Tip: {expert.name.split(' ')[0]} prefers having access to Figma files 24 hours in advance. Your prep list has been updated.
                         </div>
-                        <Link to="/workspace" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', gap: '8px' }}>
+                        <Link to="/workspace" className="btn-primary" style={{ textDecoration: 'none', display: 'inline-flex', gap: '8px', borderRadius: 'var(--radius-md)' }}>
                             <LayoutGrid size={18} />
                             Go to Workspace
                         </Link>
@@ -116,10 +116,10 @@ export default function PublicBookingPage() {
                         {/* Left */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {/* AI Scope */}
-                            <div className="card" style={{ background: 'rgba(143,0,255,0.06)', border: '1px solid rgba(218,185,255,0.1)' }}>
+                            <div className="card" style={{ background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)', borderRadius: 'var(--radius-xl)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
                                     <Sparkles size={20} color="var(--primary)" />
-                                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>AI-Drafted Project Scope</span>
+                                    <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, color: 'var(--on-surface)' }}>AI-Drafted Project Scope</span>
                                 </div>
                                 <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', marginBottom: '1rem' }}>Based on your inquiry about "Scalable Design Systems", the Curator has synthesized:</p>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -133,8 +133,8 @@ export default function PublicBookingPage() {
                             </div>
 
                             {/* Notes */}
-                            <div className="card">
-                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--on-surface-var)', marginBottom: '8px', fontFamily: 'var(--font-body)' }}>
+                            <div className="card" style={{ borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
+                                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--on-surface)', marginBottom: '8px', fontFamily: 'var(--font-body)' }}>
                                     Additional Context (optional)
                                 </label>
                                 <textarea
@@ -143,7 +143,7 @@ export default function PublicBookingPage() {
                                     placeholder="Describe your project goals, deliverables, or questions for the expert…"
                                     value={notes}
                                     onChange={e => setNotes(e.target.value)}
-                                    style={{ resize: 'vertical' }}
+                                    style={{ resize: 'vertical', borderRadius: 'var(--radius-lg)', background: 'var(--surface-low)', border: '1px solid var(--surface-ch)' }}
                                 />
                             </div>
                         </div>
@@ -151,10 +151,10 @@ export default function PublicBookingPage() {
                         {/* Right */}
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {/* Calendar */}
-                            <div className="card">
+                            <div className="card" style={{ borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
                                     <Calendar size={20} color="var(--primary)" />
-                                    <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700 }}>Intelligent Availability</span>
+                                    <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, color: 'var(--on-surface)' }}>Intelligent Availability</span>
                                 </div>
                                 <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginBottom: '1rem' }}>Synchronizing your work cycles with {expert.name.split(' ')[0]}'s peak creative flow.</p>
 
@@ -167,17 +167,17 @@ export default function PublicBookingPage() {
                                                 key={i}
                                                 onClick={() => setSelectedDate(d)}
                                                 style={{
-                                                    flexShrink: 0, padding: '10px 14px', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer',
-                                                    background: isSelected ? 'linear-gradient(135deg, var(--primary-c), var(--secondary-c))' : 'var(--surface-lowest)',
-                                                    color: isSelected ? '#fff' : 'var(--on-surface-var)',
-                                                    fontFamily: 'var(--font-display)', fontWeight: isSelected ? 700 : 500, fontSize: '0.8rem',
-                                                    transition: 'all var(--transition)', textAlign: 'center', minWidth: '52px',
+                                                    flexShrink: 0, padding: '10px 14px', borderRadius: 'var(--radius-xl)', border: '1px solid var(--surface-ch)', cursor: 'pointer',
+                                                    background: isSelected ? 'linear-gradient(135deg, var(--primary), var(--primary-c))' : 'var(--surface-lowest)',
+                                                    color: isSelected ? 'var(--on-primary)' : 'var(--on-surface-var)',
+                                                    fontFamily: 'var(--font-mono)', fontWeight: isSelected ? 700 : 500, fontSize: '0.8rem',
+                                                    transition: 'all var(--transition)', textAlign: 'center', minWidth: '55px',
                                                 }}
                                             >
-                                                <div style={{ fontSize: '0.65rem', opacity: 0.7, marginBottom: '2px' }}>
-                                                    {d.toLocaleDateString('en', { weekday: 'short' })}
+                                                <div style={{ fontSize: '0.6rem', opacity: 0.8, marginBottom: '2px' }}>
+                                                    {d.toLocaleDateString('en', { weekday: 'short' }).toUpperCase()}
                                                 </div>
-                                                <div>{d.getDate()}</div>
+                                                <div style={{ fontSize: '1rem' }}>{d.getDate()}</div>
                                             </button>
                                         );
                                     })}
@@ -192,12 +192,11 @@ export default function PublicBookingPage() {
                                                 key={time}
                                                 onClick={() => setSelectedTime(time)}
                                                 style={{
-                                                    padding: '8px 4px', borderRadius: 'var(--radius)', border: 'none', cursor: 'pointer',
-                                                    background: isSelected ? 'rgba(218,185,255,0.15)' : 'var(--surface-lowest)',
-                                                    color: isSelected ? 'var(--primary)' : 'var(--on-surface-var)',
-                                                    fontFamily: 'var(--font-body)', fontSize: '0.75rem', fontWeight: isSelected ? 600 : 400,
+                                                    padding: '8px 4px', borderRadius: 'var(--radius-md)', border: '1px solid var(--surface-ch)', cursor: 'pointer',
+                                                    background: isSelected ? 'var(--primary)' : 'var(--surface-lowest)',
+                                                    color: isSelected ? 'var(--on-primary)' : 'var(--on-surface-var)',
+                                                    fontFamily: 'var(--font-mono)', fontSize: '0.75rem', fontWeight: isSelected ? 700 : 400,
                                                     transition: 'all var(--transition)',
-                                                    border: isSelected ? '1px solid rgba(218,185,255,0.3)' : '1px solid transparent',
                                                 }}
                                             >
                                                 {time}
@@ -208,13 +207,13 @@ export default function PublicBookingPage() {
                             </div>
 
                             {/* Expert summary */}
-                            <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                <div className="avatar" style={{ width: 44, height: 44, fontSize: '1rem', flexShrink: 0 }}>{initials}</div>
+                            <div className="card" style={{ display: 'flex', gap: '1rem', alignItems: 'center', borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
+                                <div className="avatar" style={{ width: 44, height: 44, fontSize: '1rem', flexShrink: 0, background: 'var(--primary-c)', color: 'var(--on-primary-c)' }}>{initials}</div>
                                 <div style={{ flex: 1 }}>
-                                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, marginBottom: '2px' }}>{expert.name}</div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)' }}>{expert.specialty}</div>
+                                    <div style={{ fontFamily: 'var(--font-body)', fontWeight: 700, marginBottom: '2px', color: 'var(--on-surface)' }}>{expert.name}</div>
+                                    <div style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>{expert.specialty}</div>
                                 </div>
-                                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--primary)', fontSize: '1.1rem' }}>${expert.hourly_rate}/hr</div>
+                                <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, color: 'var(--primary)', fontSize: '1.1rem' }}>${expert.hourly_rate}/hr</div>
                             </div>
 
                             {/* CTA */}
