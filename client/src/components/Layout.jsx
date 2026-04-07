@@ -28,11 +28,11 @@ export default function Layout({ children }) {
             {/* Sidebar */}
             <aside className="sidebar">
                 {/* Logo */}
-                <div className="sidebar-logo">
+                <Link to="/" className="sidebar-logo" style={{ textDecoration: 'none' }}>
                     <span style={{ fontSize: '1.4rem' }}>⚡</span>
                     Match & Flow
                     <span className="sidebar-ai-badge">AI Online</span>
-                </div>
+                </Link>
 
                 {/* Curator card */}
                 <div className="card" style={{ marginBottom: '1.5rem', padding: '0.75rem 1rem', background: 'rgba(143,0,255,0.08)' }}>
