@@ -16,6 +16,12 @@ const WORKSPACE_FEATURES = [
     { icon: Brain, title: 'AI Curator', desc: 'Proactive suggestions to keep your work sessions uninterrupted.', color: '#006a2e' },
 ];
 
+const IMPACT_STATS = [
+    { icon: Rocket, val: '22ms', label: 'Match Latency', desc: 'Average time to identify the optimal expert profile.' },
+    { icon: Zap, val: '14.2%', label: 'Efficiency Gain', desc: 'Average increase in project velocity post-onboarding.' },
+    { icon: ShieldCheck, val: 'Zero', label: 'Compliance Debt', desc: 'Pre-vetted audits for every single collaboration.' },
+];
+
 export default function LandingPage() {
     const { experts, fetchExperts } = useExpertStore();
     const [query, setQuery] = useState('');
