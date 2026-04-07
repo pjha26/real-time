@@ -1,3 +1,4 @@
+import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ClerkProvider, useAuth } from '@clerk/clerk-react';
 import LandingPage from './pages/LandingPage';
@@ -11,6 +12,24 @@ import ExpertDashboard from './pages/ExpertDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import './index.css';
+
+// ── Simple Error Boundary ──
+class ErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false, error: null }; }
+  static getDerivedStateFromError(error) { return { hasError: true, error }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: '2rem', textAlign: 'center', background: '#f5f6f7', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <h2 style={{ color: '#006a2e', marginBottom: '1rem' }}>Something went wrong</h2>
+          <pre style={{ background: '#eee', padding: '1rem', borderRadius: '8px', fontSize: '0.8rem', maxWidth: '80%' }}>{this.state.error?.message}</pre>
+          <button onClick={() => window.location.reload()} className="btn-primary" style={{ marginTop: '1rem' }}>Reload Platform</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 const clerkEnabled = CLERK_KEY && !CLERK_KEY.includes('your_clerk');
@@ -68,12 +87,30 @@ function AppRoutes() {
 }
 
 export default function App() {
-  if (clerkEnabled) {
+  const [clerkError, setClerkError] = React.useState(false);
+
+  if (clerkEnabled && !clerkError) {
     return (
-      <ClerkProvider publishableKey={CLERK_KEY} afterSignOutUrl="/">
-        <AppRoutes />
-      </ClerkProvider>
+      <ErrorBoundary>
+        <ClerkProvider
+          publishableKey={CLERK_KEY}
+          afterSignOutUrl="/"
+          onError={() => setClerkError(true)}
+        >
+          <AppRoutes />
+        </ClerkProvider>
+      </ErrorBoundary>
     );
   }
-  return <AppRoutes />;
+
+  return (
+    <ErrorBoundary>
+      {clerkEnabled && clerkError && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999, background: '#ff6b6b', color: 'white', padding: '8px', textAlign: 'center', fontSize: '0.8rem' }}>
+          Clerk Authentication Error: Please check your Publishable Key in .env
+        </div>
+      )}
+      <AppRoutes />
+    </ErrorBoundary>
+  );
 }

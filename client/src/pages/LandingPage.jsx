@@ -69,7 +69,9 @@ export default function LandingPage() {
             {/* ── Navbar ── */}
             <nav className="topnav" style={{ background: 'rgba(255, 255, 255, 0.7)', borderBottom: '1px solid var(--surface-ch)' }}>
                 <Link to="/" className="topnav-logo" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <img src="/src/assets/logo.svg" alt="ExpertBook" style={{ width: 28, height: 28 }} />
+                    <div style={{ width: 28, height: 28, background: 'linear-gradient(135deg, var(--primary), var(--primary-c))', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
+                        <Rocket size={16} />
+                    </div>
                     <span style={{ color: 'var(--on-surface)', fontWeight: 800 }}>ExpertBook</span>
                 </Link>
                 <div className="topnav-links">
@@ -80,8 +82,8 @@ export default function LandingPage() {
                 </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <Link to="/login" className="btn-ghost" style={{ textDecoration: 'none' }}>Sign in</Link>
-                    <Link to="/register" className="btn-primary" style={{ textDecoration: 'none' }}>
-                        <span className="material-icons" style={{ fontSize: 16 }}>rocket_launch</span>
+                    <Link to="/register" className="btn-primary" style={{ textDecoration: 'none', gap: '8px' }}>
+                        <Rocket size={16} />
                         Get started
                     </Link>
                 </div>
@@ -391,7 +393,7 @@ function ExpertCard({ expert, featured }) {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span style={{ fontSize: '0.85rem', fontFamily: 'var(--font-display)', fontWeight: 700 }}>${expert.hourly_rate || 400}/hr</span>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>View profile <span className="material-icons" style={{ fontSize: 14 }}>arrow_forward</span></span>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>View profile <ArrowRight size={14} /></span>
                 </div>
             </div>
         </Link>
