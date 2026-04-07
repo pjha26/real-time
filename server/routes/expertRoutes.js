@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../db');
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // GET /api/experts — list all experts
 router.get('/', async (req, res) => {
     try {
@@ -56,6 +58,7 @@ router.get('/', async (req, res) => {
 // GET /api/experts/:id
 router.get('/:id', async (req, res) => {
     try {
+        // Guard: must be a UUID
         const { data, error } = await supabase
             .from('experts')
             .select(`

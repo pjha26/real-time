@@ -3,12 +3,17 @@ const router = express.Router();
 const supabase = require('../db');
 const auth = require('../middleware/auth');
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // POST /api/bookings — create a booking (client)
 router.post('/', auth, async (req, res) => {
     try {
         const { expert_id, event_type_id, start_time, end_time, scope } = req.body;
         if (!expert_id || !start_time)
             return res.status(400).json({ error: 'expert_id and start_time are required' });
+        if (!UUID_RE.test(expert_id))
+            return res.status(400).json({ error: 'Invalid expert_id — must be a valid UUID', demo: true });
+
 
         const { data, error } = await supabase
             .from('bookings')

@@ -42,9 +42,20 @@ export default function PublicBookingPage() {
     });
 
     const handleSubmit = async () => {
-        if (!user) { navigate('/login'); return; }
+        if (!user && !clerkEnabled) { navigate('/login'); return; }
         if (!selectedDate || !selectedTime) { setError('Please select a date and time.'); return; }
         setError('');
+
+        // ── DEMO MODE: If expertId is one of our mock IDs (1-6), just simulate success ──
+        if (['1', '2', '3', '4', '5', '6'].includes(expertId)) {
+            setLoading(true);
+            setTimeout(() => {
+                setLoading(false);
+                setSubmitted(true);
+            }, 800);
+            return;
+        }
+
         try {
             const start = new Date(selectedDate);
             const [h, m] = selectedTime.replace(' AM', '').replace(' PM', '').split(':');
