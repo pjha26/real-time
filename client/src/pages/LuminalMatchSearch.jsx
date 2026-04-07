@@ -41,7 +41,7 @@ export default function LuminalMatchSearch() {
             {/* ── Left sidebar ── */}
             <aside style={{ width: '260px', flexShrink: 0, borderRight: '1px solid rgba(218,185,255,0.08)', padding: '2rem 1.5rem', display: 'flex', flexDirection: 'column', gap: '1.5rem', position: 'sticky', top: 0, height: '100vh', overflowY: 'auto' }}>
                 <Link to="/" style={{ textDecoration: 'none' }}>
-                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--primary)', fontSize: '1rem', marginBottom: '0.5rem' }}>⚡ Match & Flow</div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--primary)', fontSize: '1rem', marginBottom: '0.5rem' }}>⚡ ExpertBook</div>
                 </Link>
 
                 {/* Nav */}
@@ -63,7 +63,7 @@ export default function LuminalMatchSearch() {
                 {/* Expert Portal section lable */}
                 <div style={{ borderTop: '1px solid rgba(218,185,255,0.08)', paddingTop: '1rem' }}>
                     <div style={{ fontSize: '0.68rem', color: 'var(--outline)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.75rem', fontFamily: 'var(--font-body)' }}>Expert Portal</div>
-                    <div style={{ fontSize: '0.85rem', fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--on-surface)', marginBottom: '1rem' }}>Luminal Flow</div>
+                    <div style={{ fontSize: '0.85rem', fontFamily: 'var(--font-display)', fontWeight: 700, color: 'var(--on-surface)', marginBottom: '1rem' }}>ExpertBook</div>
                     {[
                         { icon: 'waves', label: 'Flow', to: '/workspace' },
                         { icon: 'auto_awesome', label: 'Opportunities', to: '/portal' },
@@ -186,3 +186,4 @@ export default function LuminalMatchSearch() {
         </div>
     );
 }
+

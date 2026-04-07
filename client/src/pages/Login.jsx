@@ -47,7 +47,7 @@ export default function Login({ clerkEnabled = false }) {
             <div style={{ position: 'relative', zIndex: 1, width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
                 <Link to="/" style={{ textDecoration: 'none' }}>
                     <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '1.5rem', color: 'var(--primary)', letterSpacing: '-0.02em' }}>
-                        ⚡ Match & Flow
+                        ⚡ ExpertBook
                     </div>
                 </Link>
 
@@ -92,3 +92,4 @@ export default function Login({ clerkEnabled = false }) {
         </div>
     );
 }
+

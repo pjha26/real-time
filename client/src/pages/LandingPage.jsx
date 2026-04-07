@@ -67,7 +67,7 @@ export default function LandingPage() {
 
             {/* ── Navbar ── */}
             <nav className="topnav">
-                <div className="topnav-logo">⚡ Match & Flow</div>
+                <div className="topnav-logo">⚡ ExpertBook</div>
                 <div className="topnav-links">
                     <Link to="/explore" className="topnav-link">Expert Network</Link>
                     <a href="#concierge" className="topnav-link">AI Concierge</a>
@@ -269,7 +269,7 @@ export default function LandingPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '5rem', alignItems: 'center' }}>
                         <div>
                             <span className="section-label">A WORKSPACE THAT THINKS WITH YOU</span>
-                            <h2 style={{ marginTop: '0.75rem', marginBottom: '1.25rem' }}>The Match & Flow Dashboard</h2>
+                            <h2 style={{ marginTop: '0.75rem', marginBottom: '1.25rem' }}>The ExpertBook Dashboard</h2>
                             <p style={{ marginBottom: '2rem' }}>It's not just a list of tasks. It's an intelligent workspace that prioritizes your cognitive energy and keeps your flow state uninterrupted.</p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {WORKSPACE_FEATURES.map(f => (
@@ -342,8 +342,8 @@ export default function LandingPage() {
                 <div className="container">
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '2rem' }}>
                         <div>
-                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--primary)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>⚡ Match & Flow</div>
-                            <p style={{ fontSize: '0.82rem', maxWidth: '240px' }}>Powered by fluid intelligence. © 2024 Match & Flow.</p>
+                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--primary)', fontSize: '1.1rem', marginBottom: '0.5rem' }}>⚡ ExpertBook</div>
+                            <p style={{ fontSize: '0.82rem', maxWidth: '240px' }}>Powered by fluid intelligence. © 2024 ExpertBook.</p>
                         </div>
                         <div style={{ display: 'flex', gap: '3rem', flexWrap: 'wrap' }}>
                             {[['Product', [['Expert Network', '/explore'], ['AI Concierge', '#concierge'], ['Workspace', '/workspace']]], ['Company', [['Privacy Policy', '#'], ['Terms of Service', '#'], ['Contact Support', '#']]], ['Experts', [['Expert Portal', '/register'], ['Client FAQ', '#']]]].map(([section, links]) => (
@@ -391,3 +391,4 @@ function ExpertCard({ expert, featured }) {
         </Link>
     );
 }
+

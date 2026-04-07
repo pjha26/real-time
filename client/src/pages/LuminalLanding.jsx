@@ -36,7 +36,7 @@ export default function LuminalLanding() {
 
             {/* Topnav */}
             <nav className="topnav">
-                <Link to="/" className="topnav-logo" style={{ textDecoration: 'none' }}>⚡ Match & Flow</Link>
+                <Link to="/" className="topnav-logo" style={{ textDecoration: 'none' }}>⚡ ExpertBook</Link>
                 <div className="topnav-links">
                     <Link to="/search" className="topnav-link">Explore</Link>
                     <a href="#concierge" className="topnav-link">AI Concierge</a>
@@ -174,8 +174,8 @@ export default function LuminalLanding() {
             {/* Footer */}
             <footer style={{ borderTop: '1px solid rgba(218,185,255,0.06)', padding: '2rem 0', position: 'relative', zIndex: 1 }}>
                 <div className="container" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--primary)' }}>⚡ Match & Flow</div>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)' }}>© 2024 Match & Flow. All rights reserved. Powered by Fluid Intelligence.</p>
+                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, color: 'var(--primary)' }}>⚡ ExpertBook</div>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)' }}>© 2024 ExpertBook. All rights reserved. Powered by Fluid Intelligence.</p>
                     <div style={{ display: 'flex', gap: '1.5rem' }}>
                         {[['Privacy', '#'], ['Terms', '#'], ['Contact', '#']].map(([l, h]) => (
                             <a key={l} href={h} style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', textDecoration: 'none' }}>{l}</a>
@@ -186,3 +186,4 @@ export default function LuminalLanding() {
         </div>
     );
 }
+

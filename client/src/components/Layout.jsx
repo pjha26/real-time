@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/useStore';
 
 const navItems = [
@@ -29,8 +29,8 @@ export default function Layout({ children }) {
             <aside className="sidebar">
                 {/* Logo */}
                 <Link to="/" className="sidebar-logo" style={{ textDecoration: 'none' }}>
-                    <span style={{ fontSize: '1.4rem' }}>⚡</span>
-                    Match & Flow
+                    <span style={{ fontSize: '1.4rem' }}>📘</span>
+                    ExpertBook
                     <span className="sidebar-ai-badge">AI Online</span>
                 </Link>
 

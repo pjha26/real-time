@@ -49,7 +49,7 @@ export default function LuminalExpertPortal() {
                 <div style={{ padding: '2rem 2rem 0', position: 'relative', zIndex: 1 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
                         <div>
-                            <span className="section-label">LUMINAL FLOW · EXPERT PORTAL</span>
+                            <span className="section-label">EXPERTBOOK · EXPERT PORTAL</span>
                             <h1 style={{ fontSize: '1.5rem', marginTop: '0.4rem' }}>
                                 {user?.name || 'Dr. Aris Varma'} &mdash;{' '}
                                 <span style={{ color: 'var(--on-surface-var)', fontWeight: 400, fontSize: '1.1rem' }}>
@@ -172,3 +172,4 @@ export default function LuminalExpertPortal() {
         </Layout>
     );
 }
+
