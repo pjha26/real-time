@@ -231,7 +231,7 @@ export default function LandingPage() {
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1.5rem' }} className="stagger">
                         {IMPACT_STATS.map((stat, i) => (
                             <div key={stat.label} className="card animate-fadeInUp" style={{ textAlign: 'center', padding: '2.5rem 2rem' }}>
-                                <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(143,0,255,0.2), rgba(94,40,153,0.2))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem' }}>
+                                <div style={{ width: 56, height: 56, borderRadius: 'var(--radius-lg)', background: 'linear-gradient(135deg, rgba(143,0,255,0.2), rgba(94,40,153,0.2))', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.25rem', overflow: 'hidden' }}>
                                     <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '24px' }}>{stat.icon}</span>
                                 </div>
                                 <div className="stat-number" style={{ fontSize: '2.5rem', marginBottom: '0.25rem' }}>{stat.val}</div>
@@ -273,13 +273,13 @@ export default function LandingPage() {
                             <p style={{ marginBottom: '2rem' }}>It's not just a list of tasks. It's an intelligent workspace that prioritizes your cognitive energy and keeps your flow state uninterrupted.</p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {WORKSPACE_FEATURES.map(f => (
-                                    <div key={f.title} style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                                        <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'rgba(143,0,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                            <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '20px' }}>{f.icon}</span>
+                                    <div key={f.title} style={{ display: 'flex', gap: '1.25rem', alignItems: 'flex-start' }}>
+                                        <div style={{ width: 40, height: 40, borderRadius: 'var(--radius-md)', background: 'rgba(143,0,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, overflow: 'hidden' }}>
+                                            <span className="material-icons" style={{ color: 'var(--primary)', fontSize: '20px', fontFamily: "'Material Icons', sans-serif" }}>{f.icon}</span>
                                         </div>
-                                        <div>
-                                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, marginBottom: '2px', fontSize: '0.9rem' }}>{f.title}</div>
-                                            <div style={{ fontSize: '0.82rem', color: 'var(--on-surface-var)' }}>{f.desc}</div>
+                                        <div style={{ flex: 1 }}>
+                                            <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, marginBottom: '4px', fontSize: '0.95rem' }}>{f.title}</div>
+                                            <div style={{ fontSize: '0.875rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>{f.desc}</div>
                                         </div>
                                     </div>
                                 ))}
