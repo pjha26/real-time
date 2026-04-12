@@ -87,12 +87,16 @@ export default function Register({ clerkEnabled = false }) {
                         </div>
                         <div>
                             <label style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', display: 'block', marginBottom: '6px' }}>I am a…</label>
-                            <div style={{ display: 'flex', gap: '1rem' }}>
-                                {['client', 'expert'].map(r => (
-                                    <button key={r} type="button" onClick={() => setForm({ ...form, role: r })}
-                                        className={form.role === r ? 'btn-primary' : 'btn-ghost'}
-                                        style={{ flex: 1, textTransform: 'capitalize' }}>
-                                        {r}
+                            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                {[
+                                    { id: 'client', label: 'Client' },
+                                    { id: 'expert', label: 'Expert / Trainer' },
+                                    { id: 'admin', label: 'Admin' },
+                                ].map(r => (
+                                    <button key={r.id} type="button" onClick={() => setForm({ ...form, role: r.id })}
+                                        className={form.role === r.id ? 'btn-primary' : 'btn-ghost'}
+                                        style={{ flex: 1, minWidth: '80px', fontSize: '0.82rem' }}>
+                                        {r.label}
                                     </button>
                                 ))}
                             </div>

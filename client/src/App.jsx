@@ -9,6 +9,9 @@ import ExpertListing from './pages/ExpertListing';
 import ExpertDetail from './pages/ExpertDetail';
 import PublicBookingPage from './pages/PublicBookingPage';
 import ExpertDashboard from './pages/ExpertDashboard';
+import AnalyticsDashboard from './pages/AnalyticsDashboard';
+import AIMatchPage from './pages/AIMatchPage';
+import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import './index.css';
@@ -83,6 +86,9 @@ function AppRoutes() {
         <Route path="/collaborations" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
         <Route path="/curator" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
         <Route path="/bookings" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
+        <Route path="/analytics" element={<ProtectedRoute><AnalyticsDashboard /></ProtectedRoute>} />
+        <Route path="/ai-match" element={<AIMatchPage />} />
+        <Route path="/admin" element={<AdminPanel />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

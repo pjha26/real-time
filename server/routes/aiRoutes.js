@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const aiController = require('../controllers/aiController');
+const { analyzeMatch, matchExperts } = require('../controllers/aiController');
 
-// POST /api/ai/analyze — generate AI justification for a match
-router.post('/analyze', aiController.analyzeMatch);
+router.post('/analyze', analyzeMatch);
+router.post('/match', matchExperts);
 
 module.exports = router;

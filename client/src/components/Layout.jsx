@@ -8,7 +8,10 @@ import {
     Settings,
     HelpCircle,
     LogOut,
-    Zap
+    Zap,
+    BarChart3,
+    Sparkles,
+    ShieldCheck
 } from 'lucide-react';
 import { SignedIn, UserButton, useUser } from '@clerk/clerk-react';
 import { useAuthStore } from '../store/useStore';
@@ -16,8 +19,10 @@ import { useAuthStore } from '../store/useStore';
 const navItems = [
     { to: '/workspace', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/explore', icon: Search, label: 'Explore' },
+    { to: '/ai-match', icon: Sparkles, label: 'AI Match' },
     { to: '/bookings', icon: Calendar, label: 'My Bookings' },
     { to: '/collaborations', icon: Users, label: 'Collaborations' },
+    { to: '/analytics', icon: BarChart3, label: 'Analytics' },
     { to: '/curator', icon: Brain, label: 'AI Curator' },
 ];
 
@@ -68,6 +73,18 @@ export default function Layout({ children }) {
                         </NavLink>
                     ))}
                 </nav>
+
+                {/* Admin link (only visible for admin role) */}
+                {localStorage.getItem('user_role') === 'admin' && (
+                    <NavLink
+                        to="/admin"
+                        className={({ isActive }) => `nav-item${isActive ? ' active' : ''}`}
+                        style={{ borderTop: '1px solid var(--surface-ch)', paddingTop: '12px', marginTop: '4px' }}
+                    >
+                        <ShieldCheck size={20} color="#f59e0b" />
+                        Admin Panel
+                    </NavLink>
+                )}
 
                 {/* Bottom */}
                 <div>
