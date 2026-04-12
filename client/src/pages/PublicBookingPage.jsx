@@ -50,7 +50,12 @@ export default function PublicBookingPage() {
     });
 
     const handleSubmit = async () => {
-        if (!user && !clerkEnabled) { navigate('/login'); return; }
+        const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+        const isClerkActive = CLERK_KEY && !CLERK_KEY.includes('your_clerk');
+        const hasToken = localStorage.getItem('mf_token');
+
+        if (!user && !isClerkActive && !hasToken) { navigate('/login'); return; }
+
         if (!selectedDate || !selectedTime) { setError('Please select a date and time.'); return; }
         setError('');
 
