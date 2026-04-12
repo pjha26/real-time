@@ -1,12 +1,37 @@
 import { create } from 'zustand';
 import axios from 'axios';
+import { io } from 'socket.io-client';
 
 const API = 'http://localhost:5000/api';
+const SOCKET_URL = 'http://localhost:5000';
 
 const getAuthHeader = () => {
     const token = localStorage.getItem('mf_token');
     return token ? { Authorization: `Bearer ${token}` } : {};
 };
+
+export const useSocketStore = create((set, get) => ({
+    socket: null,
+    connect: (userId, role) => {
+        if (get().socket) return;
+        const newSocket = io(SOCKET_URL);
+        newSocket.on('connect', () => {
+            console.log('Socket connected:', newSocket.id);
+            if (role === 'expert') {
+                newSocket.emit('join:expert', userId);
+            } else {
+                newSocket.emit('join:client', userId);
+            }
+        });
+        set({ socket: newSocket });
+    },
+    disconnect: () => {
+        if (get().socket) {
+            get().socket.disconnect();
+            set({ socket: null });
+        }
+    }
+}));
 
 export const useAuthStore = create((set) => ({
     user: JSON.parse(localStorage.getItem('mf_user') || 'null'),

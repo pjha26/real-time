@@ -32,6 +32,12 @@ io.on('connection', (socket) => {
         socket.join(`client:${clientId}`);
     });
 
+    // Handle demo mock bookings
+    socket.on('demo:book', (data) => {
+        // Broadcast the fake booking locally so the dashboard can pick it up
+        io.emit('booking:new', data);
+    });
+
     socket.on('disconnect', () => console.log('🔌 Client disconnected:', socket.id));
 });
 

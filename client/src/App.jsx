@@ -20,11 +20,11 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ padding: '2rem', textAlign: 'center', background: '#f5f6f7', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-          <h2 style={{ color: '#006a2e', marginBottom: '1rem' }}>ExpertBook Initialization Error</h2>
-          <div style={{ background: '#fff', border: '1px solid #e0e3e4', padding: '1.5rem', borderRadius: '1.5rem', maxWidth: '420px', boxShadow: '0 4px 24px rgba(0,0,0,0.04)' }}>
-            <p style={{ color: '#595c5d', fontSize: '0.9rem', marginBottom: '1.5rem' }}>The platform could not initialize authentication. This usually happens if the Clerk key in your .env file is unauthorized or has expired.</p>
-            <pre style={{ background: '#f8f9fa', padding: '12px', borderRadius: '8px', fontSize: '0.75rem', overflow: 'auto', marginBottom: '1.5rem', textAlign: 'left', border: '1px solid #eee' }}>{this.state.error?.message || 'Unauthorized Key'}</pre>
+        <div style={{ padding: '2rem', textAlign: 'center', background: 'var(--bg)', height: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <h2 style={{ color: 'var(--on-surface)', marginBottom: '1rem' }}>ExpertBook Initialization Error</h2>
+          <div style={{ background: 'var(--surface-low)', border: '1px solid var(--surface-ch)', padding: '1.5rem', borderRadius: '1.5rem', maxWidth: '420px', boxShadow: 'var(--shadow-card)' }}>
+            <p style={{ color: 'var(--on-surface-var)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>The platform could not initialize authentication. This usually happens if the Clerk key in your .env file is unauthorized or has expired.</p>
+            <pre style={{ background: 'var(--surface-lowest)', padding: '12px', borderRadius: '8px', fontSize: '0.75rem', overflow: 'auto', marginBottom: '1.5rem', textAlign: 'left', border: '1px solid var(--surface-ch)' }}>{this.state.error?.message || 'Unauthorized Key'}</pre>
             <button onClick={() => window.location.reload()} className="btn-primary" style={{ width: '100%' }}>Reload Platform</button>
           </div>
         </div>

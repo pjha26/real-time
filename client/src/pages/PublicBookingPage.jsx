@@ -8,7 +8,7 @@ import {
     Calendar,
     Rocket
 } from 'lucide-react';
-import { useBookingStore, useAuthStore } from '../store/useStore';
+import { useBookingStore, useAuthStore, useSocketStore } from '../store/useStore';
 import Layout from '../components/Layout';
 
 const EXPERTS = {
@@ -65,6 +65,10 @@ export default function PublicBookingPage() {
             setTimeout(() => {
                 setLoading(false);
                 setSubmitted(true);
+                // Connect ad-hoc if not already connected
+                useSocketStore.getState().connect('demo_client', 'client');
+                const { socket } = useSocketStore.getState();
+                if (socket) socket.emit('demo:book', { id: `demo_${Date.now()}`, expert_id: expertId, start_time: selectedDate, event_types: { title: 'AI Curated Flow Session' }, status: 'pending' });
             }, 800);
             return;
         }
