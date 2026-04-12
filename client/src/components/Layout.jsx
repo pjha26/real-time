@@ -40,7 +40,7 @@ export default function Layout({ children }) {
             {/* Sidebar */}
             <aside className="sidebar">
                 {/* Logo */}
-                <Link to="/" className="sidebar-logo" style={{ textDecoration: 'none', marginBottom: '1.5rem' }}>
+                <Link to="/" onClick={() => window.scrollTo(0, 0)} className="sidebar-logo" style={{ textDecoration: 'none', marginBottom: '1.5rem', cursor: 'pointer', zIndex: 10 }}>
                     <img src="/src/assets/logo.svg" alt="ExpertBook" style={{ width: 28, height: 28 }} />
                     <span style={{ color: 'var(--on-surface)', fontWeight: 800 }}>ExpertBook</span>
                     <span className="sidebar-ai-badge" style={{ color: 'var(--primary)', background: 'var(--tertiary-c)' }}>Live</span>

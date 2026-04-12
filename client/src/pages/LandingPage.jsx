@@ -69,10 +69,8 @@ export default function LandingPage() {
 
             {/* ── Navbar ── */}
             <nav className="topnav" style={{ background: 'rgba(255, 255, 255, 0.7)', borderBottom: '1px solid var(--surface-ch)' }}>
-                <Link to="/" className="topnav-logo" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: 28, height: 28, background: 'linear-gradient(135deg, var(--primary), var(--primary-c))', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-                        <Rocket size={16} />
-                    </div>
+                <Link to="/" onClick={() => window.scrollTo(0, 0)} className="topnav-logo" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <img src="/src/assets/logo.svg" alt="ExpertBook Logo" style={{ width: 28, height: 28 }} />
                     <span style={{ color: 'var(--on-surface)', fontWeight: 800 }}>ExpertBook</span>
                 </Link>
                 <div className="topnav-links">
