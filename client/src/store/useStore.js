@@ -103,9 +103,16 @@ export const useExpertStore = create((set) => ({
 }));
 
 export const useBookingStore = create((set) => ({
-    bookings: [],
+    bookings: JSON.parse(localStorage.getItem('mock_bookings') || '[]'),
     loading: false,
     error: null,
+
+    addMockBooking: (booking) => set((state) => {
+        const mockBookings = JSON.parse(localStorage.getItem('mock_bookings') || '[]');
+        const updatedBookings = [booking, ...mockBookings];
+        localStorage.setItem('mock_bookings', JSON.stringify(updatedBookings));
+        return { bookings: [...updatedBookings, ...state.bookings.filter(b => !b.is_mock)] };
+    }),
 
     createBooking: async (bookingData) => {
         set({ loading: true, error: null });
@@ -125,9 +132,11 @@ export const useBookingStore = create((set) => ({
         set({ loading: true });
         try {
             const { data } = await axios.get(`${API}/bookings/my`, { headers: getAuthHeader() });
-            set({ bookings: data, loading: false });
+            const mockBookings = JSON.parse(localStorage.getItem('mock_bookings') || '[]');
+            set({ bookings: [...mockBookings, ...data], loading: false });
         } catch (err) {
-            set({ error: err.message, loading: false });
+            const mockBookings = JSON.parse(localStorage.getItem('mock_bookings') || '[]');
+            set({ bookings: mockBookings, error: err.message, loading: false });
         }
     },
 
@@ -135,9 +144,11 @@ export const useBookingStore = create((set) => ({
         set({ loading: true });
         try {
             const { data } = await axios.get(`${API}/bookings/expert`, { headers: getAuthHeader() });
-            set({ bookings: data, loading: false });
+            const mockBookings = JSON.parse(localStorage.getItem('mock_bookings') || '[]');
+            set({ bookings: [...mockBookings, ...data], loading: false });
         } catch (err) {
-            set({ error: err.message, loading: false });
+            const mockBookings = JSON.parse(localStorage.getItem('mock_bookings') || '[]');
+            set({ bookings: mockBookings, error: err.message, loading: false });
         }
     },
 }));

@@ -31,7 +31,7 @@ const SCOPE_ITEMS = [
 export default function PublicBookingPage() {
     const { expertId } = useParams();
     const { user } = useAuthStore();
-    const { createBooking, loading } = useBookingStore();
+    const { createBooking, loading: storeLoading, addMockBooking } = useBookingStore();
     const navigate = useNavigate();
 
     const expert = EXPERTS[expertId] || { name: 'Elena Vance', specialty: 'UI/UX Architecture', hourly_rate: 380 };
@@ -42,6 +42,9 @@ export default function PublicBookingPage() {
     const [notes, setNotes] = useState('');
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState('');
+    const [isBookingLocal, setIsBookingLocal] = useState(false);
+    
+    const loading = storeLoading || isBookingLocal;
 
     const days = Array.from({ length: 7 }, (_, i) => {
         const d = new Date();
@@ -59,12 +62,28 @@ export default function PublicBookingPage() {
         if (!selectedDate || !selectedTime) { setError('Please select a date and time.'); return; }
         setError('');
 
-        // ── DEMO MODE: If expertId is one of our mock IDs (1-6), just simulate success ──
+        // ── DEMO MODE: If expertId is one of our mock IDs (1-6), simulate success and save ──
         if (['1', '2', '3', '4', '5', '6'].includes(expertId)) {
-            setLoading(true);
+            setIsBookingLocal(true);
             setTimeout(() => {
-                setLoading(false);
+                setIsBookingLocal(false);
                 setSubmitted(true);
+                
+                // Add to local state so it appears in My Bookings
+                const start = new Date(selectedDate);
+                const [h, m] = selectedTime.replace(' AM', '').replace(' PM', '').split(':');
+                start.setHours(parseInt(h) + (selectedTime.includes('PM') && h !== '12' ? 12 : 0), parseInt(m));
+                
+                addMockBooking({
+                    id: `demo_${Date.now()}`,
+                    is_mock: true,
+                    expert_id: expertId,
+                    start_time: start.toISOString(),
+                    event_types: { title: 'AI Curated Flow Session' },
+                    status: 'pending',
+                    experts: { name: expert.name }
+                });
+
                 // Connect ad-hoc if not already connected
                 useSocketStore.getState().connect('demo_client', 'client');
                 const { socket } = useSocketStore.getState();

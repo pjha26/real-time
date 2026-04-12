@@ -257,7 +257,9 @@ export default function ExpertDashboard() {
                                         {bookings.map(b => (
                                             <div key={b.id} style={{ padding: '12px', borderRadius: 'var(--radius-lg)', background: 'var(--surface-low)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--surface-ch)' }}>
                                                 <div>
-                                                    <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--on-surface)' }}>{b.event_types?.title || 'Session'}</div>
+                                                    <div style={{ fontSize: '0.9rem', fontWeight: 600, color: 'var(--on-surface)' }}>
+                                                        {b.event_types?.title || 'Session'} {b.experts?.name && <span style={{ color: 'var(--primary)', fontWeight: 700 }}>— {b.experts.name}</span>}
+                                                    </div>
                                                     <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>
                                                         {new Date(b.start_time).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).toUpperCase()}
                                                     </div>
