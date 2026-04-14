@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ClerkProvider, useAuth } from '@clerk/clerk-react';
+import { Analytics } from "@vercel/analytics/react";
 import LandingPage from './pages/LandingPage';
 import LuminalLanding from './pages/LuminalLanding';
 import LuminalMatchSearch from './pages/LuminalMatchSearch';
@@ -97,14 +98,17 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <ErrorBoundary>
-      {clerkEnabled ? (
-        <ClerkProvider publishableKey={CLERK_KEY} afterSignOutUrl="/">
+    <>
+      <ErrorBoundary>
+        {clerkEnabled ? (
+          <ClerkProvider publishableKey={CLERK_KEY} afterSignOutUrl="/">
+            <AppRoutes />
+          </ClerkProvider>
+        ) : (
           <AppRoutes />
-        </ClerkProvider>
-      ) : (
-        <AppRoutes />
-      )}
-    </ErrorBoundary>
+        )}
+      </ErrorBoundary>
+      <Analytics />
+    </>
   );
 }

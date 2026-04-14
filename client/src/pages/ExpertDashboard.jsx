@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAuthStore, useBookingStore, useSocketStore } from '../store/useStore';
+import { useAuthStore, useBookingStore, useSocketStore, useDashboardStore } from '../store/useStore';
 import Layout from '../components/Layout';
 import SessionNotes from '../components/SessionNotes';
 import { useTimezone } from '../hooks/useTimezone';
@@ -18,29 +18,21 @@ import {
     Calendar,
     ArrowRight,
     Bell,
-    Globe
+    Globe,
+    Loader2
 } from 'lucide-react';
 
-const FLOW_TASKS = [
-    { id: 1, title: 'Architectural Review: Project Zenith', client: 'Sarah Jenkins', type: 'Technical Consultation', time: '10:00 AM', icon: PencilRuler },
-    { id: 2, title: 'Strategy Alignment Call', client: 'Neo-Tech Corp', type: 'Strategy Brief', time: '2:00 PM', icon: AlignLeft },
-    { id: 3, title: 'Deep Work: Algorithm Refinement', client: '', type: 'Scheduled block · No interruptions enabled', time: '4:00 PM', icon: Code2 },
-];
-
-const CURATOR_NOTES = [
-    "Sarah's primary concern: Scalability hurdles in the Q4 roadmap.",
-    "Past collaboration note: Prefers data-backed visualizations over verbal summaries.",
-    "AI Suggestion: Share the 'Zenith Growth' dashboard early to set the tone.",
-];
-
-const RECENT = [
-    { label: 'Call with David', sub: 'Completed 2h ago · Summary ready', icon: Phone, color: '#4ade80' },
-    { label: 'New Brief: AI Ethics', sub: 'Received from Horizon Corp', icon: FileText, color: 'var(--primary)' },
-];
+const ICON_MAP = {
+    'Prep': FileText,
+    'Deep Work': Code2,
+    'Strategy': AlignLeft,
+    'System': PencilRuler
+};
 
 export default function ExpertDashboard() {
     const { user } = useAuthStore();
     const { bookings, fetchExpertBookings } = useBookingStore();
+    const { flowTasks, curatorNotes, networkStats, fetchInsights, loading: insightsLoading } = useDashboardStore();
     const { connect, socket } = useSocketStore();
     const location = useLocation();
 
@@ -53,6 +45,7 @@ export default function ExpertDashboard() {
 
     useEffect(() => {
         fetchExpertBookings().catch(() => { });
+        fetchInsights();
         
         // ── Real-Time Socket Connection ──
         if (user) {
@@ -137,25 +130,35 @@ export default function ExpertDashboard() {
                                         <h3 style={{ color: 'var(--on-surface)', fontFamily: 'var(--font-body)', fontWeight: 700 }}>Intelligent Flow</h3>
                                     </div>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }} className="stagger">
-                                        {FLOW_TASKS.map((task, i) => (
+                                        {insightsLoading ? (
+                                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', color: 'var(--primary)' }}>
+                                                <Loader2 className="animate-spin" size={24} />
+                                            </div>
+                                        ) : flowTasks.map((task, i) => {
+                                            const TaskIcon = ICON_MAP[task.type] || PencilRuler;
+                                            return (
                                             <div key={task.id} className="animate-fadeInUp" style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start', padding: '1.25rem', borderRadius: 'var(--radius-xl)', background: 'var(--surface-low)', cursor: 'pointer', transition: 'all var(--transition)', border: '1px solid var(--surface-ch)' }}
                                                 onMouseEnter={e => e.currentTarget.style.background = 'var(--surface-lowest)'}
                                                 onMouseLeave={e => e.currentTarget.style.background = 'var(--surface-low)'}
                                             >
                                                 <div style={{ width: 42, height: 42, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, var(--primary), var(--primary-c))', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                    <task.icon size={20} color="var(--on-primary)" />
+                                                    <TaskIcon size={20} color="var(--on-primary)" />
                                                 </div>
                                                 <div style={{ flex: 1 }}>
-                                                    <div style={{ fontFamily: 'var(--font-body)', fontWeight: 600, marginBottom: '2px', fontSize: '0.95rem', color: 'var(--on-surface)' }}>{task.title}</div>
+                                                    <div style={{ fontFamily: 'var(--font-body)', fontWeight: 600, marginBottom: '2px', fontSize: '0.95rem', color: 'var(--on-surface)' }}>
+                                                        {task.title}
+                                                    </div>
                                                     <div style={{ fontSize: '0.8rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>
-                                                        {task.client && <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{task.client}</span>}
-                                                        {task.client && ' · '}
+                                                        <span style={{ color: task.priority === 'high' ? 'var(--primary)' : 'var(--on-surface-var)' }}>
+                                                            {task.priority?.toUpperCase()} PRIORITY
+                                                        </span>
+                                                        {' · '}
                                                         {task.type}
                                                     </div>
                                                 </div>
                                                 <div style={{ fontSize: '0.85rem', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--primary)', flexShrink: 0 }}>{task.time}</div>
                                             </div>
-                                        ))}
+                                        )})}
                                     </div>
                                 </div>
                                 )}
@@ -168,7 +171,9 @@ export default function ExpertDashboard() {
                                             <Network size={20} color="var(--primary)" />
                                             <h3 style={{ color: 'var(--on-surface)', fontFamily: 'var(--font-body)', fontWeight: 700 }}>Network Flow</h3>
                                         </div>
-                                        <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>12 ACTIVE · 4 PENDING</span>
+                                        <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>
+                                            {insightsLoading ? 'SCANNING...' : `${networkStats.active_connections} ACTIVE · ${networkStats.pending_connections} PENDING`}
+                                        </span>
                                     </div>
 
                                     {/* Visual flow */}
@@ -196,24 +201,11 @@ export default function ExpertDashboard() {
                                     </div>
 
                                     {/* Flow Health */}
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.25rem' }}>
-                                        {[{ l: 'Active', v: '12', c: 'var(--primary)' }, { l: 'Pending', v: '4', c: 'var(--tertiary)' }, { l: 'Completed', v: '38', c: 'var(--on-surface-var)' }].map(s => (
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem' }}>
+                                        {[{ l: 'Active', v: networkStats.active_connections, c: 'var(--primary)' }, { l: 'Pending', v: networkStats.pending_connections, c: 'var(--tertiary)' }, { l: 'Completed', v: '0', c: 'var(--on-surface-var)' }].map(s => (
                                             <div key={s.l} style={{ textAlign: 'center', padding: '0.75rem', background: 'var(--surface-low)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--surface-ch)' }}>
                                                 <div style={{ fontFamily: 'var(--font-mono)', fontWeight: 800, fontSize: '1.5rem', color: s.c }}>{s.v}</div>
                                                 <div style={{ fontSize: '0.7rem', color: 'var(--on-surface-var)', marginTop: '2px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{s.l}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Recent */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                        {RECENT.map(r => (
-                                            <div key={r.label} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '12px', borderRadius: 'var(--radius-lg)', background: 'var(--surface-low)', border: '1px solid var(--surface-ch)' }}>
-                                                <r.icon size={18} color="var(--primary)" />
-                                                <div>
-                                                    <div style={{ fontSize: '0.85rem', fontWeight: 600, fontFamily: 'var(--font-body)', color: 'var(--on-surface)' }}>{r.label}</div>
-                                                    <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>{r.sub}</div>
-                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -232,10 +224,14 @@ export default function ExpertDashboard() {
                                     <Brain size={20} color="var(--primary)" />
                                     <h3 style={{ color: 'var(--on-surface)', fontFamily: 'var(--font-body)', fontWeight: 700 }}>Curator Summary</h3>
                                 </div>
-                                <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginBottom: '1.25rem', display: 'block', fontFamily: 'var(--font-mono)' }}>NEXT BRIEFING — Project Zenith</span>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginBottom: '1.25rem', display: 'block', fontFamily: 'var(--font-mono)' }}>NEXT BRIEFING PREP</span>
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '1.5rem' }}>
-                                    {CURATOR_NOTES.map((note, i) => (
-                                        <div key={i} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                                    {insightsLoading ? (
+                                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem', color: 'var(--primary)' }}>
+                                            <Loader2 className="animate-spin" size={24} />
+                                        </div>
+                                    ) : curatorNotes.map((note, i) => (
+                                        <div key={i} className="animate-fadeInUp" style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', animationDelay: `${i * 0.15}s` }}>
                                             <CheckCircle2 size={16} color="var(--primary)" style={{ marginTop: '2px', flexShrink: 0 }} />
                                             <span style={{ fontSize: '0.85rem', color: 'var(--on-surface-var)', lineHeight: 1.5 }}>{note}</span>
                                         </div>

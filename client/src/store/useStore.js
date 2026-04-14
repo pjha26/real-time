@@ -152,3 +152,30 @@ export const useBookingStore = create((set) => ({
         }
     },
 }));
+
+export const useDashboardStore = create((set) => ({
+    flowTasks: [],
+    curatorNotes: [],
+    networkStats: { active_connections: 0, pending_connections: 0 },
+    loading: false,
+    error: null,
+
+    fetchInsights: async () => {
+        set({ loading: true, error: null });
+        try {
+            const { data } = await axios.get(`${API}/dashboard/insights`, { headers: getAuthHeader() });
+            set({
+                flowTasks: data.flow_tasks || [],
+                curatorNotes: data.curator_notes || [],
+                networkStats: { 
+                    active_connections: data.active_connections || 0, 
+                    pending_connections: data.pending_connections || 0 
+                },
+                loading: false
+            });
+        } catch (err) {
+            console.error("Dashboard Insights fetch failed:", err);
+            set({ error: err.message, loading: false });
+        }
+    }
+}));

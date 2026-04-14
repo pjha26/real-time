@@ -10,7 +10,16 @@ app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 // ── Clerk middleware: attaches auth context to every request ──
-app.use(clerkMiddleware());
+const hasClerkKeys = process.env.CLERK_PUBLISHABLE_KEY && !process.env.CLERK_PUBLISHABLE_KEY.includes('your_clerk');
+if (hasClerkKeys) {
+    app.use(clerkMiddleware());
+} else {
+    // Mock middleware for development without Clerk
+    app.use((req, res, next) => {
+        req.auth = { userId: null };
+        next();
+    });
+}
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -56,6 +65,7 @@ app.use('/api/ai', require('./routes/aiRoutes'));
 app.use('/api/analytics', require('./routes/analyticsRoutes'));
 app.use('/api/sessions', require('./routes/sessionNotesRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
+app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', db: 'supabase', auth: 'clerk' }));

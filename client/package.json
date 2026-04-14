@@ -12,6 +12,7 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.61.4",
     "@tailwindcss/vite": "^4.2.0",
+    "@vercel/analytics": "^2.0.1",
     "axios": "^1.14.0",
     "date-fns": "^4.1.0",
     "date-fns-tz": "^3.2.0",
