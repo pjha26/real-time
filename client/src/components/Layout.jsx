@@ -1,3 +1,4 @@
+//layout.jsx
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import {
     LayoutDashboard,
