@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore, useBookingStore, useSocketStore } from '../store/useStore';
 import Layout from '../components/Layout';
+import SessionNotes from '../components/SessionNotes';
+import { useTimezone } from '../hooks/useTimezone';
 import { Link, useLocation } from 'react-router-dom';
 import {
     PencilRuler,
@@ -15,7 +17,8 @@ import {
     BookOpen,
     Calendar,
     ArrowRight,
-    Bell
+    Bell,
+    Globe
 } from 'lucide-react';
 
 const FLOW_TASKS = [
@@ -42,6 +45,8 @@ export default function ExpertDashboard() {
     const location = useLocation();
 
     const [toastMessage, setToastMessage] = useState(null);
+    const [notesBooking, setNotesBooking] = useState(null);
+    const { formatTime, getTimezoneLabel } = useTimezone();
 
     const hour = new Date().getHours();
     const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
@@ -102,10 +107,16 @@ export default function ExpertDashboard() {
                                 </h1>
                                 <p style={{ marginTop: '0.5rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>The Curator has prioritized 3 critical tasks for your peak flow state today.</p>
                             </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-xl)', padding: '1rem 1.5rem', border: '1px solid var(--surface-ch)' }}>
-                                    <div className="stat-number" style={{ fontFamily: 'var(--font-mono)', color: 'var(--primary)' }}>98.4%</div>
-                                    <div className="stat-label">Matching Rate</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', borderRadius: 'var(--radius-full)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)', fontSize: '0.72rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>
+                                    <Globe size={12} />
+                                    {getTimezoneLabel()}
+                                </div>
+                                <div style={{ textAlign: 'right' }}>
+                                    <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-xl)', padding: '1rem 1.5rem', border: '1px solid var(--surface-ch)' }}>
+                                        <div className="stat-number" style={{ fontFamily: 'var(--font-mono)', color: 'var(--primary)' }}>98.4%</div>
+                                        <div className="stat-label">Matching Rate</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -261,12 +272,17 @@ export default function ExpertDashboard() {
                                                         {b.event_types?.title || 'Session'} {b.experts?.name && <span style={{ color: 'var(--primary)', fontWeight: 700 }}>— {b.experts.name}</span>}
                                                     </div>
                                                     <div style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>
-                                                        {new Date(b.start_time).toLocaleDateString('en', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }).toUpperCase()}
+                                                        {formatTime(b.start_time)}
                                                     </div>
                                                 </div>
-                                                <span style={{ fontSize: '0.7rem', padding: '4px 12px', borderRadius: 'var(--radius-full)', background: 'var(--primary-c)', color: 'var(--on-primary-c)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                                                    {b.status}
-                                                </span>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <button onClick={() => setNotesBooking(b)} style={{ padding: '4px 10px', borderRadius: 'var(--radius)', background: 'rgba(143,0,255,0.1)', border: 'none', color: 'var(--primary)', cursor: 'pointer', fontSize: '0.7rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                                        <FileText size={12} /> Notes
+                                                    </button>
+                                                    <span style={{ fontSize: '0.7rem', padding: '4px 12px', borderRadius: 'var(--radius-full)', background: 'var(--primary-c)', color: 'var(--on-primary-c)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                                                        {b.status}
+                                                    </span>
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
@@ -278,6 +294,8 @@ export default function ExpertDashboard() {
                     </div>
                 </div>
             </div>
+            {/* Session Notes Modal */}
+            {notesBooking && <SessionNotes booking={notesBooking} onClose={() => setNotesBooking(null)} />}
         </Layout>
     );
 }
