@@ -16,6 +16,8 @@ import AdminPanel from './pages/AdminPanel';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import './index.css';
+import AiMatchingSection from "./components/AiMatchingSection";
+
 
 // ── Simple Error Boundary ──
 class ErrorBoundary extends React.Component {
@@ -89,6 +91,7 @@ function AppRoutes() {
         <Route path="/bookings" element={<ProtectedRoute><ExpertDashboard /></ProtectedRoute>} />
         <Route path="/analytics" element={<ProtectedRoute><AnalyticsDashboard /></ProtectedRoute>} />
         <Route path="/ai-match" element={<AIMatchPage />} />
+        <Route path="/ai-matching" element={<AiMatchingSection query="AI startup strategy" />} />
         <Route path="/admin" element={<AdminPanel />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
