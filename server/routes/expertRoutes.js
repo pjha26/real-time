@@ -20,6 +20,10 @@ router.get('/', async (req, res) => {
             query = query.contains('specialty', [specialty]);
         }
 
+        if (search) {
+            query = query.or(`bio.ilike.%${search}%,users.name.ilike.%${search}%`);
+        }
+
         const { data, error } = await query;
         if (error) throw error;
 
@@ -36,17 +40,6 @@ router.get('/', async (req, res) => {
             hourly_rate: e.hourly_rate,
             availability: e.availability,
         }));
-
-        // Filter by search term if provided
-        if (search) {
-            const term = search.toLowerCase();
-            const filtered = experts.filter(e =>
-                e.name?.toLowerCase().includes(term) ||
-                e.bio?.toLowerCase().includes(term) ||
-                e.specialty?.some(s => s.toLowerCase().includes(term))
-            );
-            return res.json(filtered);
-        }
 
         res.json(experts);
     } catch (err) {

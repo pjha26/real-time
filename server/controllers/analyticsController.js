@@ -34,7 +34,7 @@ const getOverview = async (req, res) => {
         const allBookings = [...bookingsData, ...mockFromLocal];
 
         // ── KPI Cards ──
-        const totalBookings = allBookings.length || 47;
+        const totalBookings = allBookings.length;
         const pendingBookings = allBookings.filter(b => b.status === 'pending').length;
         const completedBookings = allBookings.filter(b => b.status === 'completed').length;
 
@@ -45,7 +45,7 @@ const getOverview = async (req, res) => {
             d.setDate(d.getDate() - i);
             const dateStr = d.toISOString().split('T')[0];
             const count = allBookings.filter(b => b.start_time?.startsWith(dateStr)).length;
-            trends.push({ date: dateStr, bookings: count || Math.floor(Math.random() * 5 + 1) });
+            trends.push({ date: dateStr, bookings: count });
         }
 
         // ── Peak Hours ──
@@ -54,15 +54,15 @@ const getOverview = async (req, res) => {
                 const hour = new Date(b.start_time).getHours();
                 return hour === h;
             }).length;
-            return { hour: `${h}:00`, count: count || (h >= 9 && h <= 17 ? Math.floor(Math.random() * 8 + 2) : Math.floor(Math.random() * 2)) };
+            return { hour: `${h}:00`, count: count };
         });
 
         // ── Status Distribution ──
         const statusDist = [
-            { name: 'Pending', value: pendingBookings || 12, color: '#f59e0b' },
-            { name: 'Confirmed', value: allBookings.filter(b => b.status === 'confirmed').length || 18, color: '#8F00FF' },
-            { name: 'Completed', value: completedBookings || 14, color: '#4ade80' },
-            { name: 'Cancelled', value: allBookings.filter(b => b.status === 'cancelled').length || 3, color: '#ef4444' },
+            { name: 'Pending', value: pendingBookings, color: '#f59e0b' },
+            { name: 'Confirmed', value: allBookings.filter(b => b.status === 'confirmed').length, color: '#8F00FF' },
+            { name: 'Completed', value: completedBookings, color: '#4ade80' },
+            { name: 'Cancelled', value: allBookings.filter(b => b.status === 'cancelled').length, color: '#ef4444' },
         ];
 
         // ── Revenue Trend (weekly) ──
@@ -79,11 +79,11 @@ const getOverview = async (req, res) => {
         res.json({
             kpis: {
                 totalBookings,
-                totalUsers: usersCount || 156,
-                totalExperts: expertsCount || 24,
-                avgRating: 4.8,
-                revenue: '$18,400',
-                retention: '87%',
+                totalUsers: usersCount,
+                totalExperts: expertsCount,
+                avgRating: 0,
+                revenue: '$0',
+                retention: '0%',
             },
             trends,
             peakHours,

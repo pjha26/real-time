@@ -23,12 +23,12 @@ const getStats = async (req, res) => {
         } catch (e) { }
 
         res.json({
-            totalUsers: totalUsers || 156,
-            totalExperts: totalExperts || 24,
-            totalBookings: totalBookings || 47,
-            activeToday: Math.floor(Math.random() * 20 + 5),
-            revenue: '$18,400',
-            avgSessionRating: 4.8,
+            totalUsers,
+            totalExperts,
+            totalBookings,
+            activeToday: 0,
+            revenue: '$0',
+            avgSessionRating: 0,
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -46,17 +46,6 @@ const getUsers = async (req, res) => {
             .order('created_at', { ascending: false });
 
         if (error) throw error;
-
-        // If no real users, return demo data
-        if (!data || data.length === 0) {
-            return res.json([
-                { id: 'demo-1', name: 'Alex Morgan', email: 'alex@example.com', role: 'client', created_at: new Date().toISOString() },
-                { id: 'demo-2', name: 'Sarah Kim', email: 'sarah@example.com', role: 'expert', created_at: new Date().toISOString() },
-                { id: 'demo-3', name: 'System Admin', email: 'admin@expertbook.io', role: 'admin', created_at: new Date().toISOString() },
-                { id: 'demo-4', name: 'David Chen', email: 'david@example.com', role: 'expert', created_at: new Date().toISOString() },
-                { id: 'demo-5', name: 'Maria Lopez', email: 'maria@example.com', role: 'client', created_at: new Date().toISOString() },
-            ]);
-        }
 
         res.json(data);
     } catch (err) {
@@ -76,13 +65,7 @@ const getBookings = async (req, res) => {
 
         if (error) throw error;
 
-        const mockBookings = [
-            { id: 'demo-b1', client_name: 'Alex Morgan', expert_name: 'Sarah Kim', start_time: new Date().toISOString(), status: 'confirmed', event_title: 'UX Architecture Review' },
-            { id: 'demo-b2', client_name: 'Maria Lopez', expert_name: 'David Chen', start_time: new Date(Date.now() - 86400000).toISOString(), status: 'pending', event_title: 'Cloud Migration Strategy' },
-            { id: 'demo-b3', client_name: 'John Doe', expert_name: 'Zoe Nakamura', start_time: new Date(Date.now() - 172800000).toISOString(), status: 'completed', event_title: 'AI Ethics Workshop' },
-        ];
-
-        res.json(data?.length ? data : mockBookings);
+        res.json(data);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

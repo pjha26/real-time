@@ -6,16 +6,6 @@ const { GoogleGenerativeAI } = require('@google/generative-ai');
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || 'MOCK_KEY');
 
-const MOCK_FALLBACK_DATA = {
-    flow_tasks: [
-        { id: 1, title: "Finalize Zenith Strategy", time: "11:00 AM", type: "Focus Block", priority: "high" },
-        { id: 2, title: "Review AI Integration Docs", time: "2:00 PM", type: "Prep", priority: "medium" }
-    ],
-    curator_notes: [
-        "Your upcoming 2PM meeting lacks a defined technical scope.",
-        "Consider asking the client for their cloud architecture diagram beforehand."
-    ]
-};
 
 // GET /api/dashboard/insights
 router.get('/insights', auth, async (req, res) => {
@@ -37,7 +27,7 @@ router.get('/insights', auth, async (req, res) => {
 
         if (error) {
             console.error("Dashboard Supabase error:", error);
-            return res.json({ ...MOCK_FALLBACK_DATA, active_connections: 0, total_completed: 0 });
+            return res.json({ flow_tasks: [], curator_notes: [], active_connections: 0, pending_connections: 0 });
         }
 
         // Just basic network stats based on bookings found
@@ -57,9 +47,8 @@ router.get('/insights', auth, async (req, res) => {
             return res.json({ flow_tasks, curator_notes, active_connections, pending_connections: 0 });
         }
 
-        // Use Gemini API to generate insights based on bookings
         if (!process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY === 'MOCK_KEY') {
-            return res.json({ ...MOCK_FALLBACK_DATA, active_connections, pending_connections: active_connections });
+            return res.json({ flow_tasks: [], curator_notes: [], active_connections, pending_connections: active_connections });
         }
 
         const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
@@ -92,12 +81,12 @@ Do not return markdown formatting (no \`\`\`json). Just the raw JSON object.
         let aiInsights;
         try {
             aiInsights = JSON.parse(responseText);
-            flow_tasks = aiInsights.flow_tasks || MOCK_FALLBACK_DATA.flow_tasks;
-            curator_notes = aiInsights.curator_notes || MOCK_FALLBACK_DATA.curator_notes;
+            flow_tasks = aiInsights.flow_tasks || [];
+            curator_notes = aiInsights.curator_notes || [];
         } catch (parseErr) {
             console.error("Gemini JSON Parse Error in dashboard:", parseErr);
-            flow_tasks = MOCK_FALLBACK_DATA.flow_tasks;
-            curator_notes = MOCK_FALLBACK_DATA.curator_notes;
+            flow_tasks = [];
+            curator_notes = [];
         }
 
         res.json({
