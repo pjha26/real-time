@@ -55,3 +55,24 @@ CREATE TABLE IF NOT EXISTS audit_log (
 -- ALTER TABLE bookings ENABLE ROW LEVEL SECURITY;
 -- CREATE POLICY "Users can only view their own bookings" ON bookings 
 --    FOR SELECT USING (client_id = auth.uid() OR expert_id IN (SELECT id FROM experts WHERE user_id = auth.uid()));
+
+-- ==========================================
+-- Expert Availability & Timezone Support
+-- ==========================================
+
+-- Add timezone, buffer time, and blocked dates to experts table
+ALTER TABLE experts ADD COLUMN IF NOT EXISTS timezone VARCHAR(100) DEFAULT 'UTC';
+ALTER TABLE experts ADD COLUMN IF NOT EXISTS buffer_minutes INTEGER DEFAULT 0;
+ALTER TABLE experts ADD COLUMN IF NOT EXISTS blocked_dates DATE[] DEFAULT '{}';
+
+-- Weekly working hours per expert (e.g. Mon 9:00–17:00)
+CREATE TABLE IF NOT EXISTS expert_availability (
+  id          UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  expert_id   UUID REFERENCES experts(id) ON DELETE CASCADE NOT NULL,
+  day_of_week INTEGER NOT NULL CHECK (day_of_week >= 0 AND day_of_week <= 6),  -- 0=Sun, 1=Mon ... 6=Sat
+  start_hour  TIME NOT NULL DEFAULT '09:00',
+  end_hour    TIME NOT NULL DEFAULT '17:00',
+  is_active   BOOLEAN DEFAULT true,
+  created_at  TIMESTAMPTZ DEFAULT now(),
+  UNIQUE(expert_id, day_of_week)
+);

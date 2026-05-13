@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import {
     Check,
@@ -43,6 +43,7 @@ export default function PublicBookingPage() {
     const [submitted, setSubmitted] = useState(false);
     const [error, setError] = useState('');
     const [isBookingLocal, setIsBookingLocal] = useState(false);
+    const [bookedSlots, setBookedSlots] = useState(new Set());
     
     const loading = storeLoading || isBookingLocal;
 
@@ -51,6 +52,37 @@ export default function PublicBookingPage() {
         d.setDate(d.getDate() + i);
         return d;
     });
+
+    // ── Real-time slot release listener ──
+    // When someone cancels or reschedules, free up the slot instantly
+    const { socket } = useSocketStore();
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleSlotReleased = (data) => {
+            if (data.expert_id === expertId) {
+                setBookedSlots(prev => {
+                    const next = new Set(prev);
+                    next.delete(data.start_time);
+                    return next;
+                });
+            }
+        };
+
+        const handleNewBooking = (data) => {
+            if (data.expert_id === expertId && data.start_time) {
+                setBookedSlots(prev => new Set(prev).add(data.start_time));
+            }
+        };
+
+        socket.on('booking:slot-released', handleSlotReleased);
+        socket.on('booking:new', handleNewBooking);
+
+        return () => {
+            socket.off('booking:slot-released', handleSlotReleased);
+            socket.off('booking:new', handleNewBooking);
+        };
+    }, [socket, expertId]);
 
     const handleSubmit = async () => {
         const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;

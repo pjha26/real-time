@@ -102,7 +102,7 @@ export const useExpertStore = create((set) => ({
     },
 }));
 
-export const useBookingStore = create((set) => ({
+export const useBookingStore = create((set, get) => ({
     bookings: JSON.parse(localStorage.getItem('mock_bookings') || '[]'),
     loading: false,
     error: null,
@@ -124,6 +124,52 @@ export const useBookingStore = create((set) => ({
             return data;
         } catch (err) {
             set({ error: err.response?.data?.error || 'Booking failed', loading: false });
+            throw err;
+        }
+    },
+
+    // ── Cancel a booking with ownership validation on the backend ──
+    cancelBooking: async (bookingId) => {
+        set({ loading: true, error: null });
+        try {
+            const { data } = await axios.patch(
+                `${API}/bookings/${bookingId}/status`,
+                { status: 'cancelled' },
+                { headers: getAuthHeader() }
+            );
+            // Update local state: replace the cancelled booking in the list
+            set((state) => ({
+                bookings: state.bookings.map(b =>
+                    b.id === bookingId ? { ...b, status: 'cancelled' } : b
+                ),
+                loading: false,
+            }));
+            return data;
+        } catch (err) {
+            set({ error: err.response?.data?.error || 'Cancellation failed', loading: false });
+            throw err;
+        }
+    },
+
+    // ── Reschedule a booking to a new time slot ──
+    rescheduleBooking: async (bookingId, newStartTime, newEndTime) => {
+        set({ loading: true, error: null });
+        try {
+            const { data } = await axios.patch(
+                `${API}/bookings/${bookingId}/reschedule`,
+                { new_start_time: newStartTime, new_end_time: newEndTime },
+                { headers: getAuthHeader() }
+            );
+            // Update local state with the rescheduled booking
+            set((state) => ({
+                bookings: state.bookings.map(b =>
+                    b.id === bookingId ? { ...b, ...data } : b
+                ),
+                loading: false,
+            }));
+            return data;
+        } catch (err) {
+            set({ error: err.response?.data?.error || 'Reschedule failed', loading: false });
             throw err;
         }
     },
