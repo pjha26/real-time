@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 import {
     Check,
     LayoutGrid,
     Sparkles,
     CheckCircle2,
     Calendar,
-    Rocket
+    Rocket,
+    Globe,
+    Loader2
 } from 'lucide-react';
 import { useBookingStore, useAuthStore, useSocketStore } from '../store/useStore';
+import { useTimezone } from '../hooks/useTimezone';
 import Layout from '../components/Layout';
 
 const EXPERTS = {
@@ -21,6 +25,7 @@ const EXPERTS = {
 };
 
 const TIME_SLOTS = ['9:00 AM', '10:00 AM', '11:00 AM', '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'];
+const API = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api`;
 
 const SCOPE_ITEMS = [
     'Audit of current atomic components and accessibility gaps in existing library.',
@@ -44,6 +49,10 @@ export default function PublicBookingPage() {
     const [error, setError] = useState('');
     const [isBookingLocal, setIsBookingLocal] = useState(false);
     const [bookedSlots, setBookedSlots] = useState(new Set());
+    const [availableSlots, setAvailableSlots] = useState([]);
+    const [slotsLoading, setSlotsLoading] = useState(false);
+    const [expertTimezone, setExpertTimezone] = useState('UTC');
+    const { timezone: clientTimezone, getTimezoneLabel } = useTimezone();
     
     const loading = storeLoading || isBookingLocal;
 
@@ -83,6 +92,32 @@ export default function PublicBookingPage() {
             socket.off('booking:new', handleNewBooking);
         };
     }, [socket, expertId]);
+
+    // ── Fetch available slots when a date is selected ──
+    useEffect(() => {
+        if (!selectedDate) return;
+        // Only fetch for real (UUID) expert IDs, not demo mock IDs
+        if (['1', '2', '3', '4', '5', '6'].includes(expertId)) {
+            setAvailableSlots([]); // Use static TIME_SLOTS for demos
+            return;
+        }
+
+        const fetchSlots = async () => {
+            setSlotsLoading(true);
+            try {
+                const dateStr = selectedDate.toISOString().split('T')[0];
+                const { data } = await axios.get(`${API}/experts/${expertId}/available-slots?date=${dateStr}`);
+                setAvailableSlots(data.slots || []);
+                if (data.expert_timezone) setExpertTimezone(data.expert_timezone);
+            } catch (err) {
+                console.error('Failed to fetch slots:', err);
+                setAvailableSlots([]);
+            } finally {
+                setSlotsLoading(false);
+            }
+        };
+        fetchSlots();
+    }, [selectedDate, expertId]);
 
     const handleSubmit = async () => {
         const CLERK_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -212,9 +247,15 @@ export default function PublicBookingPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             {/* Calendar */}
                             <div className="card" style={{ borderRadius: 'var(--radius-xl)', background: 'var(--surface-lowest)', border: '1px solid var(--surface-ch)' }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
-                                    <Calendar size={20} color="var(--primary)" />
-                                    <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, color: 'var(--on-surface)' }}>Intelligent Availability</span>
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '1rem' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <Calendar size={20} color="var(--primary)" />
+                                        <span style={{ fontFamily: 'var(--font-body)', fontWeight: 700, color: 'var(--on-surface)' }}>Intelligent Availability</span>
+                                    </div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '4px 10px', borderRadius: 'var(--radius-full)', background: 'var(--surface-low)', fontSize: '0.65rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)' }}>
+                                        <Globe size={10} />
+                                        {getTimezoneLabel()}
+                                    </div>
                                 </div>
                                 <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', marginBottom: '1rem' }}>Synchronizing your work cycles with {expert.name.split(' ')[0]}'s peak creative flow.</p>
 
@@ -243,27 +284,64 @@ export default function PublicBookingPage() {
                                     })}
                                 </div>
 
-                                {/* Time slots */}
-                                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
-                                    {TIME_SLOTS.map(time => {
-                                        const isSelected = selectedTime === time;
-                                        return (
-                                            <button
-                                                key={time}
-                                                onClick={() => setSelectedTime(time)}
-                                                style={{
-                                                    padding: '8px 4px', borderRadius: 'var(--radius-md)', border: '1px solid var(--surface-ch)', cursor: 'pointer',
-                                                    background: isSelected ? 'var(--primary)' : 'var(--surface-lowest)',
-                                                    color: isSelected ? 'var(--on-primary)' : 'var(--on-surface-var)',
-                                                    fontFamily: 'var(--font-mono)', fontSize: '0.75rem', fontWeight: isSelected ? 700 : 400,
-                                                    transition: 'all var(--transition)',
-                                                }}
-                                            >
-                                                {time}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
+                                {/* Time slots — dynamic or static fallback */}
+                                {slotsLoading ? (
+                                    <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem', color: 'var(--primary)' }}>
+                                        <Loader2 className="animate-spin" size={24} />
+                                    </div>
+                                ) : !selectedDate ? (
+                                    <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-var)', fontFamily: 'var(--font-mono)', textAlign: 'center', padding: '1rem' }}>Select a date to see available times</p>
+                                ) : (availableSlots.length > 0 ? (
+                                    /* Dynamic slots from API */
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
+                                        {availableSlots.map(slot => {
+                                            const localTime = new Date(slot.start_time).toLocaleTimeString('en-US', {
+                                                timeZone: clientTimezone,
+                                                hour: 'numeric',
+                                                minute: '2-digit',
+                                                hour12: true,
+                                            });
+                                            const isSelected = selectedTime === slot.start_time;
+                                            return (
+                                                <button
+                                                    key={slot.start_time}
+                                                    onClick={() => setSelectedTime(slot.start_time)}
+                                                    style={{
+                                                        padding: '8px 4px', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer',
+                                                        background: isSelected ? 'var(--primary)' : 'var(--surface-lowest)',
+                                                        color: isSelected ? 'var(--on-primary)' : 'var(--on-surface-var)',
+                                                        fontFamily: 'var(--font-mono)', fontSize: '0.75rem', fontWeight: isSelected ? 700 : 400,
+                                                        transition: 'all var(--transition)',
+                                                    }}
+                                                >
+                                                    {localTime}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                ) : (
+                                    /* Static fallback for demo experts */
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '6px' }}>
+                                        {TIME_SLOTS.map(time => {
+                                            const isSelected = selectedTime === time;
+                                            return (
+                                                <button
+                                                    key={time}
+                                                    onClick={() => setSelectedTime(time)}
+                                                    style={{
+                                                        padding: '8px 4px', borderRadius: 'var(--radius-md)', border: 'none', cursor: 'pointer',
+                                                        background: isSelected ? 'var(--primary)' : 'var(--surface-lowest)',
+                                                        color: isSelected ? 'var(--on-primary)' : 'var(--on-surface-var)',
+                                                        fontFamily: 'var(--font-mono)', fontSize: '0.75rem', fontWeight: isSelected ? 700 : 400,
+                                                        transition: 'all var(--transition)',
+                                                    }}
+                                                >
+                                                    {time}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                ))}
                             </div>
 
                             {/* Expert summary */}

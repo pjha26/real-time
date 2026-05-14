@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuthStore, useBookingStore, useSocketStore, useDashboardStore } from '../store/useStore';
 import Layout from '../components/Layout';
 import SessionNotes from '../components/SessionNotes';
+import ExpertAvailabilitySettings from '../components/ExpertAvailabilitySettings';
 import { useTimezone } from '../hooks/useTimezone';
 import { Link, useLocation } from 'react-router-dom';
 import {
@@ -19,7 +20,8 @@ import {
     ArrowRight,
     Bell,
     Globe,
-    Loader2
+    Loader2,
+    Settings
 } from 'lucide-react';
 
 const ICON_MAP = {
@@ -38,6 +40,7 @@ export default function ExpertDashboard() {
 
     const [toastMessage, setToastMessage] = useState(null);
     const [notesBooking, setNotesBooking] = useState(null);
+    const [showAvailability, setShowAvailability] = useState(false);
     const { formatTime, getTimezoneLabel } = useTimezone();
 
     const hour = new Date().getHours();
@@ -105,6 +108,13 @@ export default function ExpertDashboard() {
                                     <Globe size={12} />
                                     {getTimezoneLabel()}
                                 </div>
+                                <button
+                                    onClick={() => setShowAvailability(true)}
+                                    className="btn-secondary"
+                                    style={{ padding: '6px 14px', fontSize: '0.72rem', gap: '6px', borderRadius: 'var(--radius-md)' }}
+                                >
+                                    <Settings size={14} /> Availability
+                                </button>
                                 <div style={{ textAlign: 'right' }}>
                                     <div style={{ background: 'var(--surface-lowest)', borderRadius: 'var(--radius-xl)', padding: '1rem 1.5rem', border: '1px solid var(--surface-ch)' }}>
                                         <div className="stat-number" style={{ fontFamily: 'var(--font-mono)', color: 'var(--primary)' }}>98.4%</div>
@@ -292,6 +302,7 @@ export default function ExpertDashboard() {
             </div>
             {/* Session Notes Modal */}
             {notesBooking && <SessionNotes booking={notesBooking} onClose={() => setNotesBooking(null)} />}
+            {showAvailability && <ExpertAvailabilitySettings expertId={user?.expert_id || user?.id} onClose={() => setShowAvailability(false)} />}
         </Layout>
     );
 }

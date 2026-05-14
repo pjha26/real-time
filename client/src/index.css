@@ -27,7 +27,13 @@
   --on-secondary-c: #cea2ff;
   --outline: #988ca2;
   --outline-var: #4d4356;
+  --outline-variant: #4d4356;
   --error: #ffb4ab;
+  --error-container: #93000a;
+  --on-error-container: #ffdad6;
+  --inverse-primary: #8600ef;
+  --inverse-surface: #e5e1e4;
+  --surface-tint: #dab9ff;
 
   --font-display: 'Manrope', sans-serif;
   --font-body: 'Inter', sans-serif;
@@ -764,6 +770,10 @@ a:hover {
 
 .animate-fadeIn {
   animation: fadeIn 0.4s ease forwards;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
 }
 
 /* ── Stagger children ── */
