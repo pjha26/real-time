@@ -4,6 +4,7 @@ const http = require('http');
 const cors = require('cors');
 const { Server } = require('socket.io');
 const { clerkMiddleware } = require('@clerk/express');
+const logger = require('./utils/logger');
 
 const app = express();
 app.use(cors({ origin: '*' }));
@@ -28,12 +29,12 @@ const io = new Server(server, {
 
 // ── Socket.io: real-time booking notifications ──
 io.on('connection', (socket) => {
-    console.log('🔌 Client connected:', socket.id);
+    logger.info('🔌 Client connected:', socket.id);
 
     // Expert joins their personal room to receive booking notifications
     socket.on('join:expert', (expertId) => {
         socket.join(`expert:${expertId}`);
-        console.log(`Expert ${expertId} joined their room`);
+        logger.info(`Expert ${expertId} joined their room`);
     });
 
     // Client joins their personal room to receive booking updates
@@ -47,7 +48,7 @@ io.on('connection', (socket) => {
         io.emit('booking:new', data);
     });
 
-    socket.on('disconnect', () => console.log('🔌 Client disconnected:', socket.id));
+    socket.on('disconnect', () => logger.info('🔌 Client disconnected:', socket.id));
 });
 
 // Inject io into requests so routes can emit events
@@ -71,4 +72,4 @@ app.use('/api/dashboard', require('./routes/dashboardRoutes'));
 app.get('/api/health', (req, res) => res.json({ status: 'ok', db: 'supabase', auth: 'clerk' }));
 
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`✅ Match & Flow server running on port ${PORT}`));
+server.listen(PORT, () => logger.info(`✅ Match & Flow server running on port ${PORT}`));

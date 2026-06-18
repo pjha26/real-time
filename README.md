@@ -60,6 +60,24 @@ A comprehensive, production-ready full-stack web application designed for profes
 5. Clients can open an expert's public link, view time slots in their local timezone, and book sessions.
 6. Check **My Bookings** to view generated Video links, AI-generated session notes, and manage schedule.
 
+## 📂 Folder Structure
+
+```text
+e:\full stack\real-time
+├── client/                 # React frontend (Vite)
+│   ├── src/                # UI components, pages, context, styles
+│   └── package.json        # Frontend dependencies
+├── server/                 # Node.js Express backend
+│   ├── controllers/        # Route logic and request handling
+│   ├── models/             # Mongoose database schemas
+│   ├── routes/             # Express API routing endpoints
+│   ├── utils/              # Helper functions (e.g., logger, notifications)
+│   ├── server.js           # Main application entry point & Socket.io setup
+│   └── package.json        # Backend dependencies
+├── .gitignore              # Root git ignores (protects .env & node_modules)
+└── README.md               # Project documentation
+```
+
 ## 🏗️ System Architecture
 
 This outlines the high-level architecture of the ExpertBook project.
