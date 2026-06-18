@@ -72,6 +72,51 @@ This outlines the high-level architecture of the ExpertBook project.
 
 ### High-Level Data Flow
 
+```mermaid
+graph TD
+    subgraph Client [Frontend Layer - React/Vite]
+        UI_Public("Public Profiles & Booking")
+        UI_Dash("User & Expert Dashboards")
+    end
+    
+    subgraph Server [Backend Layer - Node.js/Express]
+        API_Auth("Auth Controller")
+        API_Book("Booking Controller")
+        API_Exp("Expert Controller")
+        SocketIO(("Socket.io"))
+    end
+    
+    subgraph DB [Data Layer - MongoDB]
+        Users[("Users")]
+        Experts[("Experts")]
+        EventTypes[("Event Types")]
+        Bookings[("Bookings")]
+    end
+
+    %% Interactions
+    UI_Public -->|Axios REST| API_Book
+    UI_Public -->|Axios REST| API_Exp
+    UI_Dash -->|Axios REST| API_Auth
+    UI_Dash -->|Axios REST| API_Book
+
+    API_Auth <-->|Mongoose| Users
+    API_Exp <-->|Mongoose| Experts
+    API_Exp <-->|Mongoose| EventTypes
+    API_Book <-->|Transactions| Bookings
+
+    API_Book -->|Emit Event| SocketIO
+    SocketIO -->|Real-time status updates| UI_Public
+    SocketIO -->|Real-time status updates| UI_Dash
+
+    classDef client fill:#3b82f6,stroke:#1e40af,stroke-width:2px,color:#fff;
+    classDef server fill:#10b981,stroke:#047857,stroke-width:2px,color:#fff;
+    classDef db fill:#6366f1,stroke:#4338ca,stroke-width:2px,color:#fff;
+    
+    class UI_Public,UI_Dash client;
+    class API_Auth,API_Book,API_Exp,SocketIO server;
+    class Users,Experts,EventTypes,Bookings db;
+```
+
 1.  **Frontend (Client):** 
     -   Handles all UI interactions. 
     -   `Zustand` manages global state like `user` authentication data. 
